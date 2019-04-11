@@ -12,6 +12,8 @@ mod defaults {
 
 /// Wrapper component for amethyst's `Camera` component.
 /// This `Camera` may follow an entity, given by their entity ID.
+/// An entity with this component won't do much without it also having
+/// an `amethyst::renderer::Camera` component.
 pub struct Camera {
     pub(crate) camera:     AmethystCamera,
     pub(crate) base_speed: Vector,
