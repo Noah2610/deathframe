@@ -1,7 +1,7 @@
 //! A collection of systems, giving the components in this crate functionality.
 
 mod camera;
-// mod collision;
+mod collision;
 // mod control_player;
 // mod debug;
 // mod decrease_velocities;
@@ -12,7 +12,7 @@ mod camera;
 
 pub mod prelude {
     pub use super::CameraSystem;
-    // pub use super::CollisionSystem;
+    pub use super::CollisionSystem;
     // pub use super::ControlPlayerSystem;
     // pub use super::DebugSystem;
     // pub use super::DecreaseVelocitiesSystem;
@@ -50,7 +50,7 @@ mod system_prelude {
 }
 
 pub use camera::CameraSystem;
-// pub use collision::CollisionSystem;
+pub use collision::CollisionSystem;
 // pub use control_player::ControlPlayerSystem;
 // pub use debug::DebugSystem;
 // pub use decrease_velocities::DecreaseVelocitiesSystem;
