@@ -1,5 +1,6 @@
 //! A collection of components.
 
+mod camera;
 mod check_collision;
 pub mod collision;
 mod decrease_velocity;
@@ -17,9 +18,9 @@ pub mod helpers;
 
 pub mod prelude {
     pub use amethyst::core::transform::Transform;
-    pub use amethyst::renderer::Camera;
 
     pub use super::collision;
+    pub use super::Camera;
     pub use super::CheckCollision;
     pub use super::Collision;
     pub use super::DecreaseVelocity;
@@ -48,8 +49,11 @@ mod component_prelude {
         Storage,
         VecStorage,
     };
+
+    pub use crate::geo::Vector;
 }
 
+pub use camera::Camera;
 pub use check_collision::CheckCollision;
 pub use collision::Collision;
 pub use decrease_velocity::DecreaseVelocity;
