@@ -2,24 +2,20 @@
 
 mod camera;
 mod collision;
-// mod control_player;
-// mod debug;
-// mod decrease_velocities;
-// mod gravity;
-// mod limit_velocities;
-// mod move_entities;
-// mod scale_sprites;
+mod decrease_velocities;
+mod gravity;
+mod limit_velocities;
+mod move_entities;
+mod scale_sprites;
 
 pub mod prelude {
     pub use super::CameraSystem;
     pub use super::CollisionSystem;
-    // pub use super::ControlPlayerSystem;
-    // pub use super::DebugSystem;
-    // pub use super::DecreaseVelocitiesSystem;
-    // pub use super::GravitySystem;
-    // pub use super::LimitVelocitiesSystem;
-    // pub use super::MoveEntitiesSystem;
-    // pub use super::ScaleSpritesSystem;
+    pub use super::DecreaseVelocitiesSystem;
+    pub use super::GravitySystem;
+    pub use super::LimitVelocitiesSystem;
+    pub use super::MoveEntitiesSystem;
+    pub use super::ScaleSpritesSystem;
 }
 
 mod system_prelude {
@@ -51,10 +47,8 @@ mod system_prelude {
 
 pub use camera::CameraSystem;
 pub use collision::CollisionSystem;
-// pub use control_player::ControlPlayerSystem;
-// pub use debug::DebugSystem;
-// pub use decrease_velocities::DecreaseVelocitiesSystem;
-// pub use gravity::GravitySystem;
-// pub use limit_velocities::LimitVelocitiesSystem;
-// pub use move_entities::MoveEntitiesSystem;
-// pub use scale_sprites::ScaleSpritesSystem;
+pub use decrease_velocities::DecreaseVelocitiesSystem;
+pub use gravity::GravitySystem;
+pub use limit_velocities::LimitVelocitiesSystem;
+pub use move_entities::MoveEntitiesSystem;
+pub use scale_sprites::ScaleSpritesSystem;
