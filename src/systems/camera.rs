@@ -62,7 +62,8 @@ impl<'a> System<'a> for CameraSystem {
                         .join()
                         .find_map(|(entity, transform)| {
                             if entity.id() == following_id {
-                                None
+                                let pos = transform.translation();
+                                Some((entity.id(), (pos.x, pos.y), None)) // NOTE: Might want to add size here too, but currently id doesn't matter
                             } else {
                                 None
                             }
