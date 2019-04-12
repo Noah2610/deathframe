@@ -1,6 +1,6 @@
 //! A collection of components.
 
-mod camera;
+pub mod camera;
 mod check_collision;
 pub mod collision;
 mod decrease_velocity;
@@ -19,6 +19,7 @@ pub mod helpers;
 pub mod prelude {
     pub use amethyst::core::transform::Transform;
 
+    pub use super::camera;
     pub use super::collision;
     pub use super::Camera;
     pub use super::CheckCollision;

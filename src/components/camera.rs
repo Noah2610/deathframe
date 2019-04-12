@@ -27,13 +27,13 @@ impl Camera {
     }
 }
 
+/// A builder struct for `Camera`.
 pub struct CameraBuilder {
     pub base_speed: Option<Vector>,
     pub deadzone:   Option<Vector>,
     pub follow:     Option<Index>,
 }
 
-/// A builder struct for `Camera`.
 impl CameraBuilder {
     /// Set the `base_speed`.
     pub fn base_speed(mut self, base_speed: Vector) -> Self {
