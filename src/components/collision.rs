@@ -6,7 +6,7 @@ use super::component_prelude::*;
 use crate::geo::Side;
 
 /// The different states of collision.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum State {
     /// `Enter` means, this collision has _just_ occured in the previous frame.
     Enter,
@@ -20,6 +20,23 @@ pub enum State {
     /// You should never be able to have a collision in this state, as it is removed
     /// in the same frame as it is set to this state.
     None,
+}
+
+impl State {
+    /// Returns `true` when state is `Enter`.
+    pub fn is_entering(&self) -> bool {
+        self == &State::Enter
+    }
+
+    /// Returns `true` when state is `Leaving`.
+    pub fn is_leaving(&self) -> bool {
+        self == &State::Leave
+    }
+
+    /// Returns `true` when state is `Steady`.
+    pub fn is_steady(&self) -> bool {
+        self == &State::Steady
+    }
 }
 
 /// Collision data. Holds information on in which _state_ of collision these entities are,
