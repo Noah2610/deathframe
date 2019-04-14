@@ -76,6 +76,20 @@ pub fn add_component_to_entity_by_name<'a, T>(
                     ))
                 }
             }
+            // TODO: Document
+            ("Camera", mut data) => {
+                if data.is_empty() {
+                    data = "{}";
+                }
+                if let Ok(deserialized) = serde_json::from_str::<Camera>(data) {
+                    entity = entity.with(deserialized);
+                } else {
+                    panic!(format!(
+                        "Couldn't deserialize JSON data for Camera:\n{:#?}",
+                        data
+                    ))
+                }
+            }
             _ => (),
         }
     }
