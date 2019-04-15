@@ -11,7 +11,7 @@ use amethyst::renderer::{
     TextureFormat,
     TextureMetadata,
 };
-use regex::{Regex, RegexBuilder};
+use regex::RegexBuilder;
 
 /// This is a resource wrapper for amethyst's `SpriteSheet`s.
 /// It can load and get `SpriteSheet`s;
@@ -71,7 +71,7 @@ impl SpriteSheetHandles {
             .build()
             .unwrap();
 
-        if let Some(capture) = filepath_regex.captures(path.to_str().unwrap()) {
+        if filepath_regex.captures(path.to_str().unwrap()).is_some() {
             let extension =
                 path.extension().expect(&err_msg_match).to_str().unwrap();
             let extension_with_dot = format!(".{}", extension);
