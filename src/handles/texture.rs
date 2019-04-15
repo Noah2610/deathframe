@@ -4,9 +4,6 @@ use std::path::Path;
 use amethyst::assets::{AssetStorage, Loader};
 use amethyst::ecs::World;
 use amethyst::renderer::{
-    SpriteSheet,
-    SpriteSheetFormat,
-    SpriteSheetHandle,
     Texture,
     TextureFormat,
     TextureHandle,
