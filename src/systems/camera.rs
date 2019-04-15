@@ -11,7 +11,6 @@ impl<'a> System<'a> for CameraSystem {
     type SystemData = (
         Entities<'a>,
         Read<'a, Time>,
-        ReadStorage<'a, AmethystCamera>,
         ReadStorage<'a, Camera>,
         ReadStorage<'a, Size>,
         ReadStorage<'a, InnerSize>,
@@ -24,7 +23,6 @@ impl<'a> System<'a> for CameraSystem {
         (
             entities,
             time,
-            amethyst_cameras,
             cameras,
             sizes,
             inner_sizes,
@@ -53,9 +51,9 @@ impl<'a> System<'a> for CameraSystem {
         //         });
 
         // Create a HashMap of all following entities for all cameras.
-        let following_entities = (&entities, &cameras, &amethyst_cameras)
+        let following_entities = (&entities, &cameras)
             .join()
-            .filter_map(|(entity_camera, camera, _)| {
+            .filter_map(|(entity_camera, camera)| {
                 // If camera is following an entity, find it.
                 let data_opt = camera.follow.map(|following_id| {
                     let following_data_opt = (&entities, &transforms)
@@ -95,22 +93,13 @@ impl<'a> System<'a> for CameraSystem {
         //   )
         // }
 
-        for (
-            entity,
-            camera,
-            transform,
-            size,
-            inner_size_opt,
-            velocity_opt,
-            _,
-        ) in (
+        for (entity, camera, transform, size, inner_size_opt, velocity_opt) in (
             &entities,
             &cameras,
             &mut transforms,
             &sizes,
             inner_sizes.maybe(),
             (&mut velocities).maybe(),
-            &amethyst_cameras,
         )
             .join()
         {
@@ -229,8 +218,27 @@ impl<'a> System<'a> for CameraSystem {
                         }
                     }
                 } else {
-                    transform.set_x(center.0);
-                    transform.set_y(center.1);
+                    if let Some(velocity) = velocity_opt {
+                        let dist = (following_pos.0 - camera_center.0).abs();
+                        if dist <= camera.deadzone.0 {
+                            velocity.x = 0.0;
+                        } else if following_pos.0 > camera_center.0 {
+                            velocity.x = camera.base_speed.0 * dist * dt;
+                        } else if following_pos.0 < camera_center.0 {
+                            velocity.x = -camera.base_speed.0 * dist * dt;
+                        }
+                        let dist = (following_pos.1 - camera_center.1).abs();
+                        if dist <= camera.deadzone.1 {
+                            velocity.y = 0.0;
+                        } else if following_pos.1 > camera_center.1 {
+                            velocity.y = camera.base_speed.1 * dist * dt;
+                        } else if following_pos.1 < camera_center.1 {
+                            velocity.y = -camera.base_speed.1 * dist * dt;
+                        }
+                    } else {
+                        transform.set_x(center.0);
+                        transform.set_y(center.1);
+                    }
                 }
             } else {
                 // Camera isn't following an entity.
