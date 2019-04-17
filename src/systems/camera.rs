@@ -61,7 +61,7 @@ impl<'a> System<'a> for CameraSystem {
                         .find_map(|(entity, transform)| {
                             if entity.id() == following_id {
                                 let pos = transform.translation();
-                                Some((entity.id(), (pos.x, pos.y), None)) // NOTE: Might want to add size here too, but currently id doesn't matter
+                                Some((entity.id(), (pos.x, pos.y).into(), None)) // NOTE: Might want to add size here too, but currently id doesn't matter
                             } else {
                                 None
                             }
@@ -123,19 +123,22 @@ impl<'a> System<'a> for CameraSystem {
                             (following.1).0 + following_size.0 * 0.5,
                             (following.1).1 + following_size.1 * 0.5,
                         )
+                            .into()
                     } else {
                         following.1
                     };
                 // I don't remember of what this is the center...
                 // I'm too confused to figure it out right now.
                 // It seems to work, so hey, _if it ain't broke, don't fix it._
-                let center = (
+                let center: Vector = (
                     following_pos.0 - size.w * 0.5,
                     following_pos.1 - size.h * 0.5,
-                );
+                )
+                    .into();
                 let camera_pos = transform.translation();
                 let camera_center =
-                    (camera_pos.x + size.w * 0.5, camera_pos.y + size.h * 0.5);
+                    (camera_pos.x + size.w * 0.5, camera_pos.y + size.h * 0.5)
+                        .into();
 
                 if let Some(inner_size) = inner_size_opt {
                     let following_rect = CollisionRect::<()>::new(
@@ -147,8 +150,8 @@ impl<'a> System<'a> for CameraSystem {
                     let camera_rects = CameraCollisionRects::from((
                         camera_id,
                         camera_center,
-                        (size.w, size.h),
-                        (inner_size.0.w, inner_size.0.h),
+                        (size.w, size.h).into(),
+                        (inner_size.0.w, inner_size.0.h).into(),
                     ));
 
                     let mut colliding_x = false;
@@ -259,27 +262,27 @@ impl From<(Index, Vector, Vector, Vector)> for CameraCollisionRects {
     fn from(
         (id, pos, size, inner_size): (Index, Vector, Vector, Vector),
     ) -> Self {
-        let size_x = ((size.0 - inner_size.0) * 0.5, size.1);
-        let size_y = (size.0, (size.1 - inner_size.1) * 0.5);
+        let size_x = Vector::from(((size.0 - inner_size.0) * 0.5, size.1));
+        let size_y = Vector::from((size.0, (size.1 - inner_size.1) * 0.5));
         CameraCollisionRects {
             top:    CollisionRect::new(
                 id,
-                (pos.0, pos.1 + size.1 * 0.5 - size_y.1 * 0.5),
+                (pos.0, pos.1 + size.1 * 0.5 - size_y.1 * 0.5).into(),
                 Some(size_y),
             ),
             bottom: CollisionRect::new(
                 id,
-                (pos.0, pos.1 - size.1 * 0.5 + size_y.1 * 0.5),
+                (pos.0, pos.1 - size.1 * 0.5 + size_y.1 * 0.5).into(),
                 Some(size_y),
             ),
             left:   CollisionRect::new(
                 id,
-                (pos.0 - size.0 * 0.5 + size_x.0 * 0.5, pos.1),
+                (pos.0 - size.0 * 0.5 + size_x.0 * 0.5, pos.1).into(),
                 Some(size_x),
             ),
             right:  CollisionRect::new(
                 id,
-                (pos.0 + size.0 * 0.5 - size_x.0 * 0.5, pos.1),
+                (pos.0 + size.0 * 0.5 - size_x.0 * 0.5, pos.1).into(),
                 Some(size_x),
             ),
         }

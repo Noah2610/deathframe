@@ -26,8 +26,8 @@ impl Component for Parallax {
 impl Default for Parallax {
     fn default() -> Self {
         Self {
-            offset:     (0.0, 0.0),
-            speed_mult: (0.5, 0.5),
+            offset:     (0.0, 0.0).into(),
+            speed_mult: (0.5, 0.5).into(),
             follow:     None,
         }
     }

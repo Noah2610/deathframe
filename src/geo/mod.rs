@@ -4,6 +4,7 @@
 mod axis;
 mod collision;
 mod side;
+mod vector;
 
 pub mod prelude {
     pub use super::collision::prelude::*;
@@ -15,5 +16,4 @@ pub mod prelude {
 pub use axis::Axis;
 pub use collision::prelude::*;
 pub use side::Side;
-
-pub type Vector = (f32, f32);
+pub use vector::Vector;

@@ -46,6 +46,12 @@ impl From<(f32, f32)> for MaxVelocity {
     }
 }
 
+impl From<Vector<f32>> for MaxVelocity {
+    fn from(data: Vector<f32>) -> Self {
+        Self::with_xy(data.0, data.1)
+    }
+}
+
 impl From<(Option<f32>, Option<f32>)> for MaxVelocity {
     fn from(data: (Option<f32>, Option<f32>)) -> Self {
         Self {

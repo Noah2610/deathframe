@@ -4,8 +4,8 @@ use super::component_prelude::*;
 
 mod defaults {
     use super::Vector;
-    pub const BASE_SPEED: Vector = (250.0, 250.0);
-    pub const DEADZONE: Vector = (16.0, 16.0);
+    pub const BASE_SPEED: Vector = Vector(250.0, 250.0);
+    pub const DEADZONE: Vector = Vector(16.0, 16.0);
 }
 
 /// Wrapper component for amethyst's `Camera` component.

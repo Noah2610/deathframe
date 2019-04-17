@@ -38,9 +38,10 @@ impl<'a> System<'a> for CollisionSystem {
                     // Create a CollisionRect with increased size, for touch collision checking
                     let rect = CollisionRect::with_custom(
                         entity_id,
-                        (pos.x - PADDING, pos.y - PADDING),
-                        size_opt
-                            .map(|size| (size.w + PADDING, size.h + PADDING)),
+                        (pos.x - PADDING, pos.y - PADDING).into(),
+                        size_opt.map(|size| {
+                            (size.w + PADDING, size.h + PADDING).into()
+                        }),
                         None,
                     );
                     rect

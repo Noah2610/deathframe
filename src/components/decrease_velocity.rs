@@ -70,6 +70,12 @@ impl From<(f32, f32)> for DecreaseVelocity {
     }
 }
 
+impl From<Vector<f32>> for DecreaseVelocity {
+    fn from(data: Vector<f32>) -> Self {
+        Self::new(data.0, data.1)
+    }
+}
+
 impl Default for DecreaseVelocity {
     fn default() -> Self {
         Self {

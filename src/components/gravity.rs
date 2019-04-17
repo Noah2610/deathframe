@@ -24,3 +24,9 @@ impl From<(f32, f32)> for Gravity {
         Self::new(data.0, data.1)
     }
 }
+
+impl From<Vector<f32>> for Gravity {
+    fn from(data: Vector<f32>) -> Self {
+        Self::new(data.0, data.1)
+    }
+}

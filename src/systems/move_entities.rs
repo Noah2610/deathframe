@@ -96,17 +96,13 @@ impl<'a> MoveEntitiesSystem {
                     let pos = transform.translation();
                     (
                         entity.id(),
-                        (pos.x, pos.y),
-                        size_opt.map(|size| (size.w, size.h)),
+                        (pos.x, pos.y).into(),
+                        size_opt.map(|size| (size.w, size.h).into()),
                         pushable_opt.map(|_| true),
                     )
                 })
-                .collect::<Vec<(
-                    Index,
-                    (f32, f32),
-                    Option<(f32, f32)>,
-                    Option<bool>,
-                )>>(),
+                .collect::<Vec<(Index, Vector, Option<Vector>, Option<bool>)>>(
+                ),
         );
         // This HashMap will be filled with entity IDs (keys) and a vector (values), by
         // which they must be moved afterwards.
@@ -261,13 +257,14 @@ fn new_collision_rect_and_position<T>(
     let new_position = (
         pos.x + if axis.is_x() { step } else { 0.0 },
         pos.y + if axis.is_y() { step } else { 0.0 },
-    );
+    )
+        .into();
     // Create a CollisionRect with new position
     (
         CollisionRect::new(
             id,
             new_position,
-            size_opt.map(|size| (size.w, size.h)),
+            size_opt.map(|size| (size.w, size.h).into()),
         ),
         new_position,
     )
