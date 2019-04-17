@@ -31,60 +31,6 @@ impl Camera {
     }
 }
 
-/// A builder struct for `Camera`.
-pub struct CameraBuilder {
-    pub base_speed: Option<Vector>,
-    pub deadzone:   Option<Vector>,
-    pub follow:     Option<Index>,
-}
-
-impl CameraBuilder {
-    /// Set the `base_speed`.
-    pub fn base_speed(mut self, base_speed: Vector) -> Self {
-        self.base_speed = Some(base_speed);
-        self
-    }
-
-    /// Set the `deadzone`.
-    pub fn deadzone(mut self, deadzone: Vector) -> Self {
-        self.deadzone = Some(deadzone);
-        self
-    }
-
-    /// Set the following entity's ID.
-    pub fn follow(mut self, follow: Index) -> Self {
-        self.follow = Some(follow);
-        self
-    }
-
-    /// Build the `Camera`.
-    pub fn build(self) -> Camera {
-        let default = Camera::default();
-        let base_speed = self.base_speed.unwrap_or(default.base_speed);
-        let deadzone = self.deadzone.unwrap_or(default.deadzone);
-        let follow = if self.follow.is_some() {
-            self.follow
-        } else {
-            default.follow
-        };
-        Camera {
-            base_speed,
-            deadzone,
-            follow,
-        }
-    }
-}
-
-impl Default for CameraBuilder {
-    fn default() -> Self {
-        CameraBuilder {
-            base_speed: None,
-            deadzone:   None,
-            follow:     None,
-        }
-    }
-}
-
 impl Component for Camera {
     type Storage = HashMapStorage<Self>;
 }
@@ -96,6 +42,57 @@ impl Default for Camera {
             base_speed: BASE_SPEED,
             deadzone:   DEADZONE,
             follow:     None,
+        }
+    }
+}
+
+/// A builder struct for `Camera`.
+pub struct CameraBuilder {
+    base_speed: Vector,
+    deadzone:   Vector,
+    follow:     Option<Index>,
+}
+
+impl CameraBuilder {
+    /// Set the `base_speed`.
+    pub fn base_speed(mut self, base_speed: Vector) -> Self {
+        self.base_speed = base_speed;
+        self
+    }
+
+    /// Set the `deadzone`.
+    pub fn deadzone(mut self, deadzone: Vector) -> Self {
+        self.deadzone = deadzone;
+        self
+    }
+
+    /// Set the following entity's ID.
+    pub fn follow(mut self, follow: Index) -> Self {
+        self.follow = Some(follow);
+        self
+    }
+
+    /// Build the `Camera`.
+    pub fn build(self) -> Camera {
+        Camera {
+            base_speed: self.base_speed,
+            deadzone:   self.deadzone,
+            follow:     self.follow,
+        }
+    }
+}
+
+impl Default for CameraBuilder {
+    fn default() -> Self {
+        let Camera {
+            base_speed,
+            deadzone,
+            follow,
+        } = Camera::default();
+        CameraBuilder {
+            base_speed,
+            deadzone,
+            follow,
         }
     }
 }
