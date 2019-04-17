@@ -59,6 +59,7 @@ impl<'a> System<'a> for ParallaxSystem {
             if let Some((following_id, following_pos, following_size_opt)) =
                 following_entities.get(&parallax_id)
             {
+                let parallax_pos = Vector::from(&*parallax_transform);
                 let following_middle =
                     if let Some(following_size) = following_size_opt {
                         parallax
@@ -69,8 +70,18 @@ impl<'a> System<'a> for ParallaxSystem {
                     };
 
                 // TODO: TEMPORARY
-                parallax_transform.set_x(following_middle.0);
-                parallax_transform.set_y(following_middle.1);
+                // let calculated_offset = (
+                //     (parallax_pos.0 - following_middle.0)
+                //         * parallax.speed_mult.0,
+                //     (parallax_pos.1 - following_middle.1)
+                //         * parallax.speed_mult.1,
+                // );
+                let new_x = (following_middle.0 + parallax.offset.0)
+                    * parallax.speed_mult.0;
+                let new_y = (following_middle.1 + parallax.offset.1)
+                    * parallax.speed_mult.1;
+                parallax_transform.set_x(new_x);
+                parallax_transform.set_y(new_y);
             }
         }
     }

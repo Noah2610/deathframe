@@ -42,6 +42,8 @@ mod system_prelude {
         SpriteRender,
         SpriteSheet,
         SpriteSheetHandle,
+        Texture,
+        TextureHandle,
     };
 
     pub use crate::components::prelude::*;
