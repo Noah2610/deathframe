@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use super::system_prelude::*;
+use crate::geo::Vector;
 
 /// The `ParallaxSystem` is in charge of managing all parallax backgrounds.
 pub struct ParallaxSystem;
@@ -9,25 +10,67 @@ impl<'a> System<'a> for ParallaxSystem {
     type SystemData = (
         Entities<'a>,
         ReadStorage<'a, Parallax>,
+        ReadStorage<'a, Size>,
         WriteStorage<'a, Transform>,
     );
 
     fn run(
         &mut self,
-        (entities, parallaxes, mut transforms): Self::SystemData,
+        (entities, parallaxes, sizes, mut transforms): Self::SystemData,
     ) {
         // Create a HashMap of entities and their positions, which are followed by all
         // parallax entities. Keys are parallax entities' IDs, values are followed entities data.
-        let mut following_entities = HashMap::new();
-        for (parallax_entity, parallax) in (&entities, &parallaxes).join() {
-            for (entity, transform) in (&entities, &transforms).join() {
-                if let Some(following_id) = parallax.follow {
-                    let pos = {
-                        let translation = transform.translation();
-                        (translation.x, translation.y)
-                    };
-                    following_entities.insert(following_id, (entity.id(),));
+        let following_entities = (&entities, &parallaxes)
+            .join()
+            .filter_map(|(parallax_entity, parallax)| {
+                if let Some(target_id) = parallax.follow {
+                    let follow_data_opt =
+                        (&entities, &transforms, sizes.maybe())
+                            .join()
+                            .find_map(|(entity, transform, size_opt)| {
+                                let entity_id = entity.id();
+                                if target_id == entity_id {
+                                    Some((
+                                        entity_id,
+                                        transform.into(),
+                                        size_opt.map(|size| size.into()),
+                                    ))
+                                } else {
+                                    None
+                                }
+                            });
+                    if let Some(follow_data) = follow_data_opt {
+                        Some((parallax_entity.id(), follow_data))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
                 }
+            })
+            .collect::<HashMap<Index, (Index, Vector, Option<Vector>)>>();
+
+        // Loop through all parallax entities and actually move them.
+        for (parallax_entity, parallax_transform, parallax) in
+            (&entities, &mut transforms, &parallaxes).join()
+        {
+            let parallax_id = parallax_entity.id();
+            // Only move them if following entity data was found in the previous step
+            if let Some((following_id, following_pos, following_size_opt)) =
+                following_entities.get(&parallax_id)
+            {
+                let following_middle =
+                    if let Some(following_size) = following_size_opt {
+                        parallax
+                            .follow_anchor
+                            .middle_for(following_pos, following_size)
+                    } else {
+                        *following_pos
+                    };
+
+                // TODO: TEMPORARY
+                parallax_transform.set_x(following_middle.0);
+                parallax_transform.set_y(following_middle.1);
             }
         }
     }
