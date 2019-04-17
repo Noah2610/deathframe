@@ -76,10 +76,12 @@ impl<'a> System<'a> for ParallaxSystem {
                 //     (parallax_pos.1 - following_middle.1)
                 //         * parallax.speed_mult.1,
                 // );
-                let new_x = (following_middle.0 + parallax.offset.0)
-                    * parallax.speed_mult.0;
-                let new_y = (following_middle.1 + parallax.offset.1)
-                    * parallax.speed_mult.1;
+                let new_x = following_middle.0
+                    - (following_middle.0 * parallax.speed_mult.0)
+                    + parallax.offset.0;
+                let new_y = following_middle.1
+                    - (following_middle.1 * parallax.speed_mult.1)
+                    + parallax.offset.1;
                 parallax_transform.set_x(new_x);
                 parallax_transform.set_y(new_y);
             }
