@@ -8,9 +8,13 @@ use crate::geo::{Anchor, Vector};
 /// The speed multiplier determines at what speed the image moves, relative to the following
 /// entity. (Does not use velocity.)
 pub struct Parallax {
-    pub offset:        Vector,
-    pub speed_mult:    Vector,
-    pub follow:        Option<Index>,
+    /// Positional offset.
+    pub offset: Vector,
+    /// Speed multipliers, values should be between 0.0 and 1.0.
+    pub speed_mult: Vector,
+    /// The ID of the entity to follow; doesn't make much sense without this.
+    pub follow: Option<Index>,
+    /// The anchor point of the following entity. Usually `Anchor::Middle`.
     pub follow_anchor: Anchor,
 }
 
