@@ -38,7 +38,7 @@ pub mod prelude {
     pub use super::Velocity;
 }
 
-mod component_prelude {
+pub mod component_prelude {
     // NOTE: Quick storage type reference
     // DenseVecStorage: Reduced memory usage for LARGE components.
     // HashMapStorage:  "Best suited for rare components."

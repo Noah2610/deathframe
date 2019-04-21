@@ -20,7 +20,7 @@ pub mod prelude {
     pub use super::ScaleSpritesSystem;
 }
 
-mod system_prelude {
+pub mod system_prelude {
     pub use amethyst::assets::AssetStorage;
     pub use amethyst::core::timing::Time;
     pub use amethyst::ecs::world::Index;
