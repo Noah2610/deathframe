@@ -4,7 +4,7 @@ use super::component_prelude::*;
 /// be larger than the positive values of `MaxVelocity`, and will never be
 /// smaller than the negative values of `MaxVelocity`.
 /// Fields are both optional; if a field is `None`, then there is no cap for that value.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct MaxVelocity {
     pub x: Option<f32>,
     pub y: Option<f32>,

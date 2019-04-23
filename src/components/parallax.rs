@@ -7,6 +7,7 @@ use crate::geo::{Anchor, Vector};
 /// similar to the camera. It is meant to be used with more parallax backgrounds.
 /// The speed multiplier determines at what speed the image moves, relative to the following
 /// entity. (Does not use velocity.)
+#[derive(Serialize, Deserialize)]
 pub struct Parallax {
     /// Positional offset.
     pub offset: Vector,

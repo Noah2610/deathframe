@@ -5,6 +5,7 @@ use super::component_prelude::*;
 /// NOTE: The whole pushing system is very janky, best not to use it.
 ///       Or if you do use it, I recommend making the `Push` entity static,
 ///       ie. _not_ giving it a `Velocity`.
+#[derive(Serialize, Deserialize)]
 pub struct Push;
 
 impl Component for Push {

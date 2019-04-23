@@ -12,7 +12,7 @@ mod defaults {
 /// This `Camera` may follow an entity, given by their entity ID.
 /// An entity with this component won't do much without it also having
 /// an `amethyst::renderer::Camera` component.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Camera {
     #[serde(default)]
     pub(crate) base_speed: Vector,

@@ -2,7 +2,7 @@ use super::component_prelude::*;
 
 /// Entities, which have `Velocity` and `Gravity`, will be affected by gravitational pull.
 /// This means, their velocity is increased by the gravity's force (`x`, `y`) every frame.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Gravity {
     pub x: f32,
     pub y: f32,

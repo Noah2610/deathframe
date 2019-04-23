@@ -6,7 +6,7 @@ use super::component_prelude::*;
 use crate::geo::Side;
 
 /// The different states of collision.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum State {
     /// `Enter` means, this collision has _just_ occured in the previous frame.
     Enter,
@@ -41,7 +41,7 @@ impl State {
 
 /// Collision data. Holds information on in which _state_ of collision these entities are,
 /// and from which _side_ they have collided. It does _not_ know which entities are colliding.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Data {
     pub side:                 Side,
     pub state:                State,
@@ -71,7 +71,7 @@ impl Data {
 /// Entities with `CheckCollision` perform collision detection against
 /// all other entities with `Collision`, every frame.
 /// Depending on if they are in collision, data will be set.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Collision {
     pub(crate) collisions: HashMap<Index, Data>,
 }

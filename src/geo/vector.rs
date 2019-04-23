@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use amethyst::core::transform::Transform;
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Vector<T = f32>(pub T, pub T)
 where
     T: Debug + Clone + Copy + PartialEq + Default;

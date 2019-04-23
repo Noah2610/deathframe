@@ -1,7 +1,7 @@
 use super::component_prelude::*;
 
 /// Entities, which have `Velocity` are moved by their velocity, every frame.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Velocity {
     #[serde(default)]
     pub x: f32,

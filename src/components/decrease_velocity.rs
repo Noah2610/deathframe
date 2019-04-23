@@ -3,7 +3,7 @@ use super::component_prelude::*;
 /// Entities, which have `Velocity` and `DecreaseVelocity`, will decrease their velocity
 /// every frame, by a certain amount (`x`, `y`).
 /// Note that, the given `x` and `y` fields must _always_ be positive.
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct DecreaseVelocity {
     pub x: f32,
     pub y: f32,

@@ -2,7 +2,7 @@ use super::Vector;
 
 /// Anchor points. Used with some components,
 /// where specifying which anchor point is used is necessary.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Anchor {
     TopLeft,
     TopRight,
