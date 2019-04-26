@@ -1,5 +1,6 @@
 //! A collection of systems, giving the components in this crate functionality.
 
+mod animation;
 mod camera;
 mod collision;
 mod decrease_velocities;
@@ -11,6 +12,7 @@ mod parallax;
 mod scale_sprites;
 
 pub mod prelude {
+    pub use super::AnimationSystem;
     pub use super::CameraSystem;
     pub use super::CollisionSystem;
     pub use super::DecreaseVelocitiesSystem;
@@ -52,6 +54,7 @@ pub mod system_prelude {
     pub use crate::input_manager::InputManager;
 }
 
+pub use animation::AnimationSystem;
 pub use camera::CameraSystem;
 pub use collision::CollisionSystem;
 pub use decrease_velocities::DecreaseVelocitiesSystem;

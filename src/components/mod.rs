@@ -1,19 +1,20 @@
 //! A collection of components.
 
+pub mod animation;
 pub mod camera;
-mod check_collision;
+pub mod check_collision;
 pub mod collision;
-mod decrease_velocity;
-mod gravity;
-mod inner_size;
-mod max_velocity;
+pub mod decrease_velocity;
+pub mod gravity;
+pub mod inner_size;
+pub mod max_velocity;
 pub mod parallax;
-mod push;
-mod pushable;
-mod scale_once;
-mod size;
-mod solid;
-mod velocity;
+pub mod push;
+pub mod pushable;
+pub mod scale_once;
+pub mod size;
+pub mod solid;
+pub mod velocity;
 
 pub mod helpers;
 
@@ -22,6 +23,7 @@ pub mod prelude {
 
     pub use super::camera;
     pub use super::collision;
+    pub use super::Animation;
     pub use super::Camera;
     pub use super::CheckCollision;
     pub use super::Collision;
@@ -56,6 +58,7 @@ pub mod component_prelude {
     pub use crate::geo::Vector;
 }
 
+pub use animation::Animation;
 pub use camera::Camera;
 pub use check_collision::CheckCollision;
 pub use collision::Collision;
