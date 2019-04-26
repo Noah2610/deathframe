@@ -18,6 +18,7 @@ use regex::RegexBuilder;
 /// _load_ them by passing a spritesheet's image file path to an appropriate method and
 /// _get_ them by passing their spritesheet's image file name (without extension) to an appropriate
 /// method.
+#[derive(Default)]
 pub struct SpriteSheetHandles {
     spritesheet_handles: HashMap<String, SpriteSheetHandle>,
 }
@@ -26,14 +27,20 @@ impl SpriteSheetHandles {
     /// Insert a new `SpriteSheetHandle` with an identifier name into this resource.
     /// You will not usually use this method, instead use a method such as `load`,
     /// which handles this for you.
-    pub fn insert<T: ToString>(&mut self, name: T, handle: SpriteSheetHandle) {
+    pub fn insert<T>(&mut self, name: T, handle: SpriteSheetHandle)
+    where
+        T: ToString,
+    {
         self.spritesheet_handles.insert(name.to_string(), handle);
     }
 
     /// Get the `SpriteSheetHandle` with the given identifier name.
     /// Returns `None` if there is no `SpriteSheetHandle` with this name,
     /// and returns `Some` with the `SpriteSheetHandle` if there is.
-    pub fn get<T: ToString>(&self, name: T) -> Option<SpriteSheetHandle> {
+    pub fn get<T>(&self, name: T) -> Option<SpriteSheetHandle>
+    where
+        T: ToString,
+    {
         let name = name.to_string();
         let err_msg =
             format!("Given SpriteSheetHandle name cannot be empty: {}", name);
@@ -138,13 +145,13 @@ impl SpriteSheetHandles {
 
     /// Get a `SpriteSheetHandle` with the given path to the spritesheet's image file.
     /// If it does not already exist, load it first, then return the newly loaded handle.
-    pub fn get_or_load<T>(
+    pub fn get_or_load<P>(
         &mut self,
-        path: T,
+        path: P,
         world: &World,
     ) -> SpriteSheetHandle
     where
-        T: AsRef<Path>,
+        P: AsRef<Path>,
     {
         let path = path.as_ref().to_str().unwrap();
         if let Some(handle) = self.get(path) {
@@ -161,13 +168,5 @@ impl SpriteSheetHandles {
         self.spritesheet_handles
             .values()
             .all(|handle| asset.get(handle).is_some())
-    }
-}
-
-impl Default for SpriteSheetHandles {
-    fn default() -> Self {
-        Self {
-            spritesheet_handles: HashMap::new(),
-        }
     }
 }
