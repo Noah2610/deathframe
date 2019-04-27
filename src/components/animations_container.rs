@@ -8,7 +8,7 @@ use super::Animation;
 #[derive(Default)]
 pub struct AnimationsContainer {
     animations:  HashMap<String, Animation>,
-    pub current: Option<Animation>,
+    pub current: Option<(String, Animation)>,
 }
 
 impl AnimationsContainer {
@@ -28,7 +28,8 @@ impl AnimationsContainer {
         T: ToString,
     {
         let name = name.to_string();
-        self.current = Some(
+        self.current = Some((
+            name.clone(),
             self.animations
                 .get(&name)
                 .expect(&format!(
@@ -36,7 +37,18 @@ impl AnimationsContainer {
                     name
                 ))
                 .clone(),
-        );
+        ));
+    }
+
+    pub fn is_current<T>(&self, target_name: T) -> bool
+    where
+        T: ToString,
+    {
+        if let Some((name, _)) = &self.current {
+            &target_name.to_string() == name
+        } else {
+            false
+        }
     }
 }
 
@@ -46,7 +58,7 @@ impl Component for AnimationsContainer {
 
 pub struct AnimationsContainerBuilder {
     animations: HashMap<String, Animation>,
-    current:    Option<Animation>,
+    current:    Option<(String, Animation)>,
 }
 
 impl AnimationsContainerBuilder {
@@ -62,16 +74,18 @@ impl AnimationsContainerBuilder {
     where
         T: ToString,
     {
-        self.current = Some(
+        let name = name.to_string();
+        self.current = Some((
+            name.clone(),
             self.animations
-                .get(&name.to_string())
+                .get(&name)
                 .expect(&format!(
                     "Animation does not exist for AnimationsContainerBuilder: \
                      {}",
-                    name.to_string()
+                    name
                 ))
                 .clone(),
-        );
+        ));
         self
     }
 

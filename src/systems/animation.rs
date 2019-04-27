@@ -45,7 +45,7 @@ impl AnimationSystem {
         for (entity, animations_container) in
             (entities, animations_containers).join()
         {
-            if let Some(animation) = &mut animations_container.current {
+            if let Some((_, animation)) = &mut animations_container.current {
                 if now - animation.last_sprite_switch_at
                     >= Duration::from_millis(animation.current_delay_ms())
                 {
