@@ -28,16 +28,18 @@ impl AnimationsContainer {
         T: ToString,
     {
         let name = name.to_string();
-        self.current = Some((
-            name.clone(),
-            self.animations
-                .get(&name)
-                .expect(&format!(
-                    "Animation does not exist for AnimationsContainer: {}",
-                    name
-                ))
-                .clone(),
-        ));
+        if !self.is_current(&name) {
+            self.current = Some((
+                name.clone(),
+                self.animations
+                    .get(&name)
+                    .expect(&format!(
+                        "Animation does not exist for AnimationsContainer: {}",
+                        name
+                    ))
+                    .clone(),
+            ));
+        }
     }
 
     pub fn is_current<T>(&self, target_name: T) -> bool
