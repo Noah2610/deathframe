@@ -23,8 +23,6 @@ impl<'a> System<'a> for AnimationSystem {
             if now - animation.last_sprite_switch_at
                 >= Duration::from_millis(animation.current_delay_ms())
             {
-                println!("SWITCH");
-
                 // Next SpriteRender
                 let max_index = animation.sprite_renders.len();
                 animation.index += 1;
