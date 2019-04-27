@@ -6,6 +6,7 @@ use amethyst::renderer::{SpriteRender, SpriteSheetHandle};
 
 use super::component_prelude::*;
 
+#[derive(Clone)]
 pub struct Animation {
     pub sprite_renders:        Vec<SpriteRender>,
     pub delays_ms:             Vec<u64>,

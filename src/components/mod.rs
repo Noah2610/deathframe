@@ -1,6 +1,7 @@
 //! A collection of components.
 
 pub mod animation;
+pub mod animations_container;
 pub mod camera;
 pub mod check_collision;
 pub mod collision;
@@ -24,6 +25,7 @@ pub mod prelude {
     pub use super::camera;
     pub use super::collision;
     pub use super::Animation;
+    pub use super::AnimationsContainer;
     pub use super::Camera;
     pub use super::CheckCollision;
     pub use super::Collision;
@@ -59,6 +61,7 @@ pub mod component_prelude {
 }
 
 pub use animation::Animation;
+pub use animations_container::AnimationsContainer;
 pub use camera::Camera;
 pub use check_collision::CheckCollision;
 pub use collision::Collision;
