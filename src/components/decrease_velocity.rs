@@ -36,6 +36,20 @@ impl DecreaseVelocity {
     }
 
     /// Call this method, when you don't want this entity to decrease
+    /// its `x` velocity at all, in the next frame.
+    pub fn dont_decrease_x(&mut self) {
+        self.dont_decrease_x_when_pos();
+        self.dont_decrease_x_when_neg();
+    }
+
+    /// Call this method, when you don't want this entity to decrease
+    /// its `y` velocity at all, in the next frame.
+    pub fn dont_decrease_y(&mut self) {
+        self.dont_decrease_y_when_pos();
+        self.dont_decrease_y_when_neg();
+    }
+
+    /// Call this method, when you don't want this entity to decrease
     /// its `x` velocity, when the `x` velocity is _positive_, in the next frame.
     pub fn dont_decrease_x_when_pos(&mut self) {
         self.should_decrease_x_pos = false;
