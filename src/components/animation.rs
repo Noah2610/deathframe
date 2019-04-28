@@ -11,7 +11,9 @@ pub struct Animation {
     pub sprite_renders:        Vec<SpriteRender>,
     pub delays_ms:             Vec<u64>,
     pub last_sprite_switch_at: Instant,
+    pub switch_now:            bool,
     pub index:                 usize,
+    pub played:                usize,
 }
 
 impl Animation {
@@ -32,6 +34,10 @@ impl Animation {
             self.index
         ))
     }
+
+    pub fn has_played(&self) -> bool {
+        self.played > 0
+    }
 }
 
 impl Component for Animation {
@@ -44,7 +50,9 @@ impl Default for Animation {
             sprite_renders:        Vec::new(),
             delays_ms:             Vec::new(),
             last_sprite_switch_at: Instant::now(),
+            switch_now:            true,
             index:                 0,
+            played:                0,
         }
     }
 }
@@ -100,6 +108,8 @@ impl AnimationBuilder {
         let Animation {
             last_sprite_switch_at,
             index,
+            played,
+            switch_now,
             ..
         } = Animation::default();
         let sprite_renders_len = self.sprite_renders.len();
@@ -123,7 +133,9 @@ impl AnimationBuilder {
             sprite_renders:        self.sprite_renders,
             delays_ms:             self.delays_ms,
             last_sprite_switch_at: last_sprite_switch_at,
+            switch_now:            switch_now,
             index:                 index,
+            played:                played,
         }
     }
 }

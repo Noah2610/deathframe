@@ -15,23 +15,13 @@ impl AnimationSystem {
         sprite_renders: &mut WriteStorage<'a, SpriteRender>,
     ) {
         for (entity, animation) in (entities, animations).join() {
-            if now - animation.last_sprite_switch_at
-                >= Duration::from_millis(animation.current_delay_ms())
-            {
-                // Next SpriteRender
-                let max_index = animation.sprite_renders.len();
-                animation.index += 1;
-
-                if animation.index >= max_index {
-                    animation.index = 0;
-                }
-
-                sprite_renders
-                    .insert(entity, animation.current_sprite_render().clone())
-                    .unwrap();
-
-                animation.last_sprite_switch_at = now;
-            }
+            self.run_for_animation(
+                now,
+                entity,
+                animation,
+                sprite_renders,
+                true,
+            );
         }
     }
 
@@ -45,28 +35,65 @@ impl AnimationSystem {
         for (entity, animations_container) in
             (entities, animations_containers).join()
         {
-            if let Some((_, animation)) = &mut animations_container.current {
-                if now - animation.last_sprite_switch_at
-                    >= Duration::from_millis(animation.current_delay_ms())
-                {
-                    // Next SpriteRender
-                    let max_index = animation.sprite_renders.len();
-                    animation.index += 1;
-
-                    if animation.index >= max_index {
-                        animation.index = 0;
-                    }
-
-                    sprite_renders
-                        .insert(
-                            entity,
-                            animation.current_sprite_render().clone(),
-                        )
-                        .unwrap();
-
-                    animation.last_sprite_switch_at = now;
+            if let Some((_, animation)) = &mut animations_container.play_once {
+                self.run_for_animation(
+                    now,
+                    entity,
+                    animation,
+                    sprite_renders,
+                    false,
+                );
+                if animation.has_played() {
+                    animations_container.play_once = None;
                 }
+            } else if let Some((_, animation)) =
+                &mut animations_container.current
+            {
+                self.run_for_animation(
+                    now,
+                    entity,
+                    animation,
+                    sprite_renders,
+                    true,
+                );
             }
+        }
+    }
+
+    fn run_for_animation<'a>(
+        &self,
+        now: Instant,
+        entity: Entity,
+        animation: &mut Animation,
+        sprite_renders: &mut WriteStorage<'a, SpriteRender>,
+        should_loop: bool,
+    ) {
+        if animation.switch_now {
+            animation.switch_now = false;
+            sprite_renders
+                .insert(entity, animation.current_sprite_render().clone())
+                .unwrap();
+            animation.last_sprite_switch_at = now;
+        } else if now - animation.last_sprite_switch_at
+            >= Duration::from_millis(animation.current_delay_ms())
+        {
+            // Next SpriteRender
+            let max_index = animation.sprite_renders.len();
+            animation.index += 1;
+
+            if animation.index >= max_index {
+                // Loop animation
+                animation.index = 0;
+                animation.played += 1;
+            }
+
+            if should_loop || (!should_loop && !animation.has_played()) {
+                sprite_renders
+                    .insert(entity, animation.current_sprite_render().clone())
+                    .unwrap();
+            }
+
+            animation.last_sprite_switch_at = now;
         }
     }
 }
