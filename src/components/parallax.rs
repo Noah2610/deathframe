@@ -55,9 +55,33 @@ impl ParallaxBuilder {
         self
     }
 
+    /// Set the `x offset`.
+    pub fn offset_x(mut self, x: f32) -> Self {
+        self.offset.0 = x;
+        self
+    }
+
+    /// Set the `y offset`.
+    pub fn offset_y(mut self, y: f32) -> Self {
+        self.offset.1 = y;
+        self
+    }
+
     /// Set the `speed_mult`.
     pub fn speed_mult(mut self, speed_mult: Vector) -> Self {
         self.speed_mult = speed_mult;
+        self
+    }
+
+    /// Set the `x speed_mult`.
+    pub fn speed_mult_x(mut self, x: f32) -> Self {
+        self.speed_mult.0 = x;
+        self
+    }
+
+    /// Set the `y speed_mult`.
+    pub fn speed_mult_y(mut self, y: f32) -> Self {
+        self.speed_mult.1 = y;
         self
     }
 
