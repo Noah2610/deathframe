@@ -43,10 +43,11 @@ impl<'a> System<'a> for CollisionSystem {
                             (size.w + PADDING, size.h + PADDING).into()
                         }),
                         None,
+                        None,
                     );
                     rect
                 })
-                .collect::<Vec<CollisionRect<()>>>(),
+                .collect::<Vec<CollisionRect<(), ()>>>(),
         );
 
         for (entity, collision, _) in
@@ -74,34 +75,38 @@ impl<'a> System<'a> for CollisionSystem {
 }
 
 struct CollisionRectSides {
-    pub inner:  CollisionRect<Side>,
-    pub top:    CollisionRect<Side>,
-    pub bottom: CollisionRect<Side>,
-    pub left:   CollisionRect<Side>,
-    pub right:  CollisionRect<Side>,
+    pub inner:  CollisionRect<(), Side>,
+    pub top:    CollisionRect<(), Side>,
+    pub bottom: CollisionRect<(), Side>,
+    pub left:   CollisionRect<(), Side>,
+    pub right:  CollisionRect<(), Side>,
 }
 
 impl CollisionRectSides {
     pub fn collides_with_side<T>(
         &self,
-        target_rect: &CollisionRect<T>,
+        target_rect: &CollisionRect<(), T>,
     ) -> Option<Side> {
         let expect_msg =
             "`CollisionRect` (for sides) should have custom data with `Side`";
-        if CollisionGrid::<()>::do_rects_collide(target_rect, &self.inner) {
+        if CollisionGrid::<(), ()>::do_rects_collide(target_rect, &self.inner) {
             Some(self.inner.custom.expect(expect_msg))
-        } else if CollisionGrid::<()>::do_rects_collide(target_rect, &self.top)
-        {
+        } else if CollisionGrid::<(), ()>::do_rects_collide(
+            target_rect,
+            &self.top,
+        ) {
             Some(self.top.custom.expect(expect_msg))
-        } else if CollisionGrid::<()>::do_rects_collide(
+        } else if CollisionGrid::<(), ()>::do_rects_collide(
             target_rect,
             &self.bottom,
         ) {
             Some(self.bottom.custom.expect(expect_msg))
-        } else if CollisionGrid::<()>::do_rects_collide(target_rect, &self.left)
-        {
+        } else if CollisionGrid::<(), ()>::do_rects_collide(
+            target_rect,
+            &self.left,
+        ) {
             Some(self.left.custom.expect(expect_msg))
-        } else if CollisionGrid::<()>::do_rects_collide(
+        } else if CollisionGrid::<(), ()>::do_rects_collide(
             target_rect,
             &self.right,
         ) {
@@ -113,7 +118,7 @@ impl CollisionRectSides {
 }
 
 fn create_collision_rects_for_sides_from<T>(
-    rect: &CollisionRect<T>,
+    rect: &CollisionRect<(), T>,
 ) -> CollisionRectSides {
     CollisionRectSides {
         inner:  CollisionRect {
@@ -122,6 +127,7 @@ fn create_collision_rects_for_sides_from<T>(
             bottom: rect.bottom + PADDING,
             left:   rect.left + PADDING,
             right:  rect.right - PADDING,
+            tag:    None,
             custom: Some(Side::Inner),
         },
         top:    CollisionRect {
@@ -130,6 +136,7 @@ fn create_collision_rects_for_sides_from<T>(
             bottom: rect.bottom + PADDING,
             left:   rect.left + PADDING,
             right:  rect.right - PADDING,
+            tag:    None,
             custom: Some(Side::Top),
         },
         bottom: CollisionRect {
@@ -138,6 +145,7 @@ fn create_collision_rects_for_sides_from<T>(
             bottom: rect.bottom,
             left:   rect.left + PADDING,
             right:  rect.right - PADDING,
+            tag:    None,
             custom: Some(Side::Bottom),
         },
         left:   CollisionRect {
@@ -146,6 +154,7 @@ fn create_collision_rects_for_sides_from<T>(
             bottom: rect.bottom + PADDING,
             left:   rect.left,
             right:  rect.right - PADDING,
+            tag:    None,
             custom: Some(Side::Left),
         },
         right:  CollisionRect {
@@ -154,6 +163,7 @@ fn create_collision_rects_for_sides_from<T>(
             bottom: rect.bottom + PADDING,
             left:   rect.left + PADDING,
             right:  rect.right,
+            tag:    None,
             custom: Some(Side::Right),
         },
     }

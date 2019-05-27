@@ -25,6 +25,7 @@ pub mod prelude {
 
     pub use super::camera;
     pub use super::collision;
+    pub use super::solid;
     pub use super::Animation;
     pub use super::AnimationsContainer;
     pub use super::Camera;

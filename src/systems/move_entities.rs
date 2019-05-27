@@ -1,18 +1,26 @@
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 use super::system_prelude::*;
 use crate::geo::prelude::*;
+use solid::SolidTag;
 
 /// This system is responsible for moving all entities with `Transform` and `Velocity`,
 /// by manipulating their `Transform` appropriately.
 /// It also handles collision with `Solid` entities; Solid entities may not move into each other.
-pub struct MoveEntitiesSystem;
+#[derive(Default)]
+pub struct MoveEntitiesSystem<STag>(PhantomData<STag>)
+where
+    STag: SolidTag;
 
-impl<'a> System<'a> for MoveEntitiesSystem {
+impl<'a, STag> System<'a> for MoveEntitiesSystem<STag>
+where
+    STag: 'static + SolidTag,
+{
     type SystemData = (
         Entities<'a>,
         Read<'a, Time>,
-        ReadStorage<'a, Solid>,
+        ReadStorage<'a, Solid<STag>>,
         ReadStorage<'a, Size>,
         ReadStorage<'a, Push>,
         ReadStorage<'a, Pushable>,
@@ -55,11 +63,14 @@ impl<'a> System<'a> for MoveEntitiesSystem {
     }
 }
 
-impl<'a> MoveEntitiesSystem {
+impl<'a, STag> MoveEntitiesSystem<STag>
+where
+    STag: 'static + SolidTag,
+{
     fn run_without_collision(
         &self,
         dt: f32,
-        solids: &ReadStorage<Solid>,
+        solids: &ReadStorage<Solid<STag>>,
         transforms: &mut WriteStorage<'a, Transform>,
         velocities: &mut WriteStorage<'a, Velocity>,
     ) {
@@ -74,7 +85,7 @@ impl<'a> MoveEntitiesSystem {
         &self,
         dt: f32,
         entities: &Entities<'a>,
-        solids: &ReadStorage<'a, Solid>,
+        solids: &ReadStorage<'a, Solid<STag>>,
         sizes: &ReadStorage<'a, Size>,
         pushers: &ReadStorage<'a, Push>,
         pushables: &ReadStorage<'a, Pushable>,
@@ -83,39 +94,45 @@ impl<'a> MoveEntitiesSystem {
     ) {
         // Generate CollisionGrid with all solid entities
         // The custom generic `bool` represents if it is pushable or not
-        let collision_grid = CollisionGrid::<bool>::from(
+        let collision_grid = CollisionGrid::<STag, bool>::from(
             (
                 entities,
                 &*transforms,
                 sizes.maybe(),
-                pushables.maybe(),
                 solids,
+                pushables.maybe(),
             )
                 .join()
-                .map(|(entity, transform, size_opt, pushable_opt, _)| {
+                .map(|(entity, transform, size_opt, solid, pushable_opt)| {
                     let pos = transform.translation();
                     (
                         entity.id(),
                         (pos.x, pos.y).into(),
                         size_opt.map(|size| (size.w, size.h).into()),
+                        solid.tag.clone(),
                         pushable_opt.map(|_| true),
                     )
                 })
-                .collect::<Vec<(Index, Vector, Option<Vector>, Option<bool>)>>(
-                ),
+                .collect::<Vec<(
+                    Index,
+                    Vector,
+                    Option<Vector>,
+                    STag,
+                    Option<bool>,
+                )>>(),
         );
         // This HashMap will be filled with entity IDs (keys) and a vector (values), by
         // which they must be moved afterwards.
         let mut translate_pushables = HashMap::new();
 
         // Now check for collisions for all solid entities, using the generated CollisionGrid
-        for (entity, velocity, size_opt, transform, pusher_opt, _) in (
+        for (entity, velocity, size_opt, solid, transform, pusher_opt) in (
             entities,
             &*velocities,
             sizes.maybe(),
+            solids,
             &mut *transforms,
             pushers.maybe(),
-            solids,
         )
             .join()
         {
@@ -133,7 +150,12 @@ impl<'a> MoveEntitiesSystem {
                 for _ in 0 ..= abs {
                     let (collision_rect, new_position) =
                         new_collision_rect_and_position(
-                            entity_id, transform, size_opt, &axis, sign,
+                            entity_id,
+                            transform,
+                            size_opt,
+                            solid.tag.clone(),
+                            &axis,
+                            sign,
                         );
                     // Check for collision in newly calculated position
                     let colliding_with =
@@ -180,7 +202,12 @@ impl<'a> MoveEntitiesSystem {
                 // Calculate new position
                 let (collision_rect, new_position) =
                     new_collision_rect_and_position(
-                        entity_id, transform, size_opt, &axis, rem,
+                        entity_id,
+                        transform,
+                        size_opt,
+                        solid.tag.clone(),
+                        &axis,
+                        rem,
                     );
                 // Check for collision in newly calculated position
                 let colliding_with =
@@ -245,13 +272,17 @@ impl<'a> MoveEntitiesSystem {
     }
 }
 
-fn new_collision_rect_and_position<T>(
+fn new_collision_rect_and_position<STag, T>(
     id: Index,
     transform: &Transform,
     size_opt: Option<&Size>,
+    tag: STag,
     axis: &Axis,
     step: f32,
-) -> (CollisionRect<T>, Vector) {
+) -> (CollisionRect<STag, T>, Vector)
+where
+    STag: SolidTag,
+{
     // Calculate new position
     let pos = transform.translation();
     let new_position = (
@@ -261,10 +292,12 @@ fn new_collision_rect_and_position<T>(
         .into();
     // Create a CollisionRect with new position
     (
-        CollisionRect::new(
+        CollisionRect::with_custom(
             id,
             new_position,
             size_opt.map(|size| (size.w, size.h).into()),
+            Some(tag),
+            None,
         ),
         new_position,
     )

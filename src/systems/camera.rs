@@ -141,7 +141,7 @@ impl<'a> System<'a> for CameraSystem {
                         .into();
 
                 if let Some(inner_size) = inner_size_opt {
-                    let following_rect = CollisionRect::<()>::new(
+                    let following_rect = CollisionRect::<(), ()>::new(
                         following_id,
                         following_pos,
                         None, // Some(player_size)
@@ -158,14 +158,14 @@ impl<'a> System<'a> for CameraSystem {
                     let mut colliding_y = false;
 
                     // Vertical rects (top/bottom)
-                    if CollisionGrid::<()>::do_rects_collide(
+                    if CollisionGrid::<(), ()>::do_rects_collide(
                         &following_rect,
                         &camera_rects.top,
                     ) {
                         colliding_y = true;
                         transform
                             .set_y((center.1 - inner_size.0.h * 0.5).ceil());
-                    } else if CollisionGrid::<()>::do_rects_collide(
+                    } else if CollisionGrid::<(), ()>::do_rects_collide(
                         &following_rect,
                         &camera_rects.bottom,
                     ) {
@@ -174,14 +174,14 @@ impl<'a> System<'a> for CameraSystem {
                             .set_y((center.1 + inner_size.0.h * 0.5).floor());
                     }
                     // Horizontal rects (left/right)
-                    if CollisionGrid::<()>::do_rects_collide(
+                    if CollisionGrid::<(), ()>::do_rects_collide(
                         &following_rect,
                         &camera_rects.left,
                     ) {
                         colliding_x = true;
                         transform
                             .set_x((center.0 + inner_size.0.w * 0.5).floor());
-                    } else if CollisionGrid::<()>::do_rects_collide(
+                    } else if CollisionGrid::<(), ()>::do_rects_collide(
                         &following_rect,
                         &camera_rects.right,
                     ) {
@@ -252,10 +252,10 @@ impl<'a> System<'a> for CameraSystem {
 }
 
 struct CameraCollisionRects {
-    pub top:    CollisionRect<()>,
-    pub bottom: CollisionRect<()>,
-    pub left:   CollisionRect<()>,
-    pub right:  CollisionRect<()>,
+    pub top:    CollisionRect<(), ()>,
+    pub bottom: CollisionRect<(), ()>,
+    pub left:   CollisionRect<(), ()>,
+    pub right:  CollisionRect<(), ()>,
 }
 
 impl From<(Index, Vector, Vector, Vector)> for CameraCollisionRects {

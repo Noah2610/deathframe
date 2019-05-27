@@ -24,7 +24,21 @@ pub fn add_component_to_entity_by_name<'a, T>(
             ("Collision", _)      => entity = entity.with(Collision::new()),
             ("Push", _)           => entity = entity.with(Push),
             ("Pushable", _)       => entity = entity.with(Pushable),
-            ("Solid", _)          => entity = entity.with(Solid),
+            ("Solid", data)       => {
+                if data.is_empty() {
+                    entity = entity.with(Solid::<()>::default());
+                } else {
+                    if let Ok(deserialized) = serde_json::from_str::<Solid<String>>(data) {
+                        entity = entity.with(deserialized);
+                    } else {
+                        panic!(format!(
+                            "Couldn't deserialize JSON data for \
+                             Solid:\n{:#?}",
+                            data
+                        ))
+                    }
+                }
+            }
             ("DecreaseVelocity", data) => {
                 if let Ok(deserialized) =
                     serde_json::from_str::<DecreaseVelocity>(data)
