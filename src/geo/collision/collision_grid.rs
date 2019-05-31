@@ -64,12 +64,14 @@ where
     /// TODO: Maybe make this a standalone function, not associated with the `CollisionGrid` struct?
     #[rustfmt::skip]
     pub fn do_rects_collide<U, V>(
-        rect_one: &CollisionRect<STag, U>,
-        rect_two: &CollisionRect<STag, V>,
+        coll_rect_one: &CollisionRect<STag, U>,
+        coll_rect_two: &CollisionRect<STag, V>,
     ) -> bool {
-        rect_one.id != rect_two.id
-            && rect_one.tag.as_ref().map(|tag_one| {
-                rect_two.tag.as_ref().map(|tag_two| {
+        let rect_one = &coll_rect_one.rect;
+        let rect_two = &coll_rect_two.rect;
+        coll_rect_one.id != coll_rect_two.id
+            && coll_rect_one.tag.as_ref().map(|tag_one| {
+                coll_rect_two.tag.as_ref().map(|tag_two| {
                     tag_one.collides_with(tag_two)
                 }).unwrap_or(true)
             }).unwrap_or(true)

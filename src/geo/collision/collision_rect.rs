@@ -1,5 +1,6 @@
 use amethyst::ecs::world::Index;
 
+use super::super::Rect;
 use super::super::Vector;
 use crate::components::solid::SolidTag;
 
@@ -11,10 +12,7 @@ where
     STag: SolidTag,
 {
     pub id: Index,
-    pub top: f32,
-    pub bottom: f32,
-    pub left: f32,
-    pub right: f32,
+    pub rect: Rect,
     /// Solid tag
     pub tag: Option<STag>,
     /// Optional, custom data.
@@ -43,20 +41,24 @@ where
         if let Some(size) = size_opt {
             CollisionRect {
                 id:     id,
-                top:    position.1 + size.1 * 0.5,
-                bottom: position.1 - size.1 * 0.5,
-                left:   position.0 - size.0 * 0.5,
-                right:  position.0 + size.0 * 0.5,
+                rect:   Rect {
+                    top:    position.1 + size.1 * 0.5,
+                    bottom: position.1 - size.1 * 0.5,
+                    left:   position.0 - size.0 * 0.5,
+                    right:  position.0 + size.0 * 0.5,
+                },
                 tag:    tag,
                 custom: custom,
             }
         } else {
             CollisionRect {
                 id:     id,
-                top:    position.1,
-                bottom: position.1,
-                left:   position.0,
-                right:  position.0,
+                rect:   Rect {
+                    top:    position.1,
+                    bottom: position.1,
+                    left:   position.0,
+                    right:  position.0,
+                },
                 tag:    tag,
                 custom: custom,
             }
