@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use amethyst::ecs::world::Index;
 
 use super::system_prelude::*;
-use crate::geo::{CollisionGrid, CollisionRect, Vector};
+use crate::geo::prelude::*;
 
 pub struct CameraSystem;
 
@@ -31,24 +31,6 @@ impl<'a> System<'a> for CameraSystem {
         ): Self::SystemData,
     ) {
         let dt = time.delta_seconds();
-
-        // TODO: REMOVE
-        // let player_data_opt =
-        //     (&entities, &players, &transforms, (&sizes).maybe())
-        //         .join()
-        //         .next()
-        //         .map(|(entity, player, transform, size_opt)| {
-        //             let translation = transform.translation();
-        //             (
-        //                 entity.id(),
-        //                 (translation.x, translation.y),
-        //                 if let Some(size) = size_opt {
-        //                     (size.w, size.h)
-        //                 } else {
-        //                     (1.0, 1.0)
-        //                 },
-        //             )
-        //         });
 
         // Create a HashMap of all following entities for all cameras.
         let following_entities = (&entities, &cameras)
@@ -113,7 +95,7 @@ impl<'a> System<'a> for CameraSystem {
                 //     player_pos.1 - player_size.1 * 0.5,
                 // );
 
-                let following_id = following.0;
+                // let following_id = following.0;
                 let following_size_opt = following.2;
                 let following_pos =
                     if let Some(following_size) = following_size_opt {
@@ -141,14 +123,12 @@ impl<'a> System<'a> for CameraSystem {
                         .into();
 
                 if let Some(inner_size) = inner_size_opt {
-                    let following_rect = CollisionRect::<(), ()>::new(
-                        following_id,
-                        following_pos,
-                        None, // Some(player_size)
-                              // TODO: Cleanup. I guess we don't need following's size after all?
-                    );
+                    let following_rect = RectBuilder::default()
+                        .with_pos(following_pos)
+                        // .with_pos_and_size(following_pos, following_size)
+                        // TODO: Cleanup. I guess we don't need following's size after all?
+                        .build();
                     let camera_rects = CameraCollisionRects::from((
-                        camera_id,
                         camera_center,
                         (size.w, size.h).into(),
                         (inner_size.0.w, inner_size.0.h).into(),
@@ -158,14 +138,14 @@ impl<'a> System<'a> for CameraSystem {
                     let mut colliding_y = false;
 
                     // Vertical rects (top/bottom)
-                    if CollisionGrid::<(), ()>::do_rects_collide(
+                    if CollisionGrid::<(), ()>::do_rects_intersect(
                         &following_rect,
                         &camera_rects.top,
                     ) {
                         colliding_y = true;
                         transform
                             .set_y((center.1 - inner_size.0.h * 0.5).ceil());
-                    } else if CollisionGrid::<(), ()>::do_rects_collide(
+                    } else if CollisionGrid::<(), ()>::do_rects_intersect(
                         &following_rect,
                         &camera_rects.bottom,
                     ) {
@@ -174,14 +154,14 @@ impl<'a> System<'a> for CameraSystem {
                             .set_y((center.1 + inner_size.0.h * 0.5).floor());
                     }
                     // Horizontal rects (left/right)
-                    if CollisionGrid::<(), ()>::do_rects_collide(
+                    if CollisionGrid::<(), ()>::do_rects_intersect(
                         &following_rect,
                         &camera_rects.left,
                     ) {
                         colliding_x = true;
                         transform
                             .set_x((center.0 + inner_size.0.w * 0.5).floor());
-                    } else if CollisionGrid::<(), ()>::do_rects_collide(
+                    } else if CollisionGrid::<(), ()>::do_rects_intersect(
                         &following_rect,
                         &camera_rects.right,
                     ) {
@@ -252,39 +232,42 @@ impl<'a> System<'a> for CameraSystem {
 }
 
 struct CameraCollisionRects {
-    pub top:    CollisionRect<(), ()>,
-    pub bottom: CollisionRect<(), ()>,
-    pub left:   CollisionRect<(), ()>,
-    pub right:  CollisionRect<(), ()>,
+    pub top:    Rect,
+    pub bottom: Rect,
+    pub left:   Rect,
+    pub right:  Rect,
 }
 
-impl From<(Index, Vector, Vector, Vector)> for CameraCollisionRects {
-    fn from(
-        (id, pos, size, inner_size): (Index, Vector, Vector, Vector),
-    ) -> Self {
+impl From<(Vector, Vector, Vector)> for CameraCollisionRects {
+    fn from((pos, size, inner_size): (Vector, Vector, Vector)) -> Self {
         let size_x = Vector::from(((size.0 - inner_size.0) * 0.5, size.1));
         let size_y = Vector::from((size.0, (size.1 - inner_size.1) * 0.5));
         CameraCollisionRects {
-            top:    CollisionRect::new(
-                id,
-                (pos.0, pos.1 + size.1 * 0.5 - size_y.1 * 0.5).into(),
-                Some(size_y),
-            ),
-            bottom: CollisionRect::new(
-                id,
-                (pos.0, pos.1 - size.1 * 0.5 + size_y.1 * 0.5).into(),
-                Some(size_y),
-            ),
-            left:   CollisionRect::new(
-                id,
-                (pos.0 - size.0 * 0.5 + size_x.0 * 0.5, pos.1).into(),
-                Some(size_x),
-            ),
-            right:  CollisionRect::new(
-                id,
-                (pos.0 + size.0 * 0.5 - size_x.0 * 0.5, pos.1).into(),
-                Some(size_x),
-            ),
+            top:    RectBuilder::default()
+                .with_pos_and_size(
+                    (pos.0, pos.1 + size.1 * 0.5 - size_y.1 * 0.5).into(),
+                    size_y,
+                )
+                .build(),
+            bottom: RectBuilder::default()
+                .with_pos_and_size(
+                    (pos.0, pos.1 - size.1 * 0.5 + size_y.1 * 0.5).into(),
+                    size_y,
+                )
+                .build(),
+
+            left:  RectBuilder::default()
+                .with_pos_and_size(
+                    (pos.0 - size.0 * 0.5 + size_x.0 * 0.5, pos.1).into(),
+                    size_x,
+                )
+                .build(),
+            right: RectBuilder::default()
+                .with_pos_and_size(
+                    (pos.0 + size.0 * 0.5 - size_x.0 * 0.5, pos.1).into(),
+                    size_x,
+                )
+                .build(),
         }
     }
 }

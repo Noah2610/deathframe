@@ -9,7 +9,9 @@ mod collision_rect;
 pub mod prelude {
     pub use super::CollisionGrid;
     pub use super::CollisionRect;
+    pub use super::CollisionRectBuilder;
 }
 
 pub use collision_grid::CollisionGrid;
 pub use collision_rect::CollisionRect;
+pub use collision_rect::CollisionRectBuilder;

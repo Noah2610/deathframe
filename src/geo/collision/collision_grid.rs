@@ -1,6 +1,6 @@
 use amethyst::ecs::world::Index;
 
-use super::super::Vector;
+use super::super::{Rect, Vector};
 use super::CollisionRect;
 use crate::components::solid::SolidTag;
 
@@ -23,7 +23,13 @@ where
 
     /// Get a stored `CollisionRect` by its entity ID.
     pub fn rect_by_id(&self, id: Index) -> Option<&CollisionRect<STag, T>> {
-        self.rects.iter().find(|rect| id == rect.id)
+        self.rects.iter().find(|rect| {
+            if let Some(other_id) = rect.id {
+                id == other_id
+            } else {
+                false
+            }
+        })
     }
 
     /// Returns `true` if the passed `CollisionRect` is colliding with any other
@@ -59,39 +65,67 @@ where
         }
     }
 
-    /// Returns `true` if the two passed `CollisionRect`s are in collision
-    /// (also checks, that their entity IDs are not the same).
+    /// Returns `true` if the two passed `CollisionRect`s are in collision;
+    /// also checks, that their entity IDs are not the same,
+    /// and that their tags allow them to collide with each other.
     /// TODO: Maybe make this a standalone function, not associated with the `CollisionGrid` struct?
-    #[rustfmt::skip]
     pub fn do_rects_collide<U, V>(
-        coll_rect_one: &CollisionRect<STag, U>,
-        coll_rect_two: &CollisionRect<STag, V>,
+        rect_one: &CollisionRect<STag, U>,
+        rect_two: &CollisionRect<STag, V>,
     ) -> bool {
-        let rect_one = &coll_rect_one.rect;
-        let rect_two = &coll_rect_two.rect;
-        coll_rect_one.id != coll_rect_two.id
-            && coll_rect_one.tag.as_ref().map(|tag_one| {
-                coll_rect_two.tag.as_ref().map(|tag_two| {
-                    tag_one.collides_with(tag_two)
-                }).unwrap_or(true)
-            }).unwrap_or(true)
-            && (
-                (
-                       rect_one.left >= rect_two.left
-                    && rect_one.left <  rect_two.right
-                ) || (
-                       rect_one.left  <= rect_two.left
-                    && rect_one.right >  rect_two.left
-                )
-            ) && (
-                (
-                       rect_one.top <= rect_two.top
-                    && rect_one.top >  rect_two.bottom
-                ) || (
-                       rect_one.top    >= rect_two.top
-                    && rect_one.bottom <  rect_two.top
-                )
+        !Self::do_rect_ids_match(&rect_one.id, &rect_two.id)
+            && Self::do_rect_tags_match(&rect_one.tag, &rect_two.tag)
+            && Self::do_rects_intersect(&rect_one.rect, &rect_two.rect)
+    }
+
+    /// Returns `true` if the two passed `Option<Index>` CollisionRect IDs are equal.
+    /// Both arguments need to be `Some` for `true` to be returned;
+    /// if any of the arguments is `None`, then `false` is returned.
+    pub fn do_rect_ids_match(
+        id_one_opt: &Option<Index>,
+        id_two_opt: &Option<Index>,
+    ) -> bool {
+        // TODO: I'm pretty sure that I can replace this logic with a pure equality check.
+        if let (Some(id_one), Some(id_two)) = (id_one_opt, id_two_opt) {
+            id_one == id_two
+        } else {
+            false
+        }
+    }
+
+    /// Returns `true` if the two passed `Option<STag>` Solid Tags may collide with each other.
+    /// Returns `true` if any of the passed arguments is `None`.
+    pub fn do_rect_tags_match(
+        tag_one_opt: &Option<STag>,
+        tag_two_opt: &Option<STag>,
+    ) -> bool {
+        if let (Some(tag_one), Some(tag_two)) = (tag_one_opt, tag_two_opt) {
+            tag_one.collides_with(tag_two)
+        } else {
+            true
+        }
+    }
+
+    /// Returns `true` if the two passed `Rect`s intersect with each other.
+    #[rustfmt::skip]
+    pub fn do_rects_intersect(rect_one: &Rect, rect_two: &Rect) -> bool {
+        (
+            (
+                   rect_one.left >= rect_two.left
+                && rect_one.left <  rect_two.right
+            ) || (
+                   rect_one.left  <= rect_two.left
+                && rect_one.right >  rect_two.left
             )
+        ) && (
+            (
+                   rect_one.top <= rect_two.top
+                && rect_one.top >  rect_two.bottom
+            ) || (
+                   rect_one.top    >= rect_two.top
+                && rect_one.bottom <  rect_two.top
+            )
+        )
     }
 }
 

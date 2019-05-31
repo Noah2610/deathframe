@@ -3,6 +3,7 @@
 mod animation;
 mod camera;
 mod collision;
+mod confine_entities;
 mod decrease_velocities;
 mod gravity;
 mod input_manager;
@@ -15,6 +16,7 @@ pub mod prelude {
     pub use super::AnimationSystem;
     pub use super::CameraSystem;
     pub use super::CollisionSystem;
+    pub use super::ConfineEntitiesSystem;
     pub use super::DecreaseVelocitiesSystem;
     pub use super::GravitySystem;
     pub use super::InputManagerSystem;
@@ -57,6 +59,7 @@ pub mod system_prelude {
 pub use animation::AnimationSystem;
 pub use camera::CameraSystem;
 pub use collision::CollisionSystem;
+pub use confine_entities::ConfineEntitiesSystem;
 pub use decrease_velocities::DecreaseVelocitiesSystem;
 pub use gravity::GravitySystem;
 pub use input_manager::InputManagerSystem;

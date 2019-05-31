@@ -36,16 +36,15 @@ impl<'a> System<'a> for CollisionSystem {
                     let entity_id = entity.id();
                     let pos = transform.translation();
                     // Create a CollisionRect with increased size, for touch collision checking
-                    let rect = CollisionRect::with_custom(
-                        entity_id,
-                        (pos.x - PADDING, pos.y - PADDING).into(),
-                        size_opt.map(|size| {
-                            (size.w + PADDING, size.h + PADDING).into()
-                        }),
-                        None,
-                        None,
-                    );
-                    rect
+                    CollisionRectBuilder::default()
+                        .id(entity_id)
+                        .with_pos_and_maybe_size(
+                            (pos.x - PADDING, pos.y - PADDING).into(),
+                            size_opt.map(|size| {
+                                (size.w + PADDING, size.h + PADDING).into()
+                            }),
+                        )
+                        .build()
                 })
                 .collect::<Vec<CollisionRect<(), ()>>>(),
         );
@@ -63,7 +62,12 @@ impl<'a> System<'a> for CollisionSystem {
                         if let Some(side) =
                             rect_side_rects.collides_with_side(other_rect)
                         {
-                            collision.set_collision_with(other_rect.id, side);
+                            collision.set_collision_with(
+                                other_rect.id.expect(
+                                    "`CollisionRect` should have an `id` here",
+                                ),
+                                side,
+                            );
                         }
                     }
                 }

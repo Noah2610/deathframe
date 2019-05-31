@@ -92,6 +92,8 @@ where
         transforms: &mut WriteStorage<'a, Transform>,
         velocities: &mut WriteStorage<'a, Velocity>,
     ) {
+        const ERRMSG_ID: &str = "`CollisionRect` should have an `id` here";
+
         // Generate CollisionGrid with all solid entities
         // The custom generic `bool` represents if it is pushable or not
         let collision_grid = CollisionGrid::<STag, bool>::from(
@@ -123,7 +125,8 @@ where
         );
         // This HashMap will be filled with entity IDs (keys) and a vector (values), by
         // which they must be moved afterwards.
-        let mut translate_pushables = HashMap::new();
+        let mut translate_pushables: HashMap<Index, (f32, f32)> =
+            HashMap::new();
 
         // Now check for collisions for all solid entities, using the generated CollisionGrid
         for (entity, velocity, size_opt, solid, transform, pusher_opt) in (
@@ -179,7 +182,7 @@ where
                                 // Also move itself.
                                 for coll_with in colliding_with {
                                     let entry = translate_pushables
-                                        .entry(coll_with.id)
+                                        .entry(coll_with.id.expect(ERRMSG_ID))
                                         .or_insert((0.0, 0.0));
                                     //*entry = new_position;
                                     match axis {
@@ -228,7 +231,7 @@ where
                             // for now we will only note, that the do need to be translated.
                             for coll_with in colliding_with {
                                 let entry = translate_pushables
-                                    .entry(coll_with.id)
+                                    .entry(coll_with.id.expect(ERRMSG_ID))
                                     .or_insert((0.0, 0.0));
                                 //*entry = new_position;
                                 match axis {
@@ -292,13 +295,14 @@ where
         .into();
     // Create a CollisionRect with new position
     (
-        CollisionRect::with_custom(
-            id,
-            new_position,
-            size_opt.map(|size| (size.w, size.h).into()),
-            Some(tag),
-            None,
-        ),
+        CollisionRectBuilder::default()
+            .id(id)
+            .with_pos_and_maybe_size(
+                new_position,
+                size_opt.map(|size| (size.w, size.h).into()),
+            )
+            .tag(tag)
+            .build(),
         new_position,
     )
 }
