@@ -19,6 +19,7 @@ where
 }
 
 /// Builder struct for `CollisionRect`.
+// #[derive(Default)]
 pub struct CollisionRectBuilder<STag, T>
 where
     STag: SolidTag,
@@ -126,7 +127,10 @@ where
 {
     fn default() -> Self {
         Self {
-            ..Default::default()
+            id:     Default::default(),
+            rect:   Default::default(),
+            tag:    Default::default(),
+            custom: Default::default(),
         }
     }
 }
