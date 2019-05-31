@@ -15,6 +15,12 @@ impl Velocity {
         Self { x, y }
     }
 
+    /// Set the velocity to `0, 0`.
+    pub fn clear(&mut self) {
+        self.x = 0.0;
+        self.y = 0.0;
+    }
+
     /// Increase the velocity with a given max velocity (`(Option<f32>, Option<f32>)`).
     /// The velocity will only be increased to a maximum of the given max velocity;
     /// if the velocity was already above the given max, no changes are made
