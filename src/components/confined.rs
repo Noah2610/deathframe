@@ -8,6 +8,12 @@ pub struct Confined {
     pub rect: Rect,
 }
 
+impl Confined {
+    pub fn new(rect: Rect) -> Self {
+        Self { rect }
+    }
+}
+
 impl Component for Confined {
     type Storage = VecStorage<Self>;
 }
