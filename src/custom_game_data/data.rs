@@ -36,8 +36,12 @@ impl<'a, 'b, T> CustomGameData<'a, 'b, T> {
             return Err(dispatcher_not_found(dispatcher_name));
         }
 
-        self.core_dispatcher.dispatch(&world.res);
+        self.update_core(world);
 
         Ok(())
+    }
+
+    pub fn update_core(&mut self, world: &World) {
+        self.core_dispatcher.dispatch(&world.res);
     }
 }

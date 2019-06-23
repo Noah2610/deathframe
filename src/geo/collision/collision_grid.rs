@@ -21,6 +21,21 @@ where
         Self { rects }
     }
 
+    /// Returns a new `CollisionGrid` with no `CollisionRect`s.
+    pub fn empty() -> Self {
+        Self { rects: Vec::new() }
+    }
+
+    /// Adds a new `CollisionRect` to the grid.
+    pub fn push(&mut self, rect: CollisionRect<STag, T>) {
+        self.rects.push(rect);
+    }
+
+    /// Clears all `CollisionRect`s from the `rects` field.
+    pub fn clear(&mut self) {
+        self.rects.clear();
+    }
+
     /// Get a stored `CollisionRect` by its entity ID.
     pub fn rect_by_id(&self, id: Index) -> Option<&CollisionRect<STag, T>> {
         self.rects.iter().find(|rect| {
