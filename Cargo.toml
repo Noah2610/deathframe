@@ -4,6 +4,8 @@ version = "0.0.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 edition = "2018"
 description = "My game development framework for the amethyst game engine"
+license = "MIT"
+repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies]
 amethyst   = "0.10.0"
