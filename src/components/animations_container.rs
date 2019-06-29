@@ -44,6 +44,15 @@ impl AnimationsContainer {
         }
     }
 
+    pub fn set_if_has<T>(&mut self, name: T)
+    where
+        T: ToString,
+    {
+        if self.has_animation(name.to_string()) {
+            self.set(name);
+        }
+    }
+
     pub fn unset(&mut self) {
         self.current = None;
     }
@@ -88,6 +97,13 @@ impl AnimationsContainer {
         } else {
             false
         }
+    }
+
+    pub fn has_animation<T>(&self, name: T) -> bool
+    where
+        T: ToString,
+    {
+        self.animations.contains_key(&name.to_string())
     }
 }
 
