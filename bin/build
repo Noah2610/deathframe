@@ -1,17 +1,32 @@
 #!/bin/bash
+# Build the project for development.
+# All command-line arguments are passed to the executed `cargo` command.
+# Optional environment variables:
+#   $RUN_NEW_TERMINAL
+#     If this variable is not `0` or empty,
+#     then the cargo command is executed in a new terminal.
+#     DEFAULT: ""
+#   $RUN_CARGO_CMD
+#     The cargo sub-command to run.
+#     DEFAULT: "build"
 
-ROOT="$( cd $(dirname $0)/..; pwd )"
-cmd="build"
-[ -n "$1" ] && cmd="$1"
+_dir="$( dirname "$0" )"
+[ -f "${_dir}/util.sh" ] || "${_dir}/download-util.sh" || exit 1
+# shellcheck source=./util.sh
+source "${_dir}/util.sh"
+unset _dir
 
-function err {
-  (1>&2 echo -e "ERROR: $1\nExiting.")
-  exit 1
+DEFAULT_RUN_CARGO_CMD="build"
+[ -z "$RUN_CARGO_CMD" ] && RUN_CARGO_CMD="$DEFAULT_RUN_CARGO_CMD"
+
+function build {
+  check "cargo"
+  cmd="cargo +nightly-2019-03-01 $RUN_CARGO_CMD --features amethyst/nightly $*"
+  if should_run_in_terminal; then
+    run_terminal "$cmd"
+  else
+    $cmd
+  fi
 }
 
-function check {
-  which "$1" &> /dev/null || err "'$1' is not available."
-}
-
-check "cargo" && \
-  cargo +nightly-2019-03-01 $cmd --features amethyst/nightly
+build "$@"
