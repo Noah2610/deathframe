@@ -6,6 +6,9 @@ const PADDING: f32 = 1.0;
 /// The `CollisionSystem` is in charge of setting collision states for colliding entities.
 /// Entities with `CheckCollision` (and with `Collision`) check for collision against
 /// other entities with `Collision`.
+/// Only checks for entities with either NO `Loadable` and NO `Loaded` components
+/// or for entities with `Loadable` AND `Loaded` components;
+/// does not check for entities with `Loadable` but NOT `Loaded` components.
 
 // NOTE:
 // Consider giving `CollisionSystem` a `CollisionGrid` field, which stores the generated
@@ -22,58 +25,105 @@ impl<'a> System<'a> for CollisionSystem {
         ReadStorage<'a, Transform>,
         ReadStorage<'a, Size>,
         ReadStorage<'a, CheckCollision>,
+        ReadStorage<'a, Loadable>,
+        ReadStorage<'a, Loaded>,
         WriteStorage<'a, Collision>,
     );
 
     fn run(
         &mut self,
-        (entities, transforms, sizes, check_collisions, mut collisions): Self::SystemData,
+        (
+            entities,
+            transforms,
+            sizes,
+            check_collisions,
+            loadables,
+            loadeds,
+            mut collisions,
+        ): Self::SystemData,
     ) {
         let collision_grid = CollisionGrid::new(
-            (&entities, &transforms, sizes.maybe(), &mut collisions)
+            (
+                &entities,
+                &transforms,
+                sizes.maybe(),
+                loadables.maybe(),
+                loadeds.maybe(),
+                &mut collisions,
+            )
                 .join()
-                .map(|(entity, transform, size_opt, _)| {
-                    let entity_id = entity.id();
-                    let pos = transform.translation();
-                    // Create a CollisionRect with increased size, for touch collision checking
-                    CollisionRectBuilder::default()
-                        .id(entity_id)
-                        .with_pos_and_maybe_size(
-                            (pos.x - PADDING, pos.y - PADDING).into(),
-                            size_opt.map(|size| {
-                                (size.w + PADDING, size.h + PADDING).into()
-                            }),
-                        )
-                        .build()
-                })
+                .filter_map(
+                    |(
+                        entity,
+                        transform,
+                        size_opt,
+                        loadable_opt,
+                        loaded_opt,
+                        _,
+                    )| {
+                        if let (None, None) | (Some(_), Some(_)) =
+                            (loadable_opt, loaded_opt)
+                        {
+                            let entity_id = entity.id();
+                            let pos = transform.translation();
+                            // Create a CollisionRect with increased size, for touch collision checking
+                            Some(
+                                CollisionRectBuilder::default()
+                                    .id(entity_id)
+                                    .with_pos_and_maybe_size(
+                                        (pos.x - PADDING, pos.y - PADDING)
+                                            .into(),
+                                        size_opt.map(|size| {
+                                            (size.w + PADDING, size.h + PADDING)
+                                                .into()
+                                        }),
+                                    )
+                                    .build(),
+                            )
+                        } else {
+                            None
+                        }
+                    },
+                )
                 .collect::<Vec<CollisionRect<(), ()>>>(),
         );
 
-        for (entity, collision, _) in
-            (&entities, &mut collisions, &check_collisions).join()
+        for (entity, collision, _, loadable_opt, loaded_opt) in (
+            &entities,
+            &mut collisions,
+            &check_collisions,
+            loadables.maybe(),
+            loadeds.maybe(),
+        )
+            .join()
         {
-            if let Some(rect) = collision_grid.rect_by_id(entity.id()) {
-                let colliding = collision_grid.colliding_with(rect);
-                if !colliding.is_empty() {
-                    let rect_side_rects =
-                        create_collision_rects_for_sides_from(rect);
-                    for other_rect in colliding {
-                        // Check which side is in collision
-                        if let Some(side) =
-                            rect_side_rects.collides_with_side(other_rect)
-                        {
-                            collision.set_collision_with(
-                                other_rect.id.expect(
-                                    "`CollisionRect` should have an `id` here",
-                                ),
-                                side,
-                            );
+            if let (None, None) | (Some(_), Some(_)) =
+                (loadable_opt, loaded_opt)
+            {
+                if let Some(rect) = collision_grid.rect_by_id(entity.id()) {
+                    let colliding = collision_grid.colliding_with(rect);
+                    if !colliding.is_empty() {
+                        let rect_side_rects =
+                            create_collision_rects_for_sides_from(rect);
+                        for other_rect in colliding {
+                            // Check which side is in collision
+                            if let Some(side) =
+                                rect_side_rects.collides_with_side(other_rect)
+                            {
+                                collision.set_collision_with(
+                                    other_rect.id.expect(
+                                        "`CollisionRect` should have an `id` \
+                                         here",
+                                    ),
+                                    side,
+                                );
+                            }
                         }
                     }
                 }
-            }
 
-            collision.update();
+                collision.update();
+            }
         }
     }
 }

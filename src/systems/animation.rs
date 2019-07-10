@@ -13,15 +13,23 @@ impl AnimationSystem {
         entities: &Entities<'a>,
         animations: &mut WriteStorage<'a, Animation>,
         sprite_renders: &mut WriteStorage<'a, SpriteRender>,
+        loadables: &ReadStorage<'a, Loadable>,
+        loadeds: &ReadStorage<'a, Loaded>,
     ) {
-        for (entity, animation) in (entities, animations).join() {
-            self.run_for_animation(
-                now,
-                entity,
-                animation,
-                sprite_renders,
-                true,
-            );
+        for (entity, animation, loadable_opt, loaded_opt) in
+            (entities, animations, loadables.maybe(), loadeds.maybe()).join()
+        {
+            if let (None, None) | (Some(_), Some(_)) =
+                (loadable_opt, loaded_opt)
+            {
+                self.run_for_animation(
+                    now,
+                    entity,
+                    animation,
+                    sprite_renders,
+                    true,
+                );
+            }
         }
     }
 
@@ -31,31 +39,44 @@ impl AnimationSystem {
         entities: &Entities<'a>,
         animations_containers: &mut WriteStorage<'a, AnimationsContainer>,
         sprite_renders: &mut WriteStorage<'a, SpriteRender>,
+        loadables: &ReadStorage<'a, Loadable>,
+        loadeds: &ReadStorage<'a, Loaded>,
     ) {
-        for (entity, animations_container) in
-            (entities, animations_containers).join()
+        for (entity, animations_container, loadable_opt, loaded_opt) in (
+            entities,
+            animations_containers,
+            loadables.maybe(),
+            loadeds.maybe(),
+        )
+            .join()
         {
-            if let Some((_, animation)) = &mut animations_container.play_once {
-                self.run_for_animation(
-                    now,
-                    entity,
-                    animation,
-                    sprite_renders,
-                    false,
-                );
-                if animation.has_played() {
-                    animations_container.play_once = None;
-                }
-            } else if let Some((_, animation)) =
-                &mut animations_container.current
+            if let (None, None) | (Some(_), Some(_)) =
+                (loadable_opt, loaded_opt)
             {
-                self.run_for_animation(
-                    now,
-                    entity,
-                    animation,
-                    sprite_renders,
-                    true,
-                );
+                if let Some((_, animation)) =
+                    &mut animations_container.play_once
+                {
+                    self.run_for_animation(
+                        now,
+                        entity,
+                        animation,
+                        sprite_renders,
+                        false,
+                    );
+                    if animation.has_played() {
+                        animations_container.play_once = None;
+                    }
+                } else if let Some((_, animation)) =
+                    &mut animations_container.current
+                {
+                    self.run_for_animation(
+                        now,
+                        entity,
+                        animation,
+                        sprite_renders,
+                        true,
+                    );
+                }
             }
         }
     }
@@ -101,6 +122,8 @@ impl AnimationSystem {
 impl<'a> System<'a> for AnimationSystem {
     type SystemData = (
         Entities<'a>,
+        ReadStorage<'a, Loadable>,
+        ReadStorage<'a, Loaded>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, AnimationsContainer>,
         WriteStorage<'a, SpriteRender>,
@@ -110,6 +133,8 @@ impl<'a> System<'a> for AnimationSystem {
         &mut self,
         (
             entities,
+            loadables,
+            loadeds,
             mut animations,
             mut animations_containers,
             mut sprite_renders,
@@ -122,6 +147,8 @@ impl<'a> System<'a> for AnimationSystem {
             &entities,
             &mut animations,
             &mut sprite_renders,
+            &loadables,
+            &loadeds,
         );
 
         self.run_with_animations_container(
@@ -129,6 +156,8 @@ impl<'a> System<'a> for AnimationSystem {
             &entities,
             &mut animations_containers,
             &mut sprite_renders,
+            &loadables,
+            &loadeds,
         );
     }
 }
