@@ -13,6 +13,7 @@ pub mod loadable;
 pub mod loaded;
 pub mod max_velocity;
 pub mod parallax;
+pub mod parallax_repeat;
 pub mod push;
 pub mod pushable;
 pub mod scale_once;
@@ -42,6 +43,7 @@ pub mod prelude {
     pub use super::Loaded;
     pub use super::MaxVelocity;
     pub use super::Parallax;
+    pub use super::ParallaxRepeat;
     pub use super::Push;
     pub use super::Pushable;
     pub use super::ScaleOnce;
@@ -65,7 +67,7 @@ pub mod component_prelude {
         VecStorage,
     };
 
-    pub use crate::geo::Vector;
+    pub use crate::geo::prelude::*;
 }
 
 pub use animation::Animation;
@@ -81,6 +83,7 @@ pub use loadable::Loadable;
 pub use loaded::Loaded;
 pub use max_velocity::MaxVelocity;
 pub use parallax::Parallax;
+pub use parallax_repeat::ParallaxRepeat;
 pub use push::Push;
 pub use pushable::Pushable;
 pub use scale_once::ScaleOnce;
