@@ -20,8 +20,33 @@ pub struct Parallax {
 }
 
 impl Parallax {
+    /// Returns a new `ParallaxBuilder`.
     pub fn new() -> ParallaxBuilder {
         ParallaxBuilder::default()
+    }
+
+    /// Calculate the new position for this parallax given
+    /// the following entity's position and size `Option`.
+    pub fn calculate_pos_with_following(
+        &self,
+        following_pos: Vector,
+        following_size_opt: Option<Vector>,
+    ) -> Vector {
+        let following_middle = if let Some(following_size) = following_size_opt
+        {
+            self.follow_anchor
+                .middle_for(&following_pos, &following_size)
+        } else {
+            following_pos
+        };
+
+        (
+            following_middle.0 + self.offset.0
+                - following_middle.0 * self.speed_mult.0,
+            following_middle.1 + self.offset.1
+                - following_middle.1 * self.speed_mult.1,
+        )
+            .into()
     }
 }
 

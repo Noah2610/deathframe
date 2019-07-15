@@ -10,6 +10,13 @@ pub struct Rect {
     pub right:  f32,
 }
 
+impl Rect {
+    /// Returns a new `RectBuilder`.
+    pub fn new() -> RectBuilder {
+        RectBuilder::default()
+    }
+}
+
 /// The builder struct for `Rect`.
 #[derive(Default)]
 pub struct RectBuilder {

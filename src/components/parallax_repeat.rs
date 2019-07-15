@@ -3,12 +3,39 @@ use super::component_prelude::*;
 /// Additional component for `Parallax` entities, whose textures should be repeated
 /// horizontally/vertically.
 pub struct ParallaxRepeat {
-    pub axis: Axis,
+    pub repeat_x: bool,
+    pub repeat_y: bool,
 }
 
 impl ParallaxRepeat {
-    pub fn new(axis: Axis) -> Self {
-        Self { axis }
+    /// Creates a new `ParallaxRepeat` component with the the given
+    /// `repeat_x` and `repeat_y` booleans as arguments.
+    pub fn new(repeat_x: bool, repeat_y: bool) -> Self {
+        Self { repeat_x, repeat_y }
+    }
+
+    /// Creates a new `ParallaxRepeat` component repeating only on the `x` axis,
+    pub fn repeat_x() -> Self {
+        Self {
+            repeat_x: true,
+            repeat_y: false,
+        }
+    }
+
+    /// Creates a new `ParallaxRepeat` component repeating only on the `y` axis,
+    pub fn repeat_y() -> Self {
+        Self {
+            repeat_x: false,
+            repeat_y: true,
+        }
+    }
+
+    /// Creates a new `ParallaxRepeat` component repeating on both axes (`x`, `y`).
+    pub fn repeat_both() -> Self {
+        Self {
+            repeat_x: true,
+            repeat_y: true,
+        }
     }
 }
 

@@ -11,14 +11,16 @@ pub struct ParallaxFollowingData {
 
 pub type ParallaxesFollowingData = HashMap<Index, ParallaxFollowingData>;
 
-pub fn parallax_following_data_for<D>(
+pub fn parallax_following_data_for<DP, DT, DS>(
     entities: &Entities,
-    parallaxes: &ReadStorage<Parallax>,
-    transforms: &Storage<Transform, D>,
-    sizes: &ReadStorage<Size>,
+    parallaxes: &Storage<Parallax, DP>,
+    transforms: &Storage<Transform, DT>,
+    sizes: &Storage<Size, DS>,
 ) -> ParallaxesFollowingData
 where
-    D: Deref<Target = MaskedStorage<Transform>>,
+    DP: Deref<Target = MaskedStorage<Parallax>>,
+    DT: Deref<Target = MaskedStorage<Transform>>,
+    DS: Deref<Target = MaskedStorage<Size>>,
 {
     (entities, parallaxes)
         .join()

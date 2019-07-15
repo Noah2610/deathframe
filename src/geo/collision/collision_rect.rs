@@ -18,6 +18,16 @@ where
     pub custom: Option<T>,
 }
 
+impl<STag, T> CollisionRect<STag, T>
+where
+    STag: SolidTag,
+{
+    /// Returns a new `CollisionRectBuilder`.
+    pub fn new() -> CollisionRectBuilder<STag, T> {
+        CollisionRectBuilder::default()
+    }
+}
+
 /// Builder struct for `CollisionRect`.
 // #[derive(Default)]
 pub struct CollisionRectBuilder<STag, T>
