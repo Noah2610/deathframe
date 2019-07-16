@@ -10,7 +10,6 @@ mod input_manager;
 mod limit_velocities;
 mod move_entities;
 mod parallax;
-mod repeat_parallax;
 mod scale_sprites;
 
 pub mod prelude {
@@ -24,7 +23,6 @@ pub mod prelude {
     pub use super::LimitVelocitiesSystem;
     pub use super::MoveEntitiesSystem;
     pub use super::ParallaxSystem;
-    pub use super::RepeatParallaxSystem;
     pub use super::ScaleSpritesSystem;
 }
 
@@ -73,5 +71,4 @@ pub use input_manager::InputManagerSystem;
 pub use limit_velocities::LimitVelocitiesSystem;
 pub use move_entities::MoveEntitiesSystem;
 pub use parallax::ParallaxSystem;
-pub use repeat_parallax::RepeatParallaxSystem;
 pub use scale_sprites::ScaleSpritesSystem;

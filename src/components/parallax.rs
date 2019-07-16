@@ -40,13 +40,51 @@ impl Parallax {
             following_pos
         };
 
-        (
+        Vector::new(
             following_middle.0 + self.offset.0
                 - following_middle.0 * self.speed_mult.0,
             following_middle.1 + self.offset.1
                 - following_middle.1 * self.speed_mult.1,
         )
-            .into()
+        // Vector::new(
+        //     following_middle.0 * self.speed_mult.0 + self.offset.0,
+        //     following_middle.1 * self.speed_mult.1 + self.offset.1,
+        // )
+    }
+
+    /// Calculate the new position for this parallax given
+    /// the following entity's position and size (_not optional!_),
+    /// _and_ it should repeat on the given axes (`repeat_x`, `repeat_y`).
+    /// Repetition means, the calculated position _must_ be within the following's area.
+    pub fn calculate_pos_with_following_with_repeat(
+        &self,
+        following_pos: Vector,
+        following_size: Vector,
+        repeat_x: bool,
+        repeat_y: bool,
+    ) -> Vector {
+        let following_middle = self
+            .follow_anchor
+            .middle_for(&following_pos, &following_size);
+
+        Vector::new(
+            if repeat_x {
+                following_middle.0 + self.offset.0
+                    - (following_middle.0 * self.speed_mult.0
+                        % following_size.0)
+            } else {
+                following_middle.0 + self.offset.0
+                    - following_middle.0 * self.speed_mult.0
+            },
+            if repeat_y {
+                following_middle.1 + self.offset.1
+                    - (following_middle.1 * self.speed_mult.1
+                        % following_size.1)
+            } else {
+                following_middle.1 + self.offset.1
+                    - following_middle.1 * self.speed_mult.1
+            },
+        )
     }
 }
 
