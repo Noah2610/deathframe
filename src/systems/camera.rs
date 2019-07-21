@@ -223,6 +223,16 @@ impl<'a> System<'a> for CameraSystem {
                         transform.set_y(center.1);
                     }
                 }
+
+                // Round camera position to integers (TODO: is this a good idea?)
+                let pos = {
+                    let trans = transform.translation();
+                    (trans.x, trans.y)
+                };
+                // transform.set_x((pos.0 as i32) as f32);
+                // transform.set_y((pos.1 as i32) as f32);
+                transform.set_x(pos.0.round());
+                transform.set_y(pos.1.round());
             } else {
                 // Camera isn't following an entity.
                 // Just don't do anything, I guess?
