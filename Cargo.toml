@@ -1,6 +1,6 @@
 [package]
 name = "deathframe"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 edition = "2018"
 description = "My game development framework for the amethyst game engine"

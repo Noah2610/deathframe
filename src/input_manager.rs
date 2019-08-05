@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use amethyst::input::InputHandler;
 
+type AxisValue = f64;
+
 #[derive(Clone, Copy, PartialEq)]
 enum ActionState {
     Down,
@@ -18,8 +20,10 @@ impl Default for ActionState {
 
 /// Manages input actions.
 /// Stores data about which actions are _down_, _up_, or being _pressed_.
+#[derive(Default)]
 pub struct InputManager {
     actions: HashMap<String, ActionState>,
+    axes:    HashMap<String, AxisValue>,
 }
 
 impl InputManager {
@@ -52,6 +56,14 @@ impl InputManager {
         self.is_action_in_state(action, ActionState::Pressed)
     }
 
+    /// Behaves identically to `amethyst::input::InputHandler::axis_value`.
+    pub fn axis_value<T>(&self, axis: T) -> Option<AxisValue>
+    where
+        T: ToString,
+    {
+        self.axes.get(&axis.to_string()).map(Clone::clone)
+    }
+
     fn is_action_in_state<T>(&self, action: T, state: ActionState) -> bool
     where
         T: ToString,
@@ -65,6 +77,11 @@ impl InputManager {
 
     /// This method is called every frame, by the `InputManagerSystem`.
     pub fn update(&mut self, input: &InputHandler<String, String>) {
+        self.update_actions(input);
+        self.update_axes(input);
+    }
+
+    fn update_actions(&mut self, input: &InputHandler<String, String>) {
         for action in input.bindings.actions() {
             let state = self
                 .actions
@@ -101,12 +118,17 @@ impl InputManager {
             }
         }
     }
-}
 
-impl Default for InputManager {
-    fn default() -> Self {
-        Self {
-            actions: HashMap::new(),
+    fn update_axes(&mut self, input: &InputHandler<String, String>) {
+        for axis in input.bindings.axes() {
+            if let Some(value) = input.axis_value(&axis) {
+                let entry = self.axes.entry(axis).or_insert(0.0);
+                if *entry != value {
+                    *entry = value;
+                }
+            } else {
+                panic!(format!("Axis should exist: {}", axis));
+            }
         }
     }
 }
