@@ -64,6 +64,16 @@ impl InputManager {
         self.axes.get(&axis.to_string()).map(Clone::clone)
     }
 
+    /// Similar to `axis_value`, but instead of passing a specific axis string ID,
+    /// pass a function, which is called with every registered axis ID and value; the function returns a boolean;
+    /// when the function returns `true`, then return the axis value of that axis.
+    pub fn axis_value_find<F>(&self, find_func: F) -> Option<AxisValue>
+    where
+        F: Fn(&(&String, &AxisValue)) -> bool,
+    {
+        self.axes.iter().find(find_func).map(|(_, value)| *value)
+    }
+
     fn is_action_in_state<T>(&self, action: T, state: ActionState) -> bool
     where
         T: ToString,
