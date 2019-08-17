@@ -6,6 +6,7 @@ use super::component_prelude::*;
 use crate::geo::Side;
 
 /// The different states of collision.
+/// The `State` is reset to `Enter` when the `Side` is changed.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum State {
     /// `Enter` means, this collision has _just_ occured in the previous frame.
@@ -114,13 +115,22 @@ impl Collision {
     pub(crate) fn set_collision_with(&mut self, entity_id: Index, side: Side) {
         if let Some(data) = self.collisions.get_mut(&entity_id) {
             // Set state of colliding entity to ...
-            data.state = match data.state {
+            data.state = match data {
                 // `Enter` if it was `Leave` previously
-                State::Leave => State::Enter,
+                Data {
+                    state: State::Leave,
+                    side: _,
+                    ..
+                } => State::Enter,
+                // `Enter` if the side has changed
+                Data {
+                    state: _, side: s, ..
+                } if s != &side => State::Enter,
                 // `Steady` if it was any other state previously
                 _ => State::Steady,
             };
             data.set_collision_this_frame = true;
+            data.side = side;
         } else {
             self.collisions.insert(entity_id, Data {
                 side,
