@@ -6,11 +6,12 @@ use super::component_prelude::*;
 use crate::geo::Side;
 
 /// The different states of collision.
-/// The `State` is reset to `Enter` when the `Side` is changed.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum State {
     /// `Enter` means, this collision has _just_ occured in the previous frame.
     Enter,
+    /// `SideEnter` means, this collision has existed previously, but the side has changed.
+    SideEnter,
     /// `Leave` means, these entities are _no longer in collision_, since the previous frame.
     /// This collision entry will be removed in the next frame.
     Leave,
@@ -122,10 +123,10 @@ impl Collision {
                     side: _,
                     ..
                 } => State::Enter,
-                // `Enter` if the side has changed
+                // `SideEnter` if the side has changed
                 Data {
                     state: _, side: s, ..
-                } if s != &side => State::Enter,
+                } if s != &side => State::SideEnter,
                 // `Steady` if it was any other state previously
                 _ => State::Steady,
             };
