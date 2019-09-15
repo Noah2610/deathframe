@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
-use amethyst::core::bundle::{Error as BundleError, ErrorKind};
 use amethyst::core::{ArcThreadPool, SystemBundle};
-use amethyst::ecs::{Dispatcher, DispatcherBuilder, System};
+use amethyst::ecs::{DispatcherBuilder, System};
 use amethyst::prelude::*;
-use amethyst::renderer::DisplayConfig;
 use amethyst::DataInit;
 
 use super::internal_helpers::*;
@@ -39,7 +37,7 @@ impl<'a, 'b, T> CustomGameDataBuilder<'a, 'b, T> {
         {
             Ok(self)
         } else {
-            Err(amethyst_error(format!(
+            Err(amethyst::Error::from_string(format!(
                 "A dispatcher with the given name has already been \
                  initialized: {}",
                 name.to_string()
@@ -58,9 +56,7 @@ impl<'a, 'b, T> CustomGameDataBuilder<'a, 'b, T> {
     where
         B: SystemBundle<'a, 'b>,
     {
-        bundle
-            .build(&mut self.core_dispatcher)
-            .map_err(|err| amethyst::Error::Core(err))?;
+        bundle.build(&mut self.core_dispatcher)?;
         Ok(self)
     }
 
@@ -78,9 +74,7 @@ impl<'a, 'b, T> CustomGameDataBuilder<'a, 'b, T> {
         if let Some(dispatcher) =
             self.dispatchers.get_mut(&dispatcher_name.to_string())
         {
-            bundle
-                .build(dispatcher)
-                .map_err(|err| amethyst::Error::Core(err))?;
+            bundle.build(dispatcher)?;
             Ok(self)
         } else {
             Err(dispatcher_not_found(dispatcher_name))

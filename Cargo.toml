@@ -1,6 +1,6 @@
 [package]
 name = "deathframe"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 edition = "2018"
 description = "My game development framework for the amethyst game engine"
@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies]
-amethyst   = "0.10.0"
+amethyst   = { version = "0.12.0", features = ["vulkan"] }
 regex      = "1.1.5"
 serde      = { version = "1.0.89", features = ["derive"] }
 serde_json = "1.0.39"

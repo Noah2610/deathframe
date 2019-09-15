@@ -25,7 +25,8 @@ pub mod helpers;
 
 pub mod prelude {
     pub use amethyst::core::transform::Transform;
-    pub use amethyst::renderer::{Flipped, Hidden, Transparent};
+    pub use amethyst::core::Hidden;
+    pub use amethyst::renderer::Transparent;
 
     pub use super::camera;
     pub use super::collision;

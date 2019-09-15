@@ -10,18 +10,14 @@
 #     The cargo sub-command to run.
 #     DEFAULT: "build"
 
-_dir="$( dirname "$0" )"
-[ -f "${_dir}/util.sh" ] || "${_dir}/download-util.sh" || exit 1
 # shellcheck source=./util.sh
-source "${_dir}/util.sh"
+_dir="$( dirname "$0" )"
+source "${_dir}/share.sh"
 unset _dir
-
-DEFAULT_RUN_CARGO_CMD="build"
-[ -z "$RUN_CARGO_CMD" ] && RUN_CARGO_CMD="$DEFAULT_RUN_CARGO_CMD"
 
 function build {
   check "cargo"
-  cmd="cargo +nightly-2019-03-01 $RUN_CARGO_CMD --features amethyst/nightly $*"
+  cmd="cargo +$RUST_VERSION build --features amethyst/nightly $*"
   if should_run_in_terminal; then
     run_terminal "$cmd"
   else

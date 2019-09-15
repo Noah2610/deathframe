@@ -2,7 +2,7 @@
 
 use std::time::Instant;
 
-use amethyst::renderer::{SpriteRender, SpriteSheetHandle};
+use amethyst::renderer::sprite::{SpriteRender, SpriteSheetHandle};
 
 use super::component_prelude::*;
 

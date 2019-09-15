@@ -1,19 +1,43 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use amethyst::assets::{AssetStorage, Loader};
+use amethyst::assets::{AssetStorage, Format, Loader};
 use amethyst::audio::output::Output;
 use amethyst::audio::{
-    AudioFormat,
     AudioSink,
+    FlacFormat,
+    Mp3Format,
     OggFormat,
     Source,
     SourceHandle,
+    WavFormat,
 };
 use amethyst::ecs::World;
 use regex::RegexBuilder;
 
 const DEFAULT_VOLUME: f32 = 1.0;
+
+/// Custom AudioFormat enum, because amethyst removed its AudioFormat enum in v0.11.0
+enum AudioFormat {
+    Flac(FlacFormat),
+    Mp3(Mp3Format),
+    Ogg(OggFormat),
+    Wav(WavFormat),
+}
+
+// impl AudioFormat {
+//     fn format<F, D>(&self) -> F
+//     where
+//         F: Format<D>,
+//     {
+//         match self {
+//             AudioFormat::Flac(a) => a,
+//             AudioFormat::Mp3(a) => a,
+//             AudioFormat::Ogg(a) => a,
+//             AudioFormat::Wav(a) => a,
+//         }
+//     }
+// }
 
 /// This is a resource wrapper for amethyst's audio `Source`s.
 /// It can load and get `SourceHandle`s;
@@ -94,10 +118,10 @@ impl AudioHandles {
                 .replace(&extension_with_dot, "");
 
             let audio_format = match extension.to_lowercase().as_str() {
-                "ogg" => AudioFormat::Ogg,
-                "wav" => AudioFormat::Wav,
-                "mp3" => AudioFormat::Mp3,
-                "flac" => AudioFormat::Flac,
+                "flac" => AudioFormat::Flac(FlacFormat),
+                "mp3" => AudioFormat::Mp3(Mp3Format),
+                "ogg" => AudioFormat::Ogg(OggFormat),
+                "wav" => AudioFormat::Wav(WavFormat),
                 ext => panic!(format!(
                     "Given format is not supported for audio: '{:?}'",
                     ext
@@ -106,13 +130,33 @@ impl AudioHandles {
 
             let handle = {
                 let loader = world.read_resource::<Loader>();
-                loader.load(
-                    path.to_str().unwrap(),
-                    audio_format,
-                    (),
-                    (),
-                    &world.read_resource(),
-                )
+                // TODO: Write better code! There must be a reason why amethyst removed their AudioFormat enum!
+                match audio_format {
+                    AudioFormat::Flac(a) => loader.load(
+                        path.to_str().unwrap(),
+                        a,
+                        (),
+                        &world.read_resource(),
+                    ),
+                    AudioFormat::Mp3(a) => loader.load(
+                        path.to_str().unwrap(),
+                        a,
+                        (),
+                        &world.read_resource(),
+                    ),
+                    AudioFormat::Ogg(a) => loader.load(
+                        path.to_str().unwrap(),
+                        a,
+                        (),
+                        &world.read_resource(),
+                    ),
+                    AudioFormat::Wav(a) => loader.load(
+                        path.to_str().unwrap(),
+                        a,
+                        (),
+                        &world.read_resource(),
+                    ),
+                }
             };
 
             self.insert(name, handle);
