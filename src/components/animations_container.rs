@@ -1,7 +1,6 @@
 //! TODO: Documentation
 
 use std::collections::HashMap;
-use std::time::Instant;
 
 use super::component_prelude::*;
 use super::Animation;

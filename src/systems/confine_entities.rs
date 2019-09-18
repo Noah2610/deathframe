@@ -1,5 +1,5 @@
 use super::system_prelude::*;
-use crate::geo::{Rect, RectBuilder, Vector};
+use crate::geo::{RectBuilder, Vector};
 
 /// This system confines all entities with `Transform` and `Confined`
 /// to the rect defined in `Confined`, taking `Size` into account.

@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use amethyst::assets::{AssetStorage, Format, Loader};
+use amethyst::assets::{AssetStorage, Loader};
 use amethyst::audio::output::Output;
 use amethyst::audio::{
-    AudioSink,
     FlacFormat,
     Mp3Format,
     OggFormat,
