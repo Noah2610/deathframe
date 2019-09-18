@@ -27,7 +27,9 @@ pub mod prelude {
 }
 
 pub mod system_prelude {
-    pub use amethyst::assets::AssetStorage;
+    pub type TextureHandle = Handle<Texture>;
+
+    pub use amethyst::assets::{AssetStorage, Handle};
     pub use amethyst::core::timing::Time;
     pub use amethyst::ecs::world::Index;
     pub use amethyst::ecs::{
@@ -44,13 +46,11 @@ pub mod system_prelude {
         WriteStorage,
     };
     pub use amethyst::input::InputHandler;
+    pub use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
     pub use amethyst::renderer::{
         Camera as AmethystCamera,
         SpriteRender,
-        SpriteSheet,
-        SpriteSheetHandle,
         Texture,
-        TextureHandle,
     };
 
     pub use super::helpers::*;

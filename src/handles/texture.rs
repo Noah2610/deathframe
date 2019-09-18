@@ -1,15 +1,12 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use amethyst::assets::{AssetStorage, Loader};
+use amethyst::assets::{AssetStorage, Handle, Loader};
 use amethyst::ecs::World;
-use amethyst::renderer::{
-    Texture,
-    TextureFormat,
-    TextureHandle,
-    TextureMetadata,
-};
+use amethyst::renderer::{ImageFormat, Texture};
 use regex::RegexBuilder;
+
+type TextureHandle = Handle<Texture>;
 
 /// This is a resource wrapper for amethyst's `Texture`s.
 /// It can load and get `TextureHandle`s;
@@ -90,25 +87,13 @@ impl TextureHandles {
                 .unwrap()
                 .replace(&extension_with_dot, "");
 
-            let image_format = match extension.to_lowercase().as_str() {
-                "png" => TextureFormat::Png,
-                "jpg" | "jpeg" => TextureFormat::Jpg,
-                "bmp" => TextureFormat::Bmp,
-                "tga" => TextureFormat::Tga,
-                ext => panic!(format!(
-                    "Given format is not supported for images: '{:?}'",
-                    ext
-                )),
-            };
-
             let handle = {
                 let loader = world.read_resource::<Loader>();
                 let texture_storage =
                     world.read_resource::<AssetStorage<Texture>>();
                 loader.load(
                     path.to_str().unwrap(),
-                    image_format,
-                    TextureMetadata::srgb_scale(),
+                    ImageFormat::default(),
                     (),
                     &texture_storage,
                 )
