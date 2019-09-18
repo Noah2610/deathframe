@@ -143,15 +143,17 @@ impl<'a> System<'a> for CameraSystem {
                         &camera_rects.top,
                     ) {
                         colliding_y = true;
-                        transform
-                            .set_y((center.1 - inner_size.0.h * 0.5).ceil());
+                        transform.set_translation_y(
+                            (center.1 - inner_size.0.h * 0.5).ceil(),
+                        );
                     } else if CollisionGrid::<(), ()>::do_rects_intersect(
                         &following_rect,
                         &camera_rects.bottom,
                     ) {
                         colliding_y = true;
-                        transform
-                            .set_y((center.1 + inner_size.0.h * 0.5).floor());
+                        transform.set_translation_y(
+                            (center.1 + inner_size.0.h * 0.5).floor(),
+                        );
                     }
                     // Horizontal rects (left/right)
                     if CollisionGrid::<(), ()>::do_rects_intersect(
@@ -159,15 +161,17 @@ impl<'a> System<'a> for CameraSystem {
                         &camera_rects.left,
                     ) {
                         colliding_x = true;
-                        transform
-                            .set_x((center.0 + inner_size.0.w * 0.5).floor());
+                        transform.set_translation_x(
+                            (center.0 + inner_size.0.w * 0.5).floor(),
+                        );
                     } else if CollisionGrid::<(), ()>::do_rects_intersect(
                         &following_rect,
                         &camera_rects.right,
                     ) {
                         colliding_x = true;
-                        transform
-                            .set_x((center.0 - inner_size.0.w * 0.5).ceil());
+                        transform.set_translation_x(
+                            (center.0 - inner_size.0.w * 0.5).ceil(),
+                        );
                     }
 
                     // When not in collision with outer camera rects,
@@ -219,8 +223,8 @@ impl<'a> System<'a> for CameraSystem {
                             velocity.y = -camera.base_speed.1 * dist * dt;
                         }
                     } else {
-                        transform.set_x(center.0);
-                        transform.set_y(center.1);
+                        transform.set_translation_x(center.0);
+                        transform.set_translation_y(center.1);
                     }
                 }
 
@@ -229,10 +233,10 @@ impl<'a> System<'a> for CameraSystem {
                     let trans = transform.translation();
                     (trans.x, trans.y)
                 };
-                // transform.set_x((pos.0 as i32) as f32);
-                // transform.set_y((pos.1 as i32) as f32);
-                transform.set_x(pos.0.round());
-                transform.set_y(pos.1.round());
+                // transform.set_translation_x((pos.0 as i32) as f32);
+                // transform.set_translation_y((pos.1 as i32) as f32);
+                transform.set_translation_x(pos.0.round());
+                transform.set_translation_y(pos.1.round());
             } else {
                 // Camera isn't following an entity.
                 // Just don't do anything, I guess?

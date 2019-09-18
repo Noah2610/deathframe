@@ -96,8 +96,8 @@ where
             if let (None, None) | (Some(_), Some(_)) =
                 (loadable_opt, loaded_opt)
             {
-                transform.translate_x(velocity.x * dt);
-                transform.translate_y(velocity.y * dt);
+                transform.prepend_translation_x(velocity.x * dt);
+                transform.prepend_translation_y(velocity.y * dt);
             }
         }
     }
@@ -220,8 +220,8 @@ where
                             collision_grid.colliding_with(&collision_rect);
                         if colliding_with.is_empty() {
                             // New position would NOT be in collision, apply new position
-                            transform.set_x(new_position.0);
-                            transform.set_y(new_position.1);
+                            transform.set_translation_x(new_position.0);
+                            transform.set_translation_y(new_position.1);
                         } else {
                             // New position would be in collision, break out of loop and don't apply
                             // new position, unless this entity is `Push`, and all colliding entities
@@ -247,8 +247,8 @@ where
                                             Axis::Y => entry.1 += sign,
                                         }
                                     }
-                                    transform.set_x(new_position.0);
-                                    transform.set_y(new_position.1);
+                                    transform.set_translation_x(new_position.0);
+                                    transform.set_translation_y(new_position.1);
                                 } else {
                                     // None of the entities are `Pushable`, so don't apply new position.
                                     break;
@@ -274,8 +274,8 @@ where
                         collision_grid.colliding_with(&collision_rect);
                     if colliding_with.is_empty() {
                         // New position would NOT be in collision, apply new position
-                        transform.set_x(new_position.0);
-                        transform.set_y(new_position.1);
+                        transform.set_translation_x(new_position.0);
+                        transform.set_translation_y(new_position.1);
                     } else {
                         // New position would be in collision, check if all collidin entities are pushable.
                         if pusher_opt.is_some() {
@@ -296,8 +296,8 @@ where
                                         Axis::Y => entry.1 += rem,
                                     }
                                 }
-                                transform.set_x(new_position.0);
-                                transform.set_y(new_position.1);
+                                transform.set_translation_x(new_position.0);
+                                transform.set_translation_y(new_position.1);
                             }
                         }
                     }
@@ -325,8 +325,8 @@ where
                             velocity.y = 0.0;
                         }
                     });
-                    transform.translate_x(x);
-                    transform.translate_y(y);
+                    transform.prepend_translation_x(x);
+                    transform.prepend_translation_y(y);
                 }
             }
         }

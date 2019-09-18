@@ -72,8 +72,8 @@ impl<'a> System<'a> for ParallaxSystem {
                             *repeat_y,
                         ),
                 };
-                parallax_transform.set_x(new_pos.0);
-                parallax_transform.set_y(new_pos.1);
+                parallax_transform.set_translation_x(new_pos.0);
+                parallax_transform.set_translation_y(new_pos.1);
             }
         }
     }

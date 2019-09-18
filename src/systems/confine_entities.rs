@@ -36,22 +36,30 @@ impl<'a> System<'a> for ConfineEntitiesSystem {
                         .with_pos_and_size(pos, size.into())
                         .build();
                     if rect.left < confined.rect.left {
-                        transform.set_x(confined.rect.left + size.w * 0.5);
+                        transform.set_translation_x(
+                            confined.rect.left + size.w * 0.5,
+                        );
                     }
                     if rect.right > confined.rect.right {
-                        transform.set_x(confined.rect.right - size.w * 0.5);
+                        transform.set_translation_x(
+                            confined.rect.right - size.w * 0.5,
+                        );
                     }
                     if rect.bottom < confined.rect.bottom {
-                        transform.set_y(confined.rect.bottom + size.h * 0.5);
+                        transform.set_translation_y(
+                            confined.rect.bottom + size.h * 0.5,
+                        );
                     }
                     if rect.top > confined.rect.top {
-                        transform.set_y(confined.rect.top - size.h * 0.5);
+                        transform.set_translation_y(
+                            confined.rect.top - size.h * 0.5,
+                        );
                     }
                 } else {
-                    transform.set_x(
+                    transform.set_translation_x(
                         pos.0.min(confined.rect.right).max(confined.rect.left),
                     );
-                    transform.set_y(
+                    transform.set_translation_y(
                         pos.1.min(confined.rect.top).max(confined.rect.bottom),
                     );
                 }
