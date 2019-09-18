@@ -131,10 +131,7 @@ where
     fn update_axes(&mut self, input: &InputHandler<B>) {
         for axis in input.bindings.axes() {
             if let Some(value) = input.axis_value(axis) {
-                let entry = self.axes.entry(*axis).or_insert(0.0);
-                if *entry != value {
-                    *entry = value;
-                }
+                self.axes.insert(axis.clone(), value);
             } else {
                 panic!(format!("Axis should exist: {:?}", axis));
             }
