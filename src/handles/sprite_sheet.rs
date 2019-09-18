@@ -3,14 +3,8 @@ use std::path::Path;
 
 use amethyst::assets::{AssetStorage, Loader};
 use amethyst::ecs::World;
-use amethyst::renderer::{
-    SpriteSheet,
-    SpriteSheetFormat,
-    SpriteSheetHandle,
-    Texture,
-    TextureFormat,
-    TextureMetadata,
-};
+use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
+use amethyst::renderer::{ImageFormat, SpriteSheetFormat, Texture};
 use regex::RegexBuilder;
 
 /// This is a resource wrapper for amethyst's `SpriteSheet`s.
@@ -102,17 +96,6 @@ impl SpriteSheetHandles {
                 ));
             }
 
-            let image_format = match extension.to_lowercase().as_str() {
-                "png" => TextureFormat::Png,
-                "jpg" | "jpeg" => TextureFormat::Jpg,
-                "bmp" => TextureFormat::Bmp,
-                "tga" => TextureFormat::Tga,
-                ext => panic!(format!(
-                    "Given format is not supported for images: '{:?}'",
-                    ext
-                )),
-            };
-
             let handle = {
                 let loader = world.read_resource::<Loader>();
                 let texture_handle = {
@@ -120,8 +103,7 @@ impl SpriteSheetHandles {
                         world.read_resource::<AssetStorage<Texture>>();
                     loader.load(
                         path.to_str().unwrap(),
-                        image_format,
-                        TextureMetadata::srgb_scale(),
+                        ImageFormat::default(),
                         (),
                         &texture_storage,
                     )
@@ -130,8 +112,7 @@ impl SpriteSheetHandles {
                     world.read_resource::<AssetStorage<SpriteSheet>>();
                 loader.load(
                     path_ron.to_str().unwrap(),
-                    SpriteSheetFormat,
-                    texture_handle,
+                    SpriteSheetFormat(texture_handle),
                     (),
                     &spritesheet_store,
                 )
