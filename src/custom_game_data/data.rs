@@ -2,12 +2,13 @@ use std::collections::HashMap;
 
 use amethyst::ecs::Dispatcher;
 use amethyst::prelude::*;
+use amethyst::DataDispose;
 
 use super::internal_helpers::*;
 use super::CustomGameDataBuilder;
 
 pub struct CustomGameData<'a, 'b, T = ()> {
-    pub(crate) core_dispatcher: Dispatcher<'a, 'b>,
+    pub(crate) core_dispatcher: Option<Dispatcher<'a, 'b>>,
     pub(crate) dispatchers:     HashMap<String, Dispatcher<'a, 'b>>,
     pub custom:                 Option<T>,
 }
@@ -42,6 +43,20 @@ impl<'a, 'b, T> CustomGameData<'a, 'b, T> {
     }
 
     pub fn update_core(&mut self, world: &World) {
-        self.core_dispatcher.dispatch(&world.res);
+        self.core_dispatcher
+            .as_mut()
+            .expect("Core Dispatcher needs to exist when calling update")
+            .dispatch(&world.res);
+    }
+}
+
+impl<'a, 'b, T> DataDispose for CustomGameData<'a, 'b, T> {
+    fn dispose(&mut self, world: &mut World) {
+        if let Some(dispatcher) = self.core_dispatcher.take() {
+            dispatcher.dispose(&mut world.res);
+        }
+        self.dispatchers.drain().for_each(|(_name, dispatcher)| {
+            dispatcher.dispose(&mut world.res);
+        })
     }
 }

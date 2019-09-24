@@ -145,7 +145,7 @@ impl<'a, 'b, T> DataInit<CustomGameData<'a, 'b, T>>
 
         // Create the `CustomGameData`
         CustomGameData {
-            core_dispatcher,
+            core_dispatcher: Some(core_dispatcher),
             dispatchers,
             custom: self.custom,
         }
