@@ -32,7 +32,7 @@ impl<'a, 'b, T> CustomGameData<'a, 'b, T> {
         let dispatcher_name = dispatcher_name.to_string();
 
         if let Some(dispatcher) = self.dispatchers.get_mut(&dispatcher_name) {
-            dispatcher.dispatch(&world.res);
+            dispatcher.dispatch(&world);
         } else {
             return Err(dispatcher_not_found(dispatcher_name));
         }
@@ -46,17 +46,17 @@ impl<'a, 'b, T> CustomGameData<'a, 'b, T> {
         self.core_dispatcher
             .as_mut()
             .expect("Core Dispatcher needs to exist when calling update")
-            .dispatch(&world.res);
+            .dispatch(&world);
     }
 }
 
 impl<'a, 'b, T> DataDispose for CustomGameData<'a, 'b, T> {
     fn dispose(&mut self, world: &mut World) {
         if let Some(dispatcher) = self.core_dispatcher.take() {
-            dispatcher.dispose(&mut world.res);
+            dispatcher.dispose(world);
         }
         self.dispatchers.drain().for_each(|(_name, dispatcher)| {
-            dispatcher.dispose(&mut world.res);
+            dispatcher.dispose(world);
         })
     }
 }

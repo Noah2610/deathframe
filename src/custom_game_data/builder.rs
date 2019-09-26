@@ -52,17 +52,22 @@ impl<'a, 'b, T> CustomGameDataBuilder<'a, 'b, T> {
     }
 
     /// Register a bundle for the _core_ dispatcher.
-    pub fn with_core_bundle<B>(mut self, bundle: B) -> amethyst::Result<Self>
+    pub fn with_core_bundle<B>(
+        mut self,
+        world: &mut World,
+        bundle: B,
+    ) -> amethyst::Result<Self>
     where
         B: SystemBundle<'a, 'b>,
     {
-        bundle.build(&mut self.core_dispatcher)?;
+        bundle.build(world, &mut self.core_dispatcher)?;
         Ok(self)
     }
 
     /// Register a bundle for the given dispatcher.
     pub fn with_bundle<U, B>(
         mut self,
+        world: &mut World,
         dispatcher_name: U,
         bundle: B,
     ) -> amethyst::Result<Self>
@@ -74,7 +79,7 @@ impl<'a, 'b, T> CustomGameDataBuilder<'a, 'b, T> {
         if let Some(dispatcher) =
             self.dispatchers.get_mut(&dispatcher_name.to_string())
         {
-            bundle.build(dispatcher)?;
+            bundle.build(world, dispatcher)?;
             Ok(self)
         } else {
             Err(dispatcher_not_found(dispatcher_name))
@@ -124,21 +129,21 @@ impl<'a, 'b, T> DataInit<CustomGameData<'a, 'b, T>>
 {
     fn build(self, world: &mut World) -> CustomGameData<'a, 'b, T> {
         // Get handle to the `ThreadPool`
-        let pool = world.read_resource::<ArcThreadPool>().clone();
+        let pool = (&*world.read_resource::<ArcThreadPool>().clone()).clone();
 
         // Create core dispatcher
         let mut core_dispatcher =
             self.core_dispatcher.with_pool(pool.clone()).build();
 
         // Create other dispatchers
-        core_dispatcher.setup(&mut world.res);
+        core_dispatcher.setup(world);
         let dispatchers = self
             .dispatchers
             .into_iter()
             .map(|(name, dispatcher_builder)| {
                 let mut dispatcher =
                     dispatcher_builder.with_pool(pool.clone()).build();
-                dispatcher.setup(&mut world.res);
+                dispatcher.setup(world);
                 (name, dispatcher)
             })
             .collect();

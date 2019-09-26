@@ -11,7 +11,7 @@ use amethyst::audio::{
     SourceHandle,
     WavFormat,
 };
-use amethyst::ecs::World;
+use amethyst::ecs::{World, WorldExt};
 use regex::RegexBuilder;
 
 const DEFAULT_VOLUME: f32 = 1.0;

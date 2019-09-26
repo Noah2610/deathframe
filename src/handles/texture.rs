@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use amethyst::assets::{AssetStorage, Handle, Loader};
-use amethyst::ecs::World;
+use amethyst::ecs::{World, WorldExt};
 use amethyst::renderer::{ImageFormat, Texture};
 use regex::RegexBuilder;
 
