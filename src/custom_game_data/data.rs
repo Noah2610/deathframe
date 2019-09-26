@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use amethyst::core::SystemBundle;
 use amethyst::ecs::Dispatcher;
 use amethyst::prelude::*;
 use amethyst::DataDispose;
@@ -7,16 +8,19 @@ use amethyst::DataDispose;
 use super::internal_helpers::*;
 use super::CustomGameDataBuilder;
 
-pub struct CustomGameData<'a, 'b, T = ()> {
+pub struct CustomGameData<'a, 'b, C = ()> {
     pub(crate) core_dispatcher: Option<Dispatcher<'a, 'b>>,
     pub(crate) dispatchers:     HashMap<String, Dispatcher<'a, 'b>>,
-    pub custom:                 Option<T>,
+    pub custom:                 Option<C>,
 }
 
-impl<'a, 'b, T> CustomGameData<'a, 'b, T> {
+impl<'a, 'b, C> CustomGameData<'a, 'b, C> {
     /// Returns a new `CustomGameDataBuilder` instance.
-    pub fn new() -> CustomGameDataBuilder<'a, 'b, T> {
-        CustomGameDataBuilder::new()
+    pub fn builder<B>() -> CustomGameDataBuilder<'a, 'b, C>
+    where
+        B: SystemBundle<'a, 'b>,
+    {
+        CustomGameDataBuilder::default()
     }
 
     // Call this from the active state with the state's (dispatcher's) name every frame.
@@ -50,7 +54,7 @@ impl<'a, 'b, T> CustomGameData<'a, 'b, T> {
     }
 }
 
-impl<'a, 'b, T> DataDispose for CustomGameData<'a, 'b, T> {
+impl<'a, 'b, C> DataDispose for CustomGameData<'a, 'b, C> {
     fn dispose(&mut self, world: &mut World) {
         if let Some(dispatcher) = self.core_dispatcher.take() {
             dispatcher.dispose(world);
