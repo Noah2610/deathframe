@@ -8,25 +8,21 @@ use amethyst::DataInit;
 use super::internal_helpers::*;
 use super::CustomGameData;
 
-struct BundleWrapper<'a, 'b>(pub Option<Box<dyn SystemBundle<'a, 'b>>>);
+struct BundleWrapper<'a, 'b>(pub Box<dyn SystemBundle<'a, 'b>>);
 impl<'a, 'b> BundleWrapper<'a, 'b> {
     pub fn new<B>(bundle: B) -> Self
     where
         B: 'static + SystemBundle<'a, 'b>,
     {
-        Self(Some(Box::new(bundle)))
+        Self(Box::new(bundle))
     }
 
     pub fn build(
-        &mut self,
+        self: Box<Self>,
         world: &mut World,
         dispatcher: &mut DispatcherBuilder<'a, 'b>,
     ) -> amethyst::Result<()> {
-        if let Some(bundle) = self.0.take() {
-            bundle.build(world, dispatcher)
-        } else {
-            Err(amethyst::Error::from_string("Bundle was already built"))
-        }
+        self.0.build(world, dispatcher)
     }
 }
 
@@ -150,11 +146,16 @@ impl<'a, 'b, C> DataInit<CustomGameData<'a, 'b, C>>
         let pool = (&*world.read_resource::<ArcThreadPool>().clone()).clone();
 
         // Build core bundles
-        for bundle in self.core_bundles {
-            bundle
-                .build(world, &mut self.core_dispatcher)
-                .expect("Couldn't build core bundle");
-        }
+        self.core_bundles
+            .into_iter()
+            .try_for_each(|bundle| {
+                BundleWrapper::build(
+                    Box::new(bundle),
+                    world,
+                    &mut self.core_dispatcher,
+                )
+            })
+            .expect("Couldn't build core bundle");
 
         // Create core dispatcher
         let mut core_dispatcher =
