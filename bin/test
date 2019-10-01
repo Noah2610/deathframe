@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build the project for development.
+# Run `cargo test` on the project for development.
 # All command-line arguments are passed to the executed `cargo` command.
 # Optional environment variables:
 #   $RUN_NEW_TERMINAL
@@ -12,4 +12,4 @@ _dir="$( dirname "$0" )"
 source "${_dir}/share.sh"
 unset _dir
 
-cargo_cmd build $*
+cargo_cmd test "$*"
