@@ -15,68 +15,59 @@ use amethyst::{StateData, Trans};
 /// # use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
 /// # use amethyst::{State, StateData, StateEvent, Trans};
 ///
-/// use deathframe::menu::Menu;
+/// use deathframe::menu::{Menu, UiData};
 ///
+/// type MyGameData = ();
+/// type MyStateEvent = ();
+///
+/// #[derive(Default)]
 /// struct ExampleState {
-///     ui_entities:  Vec<Entity>,
-///     ui_reader_id: Option<ReaderId<UiEvent>>,
-///     to_main_menu: bool,
+///     ui_data: UiData,
 /// }
 ///
-/// impl Menu for ExampleState {
-///     fn event_triggered<'a, 'b>(
+/// impl<MyGameData, MyStateEvent> Menu<MyGameData, MyStateEvent> for ExampleState {
+///     fn event_triggered(
 ///         &mut self,
+///         data: &mut StateData<MyGameData>,
 ///         event_name: String,
-///     ) -> Option<Trans<T, E> {
+///     ) -> Option<Trans<MyGameData, MyStateEvent>> {
 ///         match event_name.as_ref() {
-///             "pause_button" => Some(Trans::Pop),
-///             "quit_button" => {
-///                 self.to_main_menu = true;
-///                 Some(Trans::Pop)
-///             }
+///             "btn_quit" => Some(Trans::Pop),
 ///             _ => None,
 ///         }
 ///     }
 ///
 ///     fn ui_ron_path(&self) -> &str {
-///         UI_RON_PATH
+///         "resources/my_ui.ron"
 ///     }
 ///
-///     fn ui_entities(&self) -> &Vec<Entity> {
-///         &self.ui_entities
+///     fn ui_data(&self) -> &UiData {
+///         &self.ui_data
 ///     }
 ///
-///     fn ui_entities_mut(&mut self) -> &mut Vec<Entity> {
-///         &mut self.ui_entities
-///     }
-///
-///     fn ui_reader_id(&self) -> &Option<ReaderId<UiEvent>> {
-///         &self.ui_reader_id
-///     }
-///
-///     fn ui_reader_id_mut(&mut self) -> &mut Option<ReaderId<UiEvent>> {
-///         &mut self.ui_reader_id
+///     fn ui_data_mut(&mut self) -> &mut UiData {
+///         &mut self.ui_data
 ///     }
 /// }
 ///```
+
+#[derive(Default)]
+pub struct UiData {
+    ui_entities:  Vec<Entity>,
+    ui_reader_id: Option<ReaderId<UiEvent>>,
+}
 
 pub trait Menu<T, E> {
     /// Returns the path to the UI's RON configuration file.
     fn ui_ron_path(&self) -> &str;
 
-    /// Returns a reference to the Vec of UI entities.
-    fn ui_entities(&self) -> &Vec<Entity>;
+    /// Returns a shared reference to the UiData.
+    fn ui_data(&self) -> &UiData;
 
-    /// Returns a mutable reference to the Vec of UI entities.
-    fn ui_entities_mut(&mut self) -> &mut Vec<Entity>;
+    /// Returns a mutable reference to the UiData.
+    fn ui_data_mut(&mut self) -> &mut UiData;
 
-    /// Returns a reference to an Option of ReaderId.
-    fn ui_reader_id(&self) -> &Option<ReaderId<UiEvent>>;
-
-    /// Returns a mutable reference to an Option of ReaderId.
-    fn ui_reader_id_mut(&mut self) -> &mut Option<ReaderId<UiEvent>>;
-
-    fn event_triggered<'a, 'b>(
+    fn event_triggered(
         &mut self,
         data: &mut StateData<T>,
         event_name: String,
@@ -88,17 +79,19 @@ pub trait Menu<T, E> {
         let menu_entity = data.world.exec(|mut creator: UiCreator| {
             creator.create(self.ui_ron_path(), &mut progress)
         });
-        self.ui_entities_mut().push(menu_entity);
+        self.ui_data_mut().ui_entities.push(menu_entity);
 
         progress
     }
 
     fn delete_ui(&mut self, data: &mut StateData<T>) {
-        data.world.delete_entities(self.ui_entities()).unwrap();
-        self.ui_entities_mut().clear();
+        data.world
+            .delete_entities(&self.ui_data().ui_entities)
+            .unwrap();
+        self.ui_data_mut().ui_entities.clear();
     }
 
-    fn update_ui_events<'a, 'b>(
+    fn update_ui_events(
         &mut self,
         data: &mut StateData<T>,
     ) -> Option<Trans<T, E>> {
@@ -111,7 +104,8 @@ pub trait Menu<T, E> {
                 ReadStorage<UiTransform>,
             )| {
                 let reader_id = self
-                    .ui_reader_id_mut()
+                    .ui_data_mut()
+                    .ui_reader_id
                     .get_or_insert_with(|| events.register_reader());
 
                 for event in events.read(reader_id) {
