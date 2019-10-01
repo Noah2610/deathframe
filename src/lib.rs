@@ -11,3 +11,4 @@ pub mod custom_game_data;
 pub mod geo;
 pub mod handles;
 pub mod input_manager;
+pub mod menu;
