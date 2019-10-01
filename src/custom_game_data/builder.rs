@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+use amethyst::core::deferred_dispatcher_operation::{
+    AddBundle,
+    DispatcherOperation,
+};
 use amethyst::core::{ArcThreadPool, SystemBundle};
 use amethyst::ecs::{DispatcherBuilder, System};
 use amethyst::prelude::*;
@@ -8,31 +12,14 @@ use amethyst::DataInit;
 use super::internal_helpers::*;
 use super::CustomGameData;
 
-struct BundleWrapper<'a, 'b>(pub Box<dyn SystemBundle<'a, 'b>>);
-impl<'a, 'b> BundleWrapper<'a, 'b> {
-    pub fn new<B>(bundle: B) -> Self
-    where
-        B: 'static + SystemBundle<'a, 'b>,
-    {
-        Self(Box::new(bundle))
-    }
-
-    pub fn build(
-        self: Box<Self>,
-        world: &mut World,
-        dispatcher: &mut DispatcherBuilder<'a, 'b>,
-    ) -> amethyst::Result<()> {
-        self.0.build(world, dispatcher)
-    }
-}
-
 /// Builder struct for `CustomGameData`.
 pub struct CustomGameDataBuilder<'a, 'b, C = ()> {
-    core_dispatcher: DispatcherBuilder<'a, 'b>,
-    dispatchers:     HashMap<String, DispatcherBuilder<'a, 'b>>,
-    core_bundles:    Vec<BundleWrapper<'a, 'b>>,
-    bundles:         HashMap<String, Vec<BundleWrapper<'a, 'b>>>,
-    custom:          Option<C>,
+    core_dispatcher:            DispatcherBuilder<'a, 'b>,
+    dispatchers:                HashMap<String, DispatcherBuilder<'a, 'b>>,
+    core_dispatcher_operations: Vec<Box<dyn DispatcherOperation<'a, 'b>>>,
+    dispatcher_operations:
+        HashMap<String, Vec<Box<dyn DispatcherOperation<'a, 'b>>>>,
+    custom:                     Option<C>,
 }
 
 impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
@@ -65,10 +52,10 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
     /// Register a bundle for the _core_ dispatcher.
     pub fn with_core_bundle<B>(mut self, bundle: B) -> amethyst::Result<Self>
     where
-        B: 'static + SystemBundle<'a, 'b>,
+        B: SystemBundle<'a, 'b> + 'static,
     {
-        self.core_bundles.push(BundleWrapper::new(bundle));
-        // bundle.build(world, &mut self.core_dispatcher)?;
+        self.core_dispatcher_operations
+            .push(Box::new(AddBundle { bundle }));
         Ok(self)
     }
 
@@ -80,18 +67,17 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
     ) -> amethyst::Result<Self>
     where
         U: ToString,
-        B: 'static + SystemBundle<'a, 'b>,
+        B: SystemBundle<'a, 'b> + 'static,
     {
         let dispatcher_name = dispatcher_name.to_string();
         // if let Some(dispatcher) =
         //     self.dispatchers.get_mut(&dispatcher_name.to_string())
         // {
         if self.dispatchers.contains_key(&dispatcher_name) {
-            self.bundles
+            self.dispatcher_operations
                 .entry(dispatcher_name)
-                .or_insert(Vec::new())
-                .push(BundleWrapper::new(bundle));
-            // bundle.build(world, dispatcher)?;
+                .or_insert_with(Vec::new)
+                .push(Box::new(AddBundle { bundle }));
             Ok(self)
         } else {
             Err(dispatcher_not_found(dispatcher_name))
@@ -139,34 +125,43 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
 impl<'a, 'b, C> DataInit<CustomGameData<'a, 'b, C>>
     for CustomGameDataBuilder<'a, 'b, C>
 {
-    fn build(mut self, world: &mut World) -> CustomGameData<'a, 'b, C> {
-        // Build bundles
-
+    fn build(self, world: &mut World) -> CustomGameData<'a, 'b, C> {
         // Get handle to the `ThreadPool`
-        let pool = (&*world.read_resource::<ArcThreadPool>().clone()).clone();
+        let pool = (*world.read_resource::<ArcThreadPool>()).clone();
+
+        let mut core_dispatcher_builder = self.core_dispatcher;
 
         // Build core bundles
-        self.core_bundles
+        self.core_dispatcher_operations
             .into_iter()
-            .try_for_each(|bundle| {
-                BundleWrapper::build(
-                    Box::new(bundle),
-                    world,
-                    &mut self.core_dispatcher,
-                )
+            .try_for_each(|operation| {
+                operation.exec(world, &mut core_dispatcher_builder)
             })
             .expect("Couldn't build core bundle");
 
         // Create core dispatcher
         let mut core_dispatcher =
-            self.core_dispatcher.with_pool(pool.clone()).build();
+            core_dispatcher_builder.with_pool(pool.clone()).build();
+        core_dispatcher.setup(world);
+
+        let mut dispatcher_operations = self.dispatcher_operations;
 
         // Create other dispatchers
-        core_dispatcher.setup(world);
         let dispatchers = self
             .dispatchers
             .into_iter()
-            .map(|(name, dispatcher_builder)| {
+            .map(|(name, mut dispatcher_builder)| {
+                // Build bundles
+                if let Some(operations) = dispatcher_operations.remove(&name) {
+                    operations
+                        .into_iter()
+                        .try_for_each(|operation| {
+                            operation.exec(world, &mut dispatcher_builder)
+                        })
+                        .expect("Couldn't build bundle");
+                }
+
+                // Build dispatcher
                 let mut dispatcher =
                     dispatcher_builder.with_pool(pool.clone()).build();
                 dispatcher.setup(world);
@@ -187,11 +182,11 @@ impl<'a, 'b, C> Default for CustomGameDataBuilder<'a, 'b, C> {
     /// Creates a new builder for `CustomGameData`
     fn default() -> Self {
         Self {
-            core_dispatcher: DispatcherBuilder::new(),
-            dispatchers:     HashMap::new(),
-            core_bundles:    Vec::new(),
-            bundles:         HashMap::new(),
-            custom:          None,
+            core_dispatcher:            DispatcherBuilder::new(),
+            dispatchers:                HashMap::new(),
+            core_dispatcher_operations: Vec::new(),
+            dispatcher_operations:      HashMap::new(),
+            custom:                     None,
         }
     }
 }
