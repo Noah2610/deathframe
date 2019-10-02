@@ -67,12 +67,17 @@ pub trait Menu<T, E> {
     /// Returns a mutable reference to the UiData.
     fn ui_data_mut(&mut self) -> &mut UiData;
 
+    /// This method is called when an event is triggered.
+    /// It is passed the `event_name` as a `String`.
+    /// Internally, this method is called from `update_ui_events`,
+    /// see `update_ui_events` for more information.
     fn event_triggered(
         &mut self,
         data: &mut StateData<T>,
         event_name: String,
     ) -> Option<Trans<T, E>>;
 
+    /// Call this method to create the UI entities, specified in the UI's ron file.
     fn create_ui(&mut self, data: &mut StateData<T>) -> ProgressCounter {
         let mut progress = ProgressCounter::new();
 
@@ -84,6 +89,7 @@ pub trait Menu<T, E> {
         progress
     }
 
+    /// Deletes the created UI entities.
     fn delete_ui(&mut self, data: &mut StateData<T>) {
         data.world
             .delete_entities(&self.ui_data().ui_entities)
@@ -91,6 +97,9 @@ pub trait Menu<T, E> {
         self.ui_data_mut().ui_entities.clear();
     }
 
+    /// This method should be called every tick.
+    /// I usually call this from my state's `fixed_update` method.
+    /// This method will call the `event_triggered` method, if a UI element is clicked.
     fn update_ui_events(
         &mut self,
         data: &mut StateData<T>,
