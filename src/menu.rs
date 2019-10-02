@@ -59,7 +59,8 @@ pub struct UiData {
 
 pub trait Menu<T, E> {
     /// Returns the path to the UI's RON configuration file.
-    fn ui_ron_path(&self) -> &str;
+    // TODO: Don't require a `String` to be returned, be more generic.
+    fn ui_ron_path(&self) -> String;
 
     /// Returns a shared reference to the UiData.
     fn ui_data(&self) -> &UiData;
