@@ -1,55 +1,55 @@
 //! States can implement the `Menu` trait.
 //! Provides simple ui helper methods.
+//!
+//! # Boilerplate
+//!```
+//! # use amethyst::assets::ProgressCounter;
+//! # use amethyst::ecs::{Entities, Entity, Join, ReadStorage, WorldExt, Write};
+//! # use amethyst::shrev::{EventChannel, ReaderId};
+//! # use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
+//! # use amethyst::{State, StateData, StateEvent, Trans};
+//!
+//! use deathframe::menu::{Menu, UiData};
+//!
+//! type MyGameData = ();
+//! type MyStateEvent = ();
+//!
+//! #[derive(Default)]
+//! struct ExampleState {
+//!     ui_data: UiData,
+//! }
+//!
+//! impl<MyGameData, MyStateEvent> Menu<MyGameData, MyStateEvent> for ExampleState {
+//!     fn event_triggered(
+//!         &mut self,
+//!         data: &mut StateData<MyGameData>,
+//!         event_name: String,
+//!     ) -> Option<Trans<MyGameData, MyStateEvent>> {
+//!         match event_name.as_ref() {
+//!             "btn_quit" => Some(Trans::Pop),
+//!             _ => None,
+//!         }
+//!     }
+//!
+//!     fn ui_ron_path(&self) -> &str {
+//!         "resources/my_ui.ron"
+//!     }
+//!
+//!     fn ui_data(&self) -> &UiData {
+//!         &self.ui_data
+//!     }
+//!
+//!     fn ui_data_mut(&mut self) -> &mut UiData {
+//!         &mut self.ui_data
+//!     }
+//! }
+//!```
 
 use amethyst::assets::ProgressCounter;
 use amethyst::ecs::{Entities, Entity, Join, ReadStorage, WorldExt, Write};
 use amethyst::shrev::{EventChannel, ReaderId};
 use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
 use amethyst::{StateData, Trans};
-
-/// # Boilerplate
-///```
-/// # use amethyst::assets::ProgressCounter;
-/// # use amethyst::ecs::{Entities, Entity, Join, ReadStorage, WorldExt, Write};
-/// # use amethyst::shrev::{EventChannel, ReaderId};
-/// # use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
-/// # use amethyst::{State, StateData, StateEvent, Trans};
-///
-/// use deathframe::menu::{Menu, UiData};
-///
-/// type MyGameData = ();
-/// type MyStateEvent = ();
-///
-/// #[derive(Default)]
-/// struct ExampleState {
-///     ui_data: UiData,
-/// }
-///
-/// impl<MyGameData, MyStateEvent> Menu<MyGameData, MyStateEvent> for ExampleState {
-///     fn event_triggered(
-///         &mut self,
-///         data: &mut StateData<MyGameData>,
-///         event_name: String,
-///     ) -> Option<Trans<MyGameData, MyStateEvent>> {
-///         match event_name.as_ref() {
-///             "btn_quit" => Some(Trans::Pop),
-///             _ => None,
-///         }
-///     }
-///
-///     fn ui_ron_path(&self) -> &str {
-///         "resources/my_ui.ron"
-///     }
-///
-///     fn ui_data(&self) -> &UiData {
-///         &self.ui_data
-///     }
-///
-///     fn ui_data_mut(&mut self) -> &mut UiData {
-///         &mut self.ui_data
-///     }
-/// }
-///```
 
 #[derive(Default)]
 pub struct UiData {
