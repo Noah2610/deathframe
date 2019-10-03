@@ -1,12 +1,13 @@
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 use amethyst::core::deferred_dispatcher_operation::{
     AddBundle,
+    AddSystemDesc,
     DispatcherOperation,
 };
-use amethyst::core::{ArcThreadPool, SystemBundle};
-use amethyst::ecs::{DispatcherBuilder, System};
-use amethyst::prelude::*;
+use amethyst::core::{ArcThreadPool, SystemBundle, SystemDesc};
+use amethyst::ecs::{DispatcherBuilder, System, World, WorldExt};
 use amethyst::DataInit;
 
 use super::internal_helpers::*;
@@ -70,9 +71,6 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
         B: SystemBundle<'a, 'b> + 'static,
     {
         let dispatcher_name = dispatcher_name.to_string();
-        // if let Some(dispatcher) =
-        //     self.dispatchers.get_mut(&dispatcher_name.to_string())
-        // {
         if self.dispatchers.contains_key(&dispatcher_name) {
             self.dispatcher_operations
                 .entry(dispatcher_name)
@@ -115,6 +113,67 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
         let dispatcher_name = dispatcher_name.to_string();
         if let Some(dispatcher) = self.dispatchers.get_mut(&dispatcher_name) {
             dispatcher.add(system, name, dependencies);
+            Ok(self)
+        } else {
+            Err(dispatcher_not_found(dispatcher_name))
+        }
+    }
+
+    /// Register a system description for the _core_ dispatcher.
+    pub fn with_core_desc<SD, S>(
+        mut self,
+        system_desc: SD,
+        name: &str,
+        dependencies: &[&str],
+    ) -> amethyst::Result<Self>
+    where
+        SD: SystemDesc<'a, 'b, S> + 'static,
+        S: for<'c> System<'c> + Send + 'static,
+    {
+        let name = name.to_string();
+        let dependencies =
+            dependencies.into_iter().map(ToString::to_string).collect();
+
+        let dispatcher_operation = Box::new(AddSystemDesc {
+            system_desc,
+            name,
+            dependencies,
+            marker: PhantomData::<S>,
+        })
+            as Box<dyn DispatcherOperation<'a, 'b> + 'static>;
+        self.core_dispatcher_operations.push(dispatcher_operation);
+        Ok(self)
+    }
+
+    /// Register a system description for the given dispatcher.
+    pub fn with_desc<U, SD, S>(
+        mut self,
+        dispatcher_name: U,
+        system_desc: SD,
+        name: &str,
+        dependencies: &[&str],
+    ) -> amethyst::Result<Self>
+    where
+        U: ToString,
+        SD: SystemDesc<'a, 'b, S> + 'static,
+        S: for<'c> System<'c> + Send + 'static,
+    {
+        let dispatcher_name = dispatcher_name.to_string();
+        if self.dispatchers.contains_key(&dispatcher_name) {
+            let name = name.to_string();
+            let dependencies =
+                dependencies.into_iter().map(ToString::to_string).collect();
+            let dispatcher_operation = Box::new(AddSystemDesc {
+                system_desc,
+                name,
+                dependencies,
+                marker: PhantomData::<S>,
+            })
+                as Box<dyn DispatcherOperation<'a, 'b> + 'static>;
+            self.dispatcher_operations
+                .entry(dispatcher_name)
+                .or_insert_with(Vec::new)
+                .push(dispatcher_operation);
             Ok(self)
         } else {
             Err(dispatcher_not_found(dispatcher_name))
