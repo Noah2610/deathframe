@@ -31,10 +31,6 @@
 //!         }
 //!     }
 //!
-//!     fn ui_ron_path(&self) -> &str {
-//!         "resources/my_ui.ron"
-//!     }
-//!
 //!     fn ui_data(&self) -> &UiData {
 //!         &self.ui_data
 //!     }
@@ -58,10 +54,6 @@ pub struct UiData {
 }
 
 pub trait Menu<T, E> {
-    /// Returns the path to the UI's RON configuration file.
-    // TODO: Don't require a `String` to be returned, be more generic.
-    fn ui_ron_path(&self) -> String;
-
     /// Returns a shared reference to the UiData.
     fn ui_data(&self) -> &UiData;
 
@@ -79,11 +71,18 @@ pub trait Menu<T, E> {
     ) -> Option<Trans<T, E>>;
 
     /// Call this method to create the UI entities, specified in the UI's ron file.
-    fn create_ui(&mut self, data: &mut StateData<T>) -> ProgressCounter {
+    fn create_ui<S>(
+        &mut self,
+        data: &mut StateData<T>,
+        ron_path: S,
+    ) -> ProgressCounter
+    where
+        S: ToString,
+    {
         let mut progress = ProgressCounter::new();
 
         let menu_entity = data.world.exec(|mut creator: UiCreator| {
-            creator.create(self.ui_ron_path(), &mut progress)
+            creator.create(ron_path.to_string(), &mut progress)
         });
         self.ui_data_mut().ui_entities.push(menu_entity);
 
