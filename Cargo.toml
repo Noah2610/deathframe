@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies]
-amethyst   = { version = "0.13.0", features = ["vulkan"] }
+amethyst   = { version = "0.13.1", features = ["vulkan"] }
 regex      = "1.1.5"
 serde      = { version = "1.0.89", features = ["derive"] }
 serde_json = "1.0.39"

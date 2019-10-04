@@ -2,6 +2,7 @@ use super::system_prelude::*;
 
 /// Gets all entities with `Velocity` and `DecreaseVelocity`,
 /// and decreases their velocities every frame.
+#[derive(Default)]
 pub struct DecreaseVelocitiesSystem;
 
 impl<'a> System<'a> for DecreaseVelocitiesSystem {
