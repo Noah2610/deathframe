@@ -5,6 +5,7 @@ use amethyst::ecs::world::Index;
 use super::system_prelude::*;
 use crate::geo::prelude::*;
 
+#[derive(Default)]
 pub struct CameraSystem;
 
 impl<'a> System<'a> for CameraSystem {
