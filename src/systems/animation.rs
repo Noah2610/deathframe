@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 
 use super::system_prelude::*;
 
+#[derive(Default)]
 pub struct AnimationSystem;
 
 impl AnimationSystem {
