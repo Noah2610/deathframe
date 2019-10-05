@@ -1,7 +1,6 @@
 //! A collection of systems, giving the components in this crate functionality.
 
 mod animation;
-mod camera;
 mod collision;
 mod confine_entities;
 mod decrease_velocities;
@@ -14,7 +13,6 @@ mod scale_sprites;
 
 pub mod prelude {
     pub use super::AnimationSystem;
-    pub use super::CameraSystem;
     pub use super::CollisionSystem;
     pub use super::ConfineEntitiesSystem;
     pub use super::DecreaseVelocitiesSystem;
@@ -62,7 +60,6 @@ pub mod system_prelude {
 mod helpers;
 
 pub use animation::AnimationSystem;
-pub use camera::CameraSystem;
 pub use collision::CollisionSystem;
 pub use confine_entities::ConfineEntitiesSystem;
 pub use decrease_velocities::DecreaseVelocitiesSystem;
