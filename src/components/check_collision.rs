@@ -8,9 +8,3 @@ pub struct CheckCollision;
 impl Component for CheckCollision {
     type Storage = NullStorage<Self>;
 }
-
-impl Default for CheckCollision {
-    fn default() -> Self {
-        Self
-    }
-}
