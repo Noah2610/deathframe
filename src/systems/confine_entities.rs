@@ -3,6 +3,7 @@ use crate::geo::{RectBuilder, Vector};
 
 /// This system confines all entities with `Transform` and `Confined`
 /// to the rect defined in `Confined`, taking `Size` into account.
+#[derive(Default)]
 pub struct ConfineEntitiesSystem;
 
 impl<'a> System<'a> for ConfineEntitiesSystem {
