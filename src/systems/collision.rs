@@ -17,6 +17,7 @@ const PADDING: f32 = 1.0;
 // This might improve performance, as the `CollisionGrid` wouldn't be re-generated every frame.
 // It would have to re-generate and remove all `CollisionRect`s with moving entities each frame
 // though, so benchmarking would be needed to verify that this would be beneficial.
+#[derive(Default)]
 pub struct CollisionSystem;
 
 impl<'a> System<'a> for CollisionSystem {

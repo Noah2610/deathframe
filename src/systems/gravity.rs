@@ -1,6 +1,7 @@
 use super::system_prelude::*;
 
 /// This system increases entities' velocities every frame.
+#[derive(Default)]
 pub struct GravitySystem;
 
 impl<'a> System<'a> for GravitySystem {
