@@ -21,7 +21,7 @@ pub fn add_component_to_entity_by_name<'a, T>(
             capture.name("params").map(|x| x.as_str()).unwrap_or(""),
         ) {
             ("CheckCollision", _) => entity = entity.with(CheckCollision),
-            ("Collision", _)      => entity = entity.with(Collision::new()),
+            ("Collision", _)      => entity = entity.with(Collision::default()),
             ("Push", _)           => entity = entity.with(Push),
             ("Pushable", _)       => entity = entity.with(Pushable),
             ("Solid", data)       => {

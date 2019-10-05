@@ -73,18 +73,12 @@ impl Data {
 /// Entities with `CheckCollision` perform collision detection against
 /// all other entities with `Collision`, every frame.
 /// Depending on if they are in collision, data will be set.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Collision {
     pub(crate) collisions: HashMap<Index, Data>,
 }
 
 impl Collision {
-    pub fn new() -> Self {
-        Self {
-            collisions: HashMap::new(),
-        }
-    }
-
     /// Returns `true` if in collision with _any_ other entity.
     /// NOTE: I'm pretty sure this will also return `true` for leaving collisions (`State::Leave`).
     ///       Should probably return `false` if all collisions are leaving.
