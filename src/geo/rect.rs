@@ -12,7 +12,7 @@ pub struct Rect {
 
 impl Rect {
     /// Returns a new `RectBuilder`.
-    pub fn new() -> RectBuilder {
+    pub fn builder() -> RectBuilder {
         RectBuilder::default()
     }
 }
