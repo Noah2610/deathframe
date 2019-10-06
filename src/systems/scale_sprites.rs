@@ -3,6 +3,7 @@ use super::system_prelude::*;
 /// This system gets all entities with `Transform`, `Size`, `SpriteRender`, and  `ScaleOnce`,
 /// and scales their sprite to their entity's size _once_; after scaling, the `ScaleOnce`
 /// component is removed from the entity.
+#[derive(Default)]
 pub struct ScaleSpritesSystem;
 
 impl<'s> System<'s> for ScaleSpritesSystem {
