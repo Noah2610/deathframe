@@ -134,12 +134,13 @@ impl SpriteSheetHandles {
     where
         P: AsRef<Path>,
     {
-        let path = path.as_ref().to_str().unwrap();
+        let path = path.as_ref().to_str().expect("Should convert path to str");
         if let Some(handle) = self.get(path) {
             handle
         } else {
             self.load(path, world);
-            self.get(path).unwrap()
+            self.get(path)
+                .expect("SpriteSheet should be loaded at this point")
         }
     }
 
