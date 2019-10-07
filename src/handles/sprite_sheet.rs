@@ -39,13 +39,7 @@ impl SpriteSheetHandles {
         let err_msg =
             format!("Given SpriteSheetHandle name cannot be empty: {}", name);
         // Get the basename of the file (without the extension), in case a path is passed
-        let name = name
-            .split("/")
-            .last()
-            .expect(&err_msg)
-            .split(".")
-            .next()
-            .expect(&err_msg);
+        let name = name.split(".").last().expect(&err_msg);
         self.spritesheet_handles.get(name).map(Clone::clone)
     }
 
