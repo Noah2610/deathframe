@@ -47,6 +47,11 @@ use amethyst::shrev::{EventChannel, ReaderId};
 use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
 use amethyst::{StateData, Trans};
 
+pub mod prelude {
+    pub use super::Menu;
+    pub use super::UiData;
+}
+
 #[derive(Default)]
 pub struct UiData {
     ui_entities:  Vec<Entity>,
