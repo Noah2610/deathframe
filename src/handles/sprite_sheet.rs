@@ -36,11 +36,7 @@ impl SpriteSheetHandles {
         T: ToString,
     {
         let name = name.to_string();
-        let err_msg =
-            format!("Given SpriteSheetHandle name cannot be empty: {}", name);
-        // Get the basename of the file (without the extension), in case a path is passed
-        let name = name.split(".").last().expect(&err_msg);
-        self.spritesheet_handles.get(name).map(Clone::clone)
+        self.spritesheet_handles.get(&name).map(Clone::clone)
     }
 
     /// Load a new `SpriteSheet` and `SpriteSheetHandle` into this resource
@@ -112,7 +108,8 @@ impl SpriteSheetHandles {
                 )
             };
 
-            self.insert(name, handle);
+            let key = path.to_str().expect("Should convert path to str");
+            self.insert(key, handle);
         } else {
             panic!(err_msg_match)
         }
