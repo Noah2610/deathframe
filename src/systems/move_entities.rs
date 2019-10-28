@@ -205,7 +205,7 @@ where
                     let rem = vel % 1.0;
 
                     // Try to move by one absolute unit
-                    for _ in 0 ..= abs {
+                    for _ in 0 .. abs {
                         let (collision_rect, new_position) =
                             new_collision_rect_and_position(
                                 entity_id,
