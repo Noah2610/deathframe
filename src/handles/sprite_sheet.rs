@@ -66,15 +66,6 @@ impl SpriteSheetHandles {
             let extension =
                 path.extension().expect(&err_msg_match).to_str().unwrap();
             let extension_with_dot = format!(".{}", extension);
-            let name = path
-                .file_name()
-                .expect(&format!(
-                    "Given path must lead to an image file. Given: '{:?}'",
-                    path
-                ))
-                .to_str()
-                .unwrap()
-                .replace(&extension_with_dot, "");
             let path_ron_string =
                 path.to_str().unwrap().replace(&extension_with_dot, ".ron");
             let path_ron = Path::new(path_ron_string.as_str());

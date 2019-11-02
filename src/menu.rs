@@ -123,7 +123,7 @@ pub trait Menu<T, E> {
                     .get_or_insert_with(|| events.register_reader());
 
                 for event in events.read(reader_id) {
-                    if let UiEventType::ClickStop = event.event_type {
+                    if let UiEventType::Click = event.event_type {
                         let target_entity_id = event.target.id();
                         if let Some(name) = (&entities, &ui_transforms)
                             .join()
