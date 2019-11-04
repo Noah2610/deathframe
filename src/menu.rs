@@ -44,7 +44,7 @@
 use amethyst::assets::ProgressCounter;
 use amethyst::ecs::{Entities, Entity, Join, ReadStorage, WorldExt, Write};
 use amethyst::shrev::{EventChannel, ReaderId};
-use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
+use amethyst::ui::{UiCreator, UiEvent, UiTransform};
 use amethyst::{StateData, Trans};
 
 pub mod prelude {
@@ -73,6 +73,7 @@ pub trait Menu<T, E> {
         &mut self,
         data: &mut StateData<T>,
         event_name: String,
+        event: UiEvent,
     ) -> Option<Trans<T, E>>;
 
     /// Call this method to create the UI entities, specified in the UI's ron file.
@@ -127,27 +128,25 @@ pub trait Menu<T, E> {
                     .get_or_insert_with(|| events.register_reader());
 
                 for event in events.read(reader_id) {
-                    if let UiEventType::Click = event.event_type {
-                        let target_entity_id = event.target.id();
-                        if let Some(name) = (&entities, &ui_transforms)
-                            .join()
-                            .find_map(|(entity, transform)| {
-                                if entity.id() == target_entity_id {
-                                    Some(transform.id.to_string())
-                                } else {
-                                    None
-                                }
-                            })
-                        {
-                            triggered_event = Some(name);
-                        }
+                    let target_entity_id = event.target.id();
+                    if let Some(name) = (&entities, &ui_transforms)
+                        .join()
+                        .find_map(|(entity, transform)| {
+                            if entity.id() == target_entity_id {
+                                Some(transform.id.to_string())
+                            } else {
+                                None
+                            }
+                        })
+                    {
+                        triggered_event = Some((name, event.clone()));
                     }
                 }
             },
         );
 
-        if let Some(event_name) = triggered_event {
-            let trans_opt = self.event_triggered(data, event_name);
+        if let Some((event_name, event)) = triggered_event {
+            let trans_opt = self.event_triggered(data, event_name, event);
             if trans_opt.is_some() {
                 trans_opt
             } else {
