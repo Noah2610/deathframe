@@ -89,9 +89,13 @@ pub trait Menu<T, E> {
         let menu_entity = data.world.exec(|mut creator: UiCreator| {
             creator.create(ron_path.to_string(), &mut progress)
         });
-        self.ui_data_mut().ui_entities.push(menu_entity);
+        self.push_ui_entity(menu_entity);
 
         progress
+    }
+
+    fn push_ui_entity(&mut self, entity: Entity) {
+        self.ui_data_mut().ui_entities.push(entity);
     }
 
     /// Deletes the created UI entities.
