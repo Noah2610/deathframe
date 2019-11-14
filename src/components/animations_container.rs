@@ -160,3 +160,12 @@ impl Default for AnimationsContainerBuilder {
         }
     }
 }
+
+impl From<AnimationsContainer> for AnimationsContainerBuilder {
+    fn from(container: AnimationsContainer) -> Self {
+        Self {
+            animations: container.animations,
+            current:    container.current,
+        }
+    }
+}
