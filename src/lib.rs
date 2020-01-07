@@ -1,4 +1,5 @@
-extern crate amethyst;
+pub extern crate amethyst;
+
 extern crate regex;
 #[macro_use]
 extern crate serde;

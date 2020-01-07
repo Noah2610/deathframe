@@ -8,8 +8,24 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies]
-amethyst   = { version = "0.13.2", features = ["vulkan"] }
 regex      = "1.1.5"
 serde      = { version = "1.0.89", features = ["derive"] }
 serde_json = "1.0.39"
-bitflags   = "=1.0.4"  # https://github.com/rust-lang/rust/issues/59134#issuecomment-489430178
+# bitflags   = "=1.0.4"  # https://github.com/rust-lang/rust/issues/59134#issuecomment-489430178
+
+[dependencies.amethyst]
+# version = "0.13.2"
+git = "https://github.com/amethyst/amethyst"
+rev = "8c022f464e3d17a4b997cad83c5a1a62c7289ace"
+default-features = false
+# features = ["animation", "audio", "locale", "network", "renderer"]
+features = ["animation", "audio", "renderer"]
+
+[features]
+default = []
+
+vulkan = ["amethyst/vulkan"]
+metal  = ["amethyst/metal"]
+empty  = ["amethyst/empty"]
+
+nightly = ["amethyst/nightly"]
