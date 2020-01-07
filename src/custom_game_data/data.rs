@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::fmt::Display;
+use std::fmt::Debug;
 use std::hash::Hash;
 
 use amethyst::core::SystemBundle;
@@ -12,7 +12,7 @@ use super::CustomGameDataBuilder;
 
 pub struct CustomGameData<'a, 'b, D, C = ()>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     pub(crate) core_dispatcher: Option<Dispatcher<'a, 'b>>,
     pub(crate) dispatchers:     HashMap<D, Dispatcher<'a, 'b>>,
@@ -21,7 +21,7 @@ where
 
 impl<'a, 'b, D, C> CustomGameData<'a, 'b, D, C>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     /// Returns a new `CustomGameDataBuilder` instance.
     pub fn builder<B>() -> CustomGameDataBuilder<'a, 'b, D, C>
@@ -58,7 +58,7 @@ where
 
 impl<'a, 'b, D, C> DataDispose for CustomGameData<'a, 'b, D, C>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     fn dispose(&mut self, world: &mut World) {
         if let Some(dispatcher) = self.core_dispatcher.take() {

@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::fmt::Display;
+use std::fmt::Debug;
 use std::hash::Hash;
 use std::marker::PhantomData;
 
@@ -18,7 +18,7 @@ use super::CustomGameData;
 /// Builder struct for `CustomGameData`.
 pub struct CustomGameDataBuilder<'a, 'b, D, C = ()>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     core_dispatcher:            DispatcherBuilder<'a, 'b>,
     dispatchers:                HashMap<D, DispatcherBuilder<'a, 'b>>,
@@ -30,11 +30,11 @@ where
 
 impl<'a, 'b, D, C> CustomGameDataBuilder<'a, 'b, D, C>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     /// Initialize a new dispatcher with the given name.
     pub fn dispatcher(mut self, name: D) -> amethyst::Result<Self> {
-        let name_s = format!("{}", &name);
+        let name_s = format!("{:?}", &name);
 
         if self
             .dispatchers
@@ -185,7 +185,7 @@ where
 impl<'a, 'b, D, C> DataInit<CustomGameData<'a, 'b, D, C>>
     for CustomGameDataBuilder<'a, 'b, D, C>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     fn build(self, world: &mut World) -> CustomGameData<'a, 'b, D, C> {
         // Get handle to the `ThreadPool`
@@ -242,7 +242,7 @@ where
 
 impl<'a, 'b, D, C> Default for CustomGameDataBuilder<'a, 'b, D, C>
 where
-    D: Hash + Eq + Display,
+    D: Hash + Eq + Debug,
 {
     /// Creates a new builder for `CustomGameData`
     fn default() -> Self {

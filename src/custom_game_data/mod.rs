@@ -16,8 +16,11 @@ mod internal_helpers {
     /// that the dispatcher with the given name could not be found.
     pub fn dispatcher_not_found<T>(name: T) -> amethyst::Error
     where
-        T: std::fmt::Display,
+        T: std::fmt::Debug,
     {
-        amethyst::Error::from_string(format!("Dispatcher not found: {}", name))
+        amethyst::Error::from_string(format!(
+            "Dispatcher not found: {:?}",
+            name
+        ))
     }
 }
