@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::fmt::Display;
+use std::hash::Hash;
 
 use amethyst::core::SystemBundle;
 use amethyst::ecs::Dispatcher;
@@ -8,15 +10,21 @@ use amethyst::DataDispose;
 use super::internal_helpers::*;
 use super::CustomGameDataBuilder;
 
-pub struct CustomGameData<'a, 'b, C = ()> {
+pub struct CustomGameData<'a, 'b, D, C = ()>
+where
+    D: Hash + Eq + Display,
+{
     pub(crate) core_dispatcher: Option<Dispatcher<'a, 'b>>,
-    pub(crate) dispatchers:     HashMap<String, Dispatcher<'a, 'b>>,
+    pub(crate) dispatchers:     HashMap<D, Dispatcher<'a, 'b>>,
     pub custom:                 Option<C>,
 }
 
-impl<'a, 'b, C> CustomGameData<'a, 'b, C> {
+impl<'a, 'b, D, C> CustomGameData<'a, 'b, D, C>
+where
+    D: Hash + Eq + Display,
+{
     /// Returns a new `CustomGameDataBuilder` instance.
-    pub fn builder<B>() -> CustomGameDataBuilder<'a, 'b, C>
+    pub fn builder<B>() -> CustomGameDataBuilder<'a, 'b, D, C>
     where
         B: SystemBundle<'a, 'b>,
     {
@@ -24,17 +32,11 @@ impl<'a, 'b, C> CustomGameData<'a, 'b, C> {
     }
 
     // Call this from the active state with the state's (dispatcher's) name every frame.
-    pub fn update<U>(
+    pub fn update(
         &mut self,
         world: &World,
-        dispatcher_name: U,
-    ) -> amethyst::Result<()>
-    // TODO: Create proper error enum
-    where
-        U: ToString,
-    {
-        let dispatcher_name = dispatcher_name.to_string();
-
+        dispatcher_name: D,
+    ) -> amethyst::Result<()> {
         if let Some(dispatcher) = self.dispatchers.get_mut(&dispatcher_name) {
             dispatcher.dispatch(&world);
         } else {
@@ -54,7 +56,10 @@ impl<'a, 'b, C> CustomGameData<'a, 'b, C> {
     }
 }
 
-impl<'a, 'b, C> DataDispose for CustomGameData<'a, 'b, C> {
+impl<'a, 'b, D, C> DataDispose for CustomGameData<'a, 'b, D, C>
+where
+    D: Hash + Eq + Display,
+{
     fn dispose(&mut self, world: &mut World) {
         if let Some(dispatcher) = self.core_dispatcher.take() {
             dispatcher.dispose(world);

@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::fmt::Display;
+use std::hash::Hash;
 use std::marker::PhantomData;
 
 use amethyst::core::deferred_dispatcher_operation::{
@@ -14,24 +16,29 @@ use super::internal_helpers::*;
 use super::CustomGameData;
 
 /// Builder struct for `CustomGameData`.
-pub struct CustomGameDataBuilder<'a, 'b, C = ()> {
+pub struct CustomGameDataBuilder<'a, 'b, D, C = ()>
+where
+    D: Hash + Eq + Display,
+{
     core_dispatcher:            DispatcherBuilder<'a, 'b>,
-    dispatchers:                HashMap<String, DispatcherBuilder<'a, 'b>>,
+    dispatchers:                HashMap<D, DispatcherBuilder<'a, 'b>>,
     core_dispatcher_operations: Vec<Box<dyn DispatcherOperation<'a, 'b>>>,
     dispatcher_operations:
-        HashMap<String, Vec<Box<dyn DispatcherOperation<'a, 'b>>>>,
+        HashMap<D, Vec<Box<dyn DispatcherOperation<'a, 'b>>>>,
     custom:                     Option<C>,
 }
 
-impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
+impl<'a, 'b, D, C> CustomGameDataBuilder<'a, 'b, D, C>
+where
+    D: Hash + Eq + Display,
+{
     /// Initialize a new dispatcher with the given name.
-    pub fn dispatcher<U>(mut self, name: U) -> amethyst::Result<Self>
-    where
-        U: ToString,
-    {
+    pub fn dispatcher(mut self, name: D) -> amethyst::Result<Self> {
+        let name_s = format!("{}", &name);
+
         if self
             .dispatchers
-            .insert(name.to_string(), DispatcherBuilder::new())
+            .insert(name, DispatcherBuilder::new())
             .is_none()
         {
             Ok(self)
@@ -39,7 +46,7 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
             Err(amethyst::Error::from_string(format!(
                 "A dispatcher with the given name has already been \
                  initialized: {}",
-                name.to_string()
+                name_s
             )))
         }
     }
@@ -61,16 +68,14 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
     }
 
     /// Register a bundle for the given dispatcher.
-    pub fn with_bundle<U, B>(
+    pub fn with_bundle<B>(
         mut self,
-        dispatcher_name: U,
+        dispatcher_name: D,
         bundle: B,
     ) -> amethyst::Result<Self>
     where
-        U: ToString,
         B: SystemBundle<'a, 'b> + 'static,
     {
-        let dispatcher_name = dispatcher_name.to_string();
         if self.dispatchers.contains_key(&dispatcher_name) {
             self.dispatcher_operations
                 .entry(dispatcher_name)
@@ -99,18 +104,16 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
     }
 
     /// Register a system for the given dispatcher.
-    pub fn with<U, S>(
+    pub fn with<S>(
         mut self,
-        dispatcher_name: U,
+        dispatcher_name: D,
         system: S,
         name: &str,
         dependencies: &[&str],
     ) -> amethyst::Result<Self>
     where
-        U: ToString,
         for<'c> S: System<'c> + Send + 'a,
     {
-        let dispatcher_name = dispatcher_name.to_string();
         if let Some(dispatcher) = self.dispatchers.get_mut(&dispatcher_name) {
             dispatcher.add(system, name, dependencies);
             Ok(self)
@@ -146,19 +149,17 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
     }
 
     /// Register a system description for the given dispatcher.
-    pub fn with_desc<U, SD, S>(
+    pub fn with_desc<SD, S>(
         mut self,
-        dispatcher_name: U,
+        dispatcher_name: D,
         system_desc: SD,
         name: &str,
         dependencies: &[&str],
     ) -> amethyst::Result<Self>
     where
-        U: ToString,
         SD: SystemDesc<'a, 'b, S> + 'static,
         S: for<'c> System<'c> + Send + 'static,
     {
-        let dispatcher_name = dispatcher_name.to_string();
         if self.dispatchers.contains_key(&dispatcher_name) {
             let name = name.to_string();
             let dependencies =
@@ -181,10 +182,12 @@ impl<'a, 'b, C> CustomGameDataBuilder<'a, 'b, C> {
     }
 }
 
-impl<'a, 'b, C> DataInit<CustomGameData<'a, 'b, C>>
-    for CustomGameDataBuilder<'a, 'b, C>
+impl<'a, 'b, D, C> DataInit<CustomGameData<'a, 'b, D, C>>
+    for CustomGameDataBuilder<'a, 'b, D, C>
+where
+    D: Hash + Eq + Display,
 {
-    fn build(self, world: &mut World) -> CustomGameData<'a, 'b, C> {
+    fn build(self, world: &mut World) -> CustomGameData<'a, 'b, D, C> {
         // Get handle to the `ThreadPool`
         let pool = (*world.read_resource::<ArcThreadPool>()).clone();
 
@@ -237,7 +240,10 @@ impl<'a, 'b, C> DataInit<CustomGameData<'a, 'b, C>>
     }
 }
 
-impl<'a, 'b, C> Default for CustomGameDataBuilder<'a, 'b, C> {
+impl<'a, 'b, D, C> Default for CustomGameDataBuilder<'a, 'b, D, C>
+where
+    D: Hash + Eq + Display,
+{
     /// Creates a new builder for `CustomGameData`
     fn default() -> Self {
         Self {
