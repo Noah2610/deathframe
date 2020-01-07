@@ -12,4 +12,4 @@ _dir="$( dirname "$0" )"
 source "${_dir}/share.sh"
 unset _dir
 
-cargo_cmd test "$*"
+cargo_cmd test "$@"

@@ -4,20 +4,44 @@ _dir="$( dirname "$0" )"
 source "${_dir}/util.sh"
 unset _dir
 
-# https://stackoverflow.com/a/17841619/10927893
-function join_by { local IFS="$1"; shift; echo "$*"; }
+check "rustup"
 
 function cargo_cmd {
-  check "cargo"
-  local cargo_cmd="$1"
-  shift
-  cmd="cargo +$RUST_VERSION $cargo_cmd --features amethyst/nightly $*"
-  if should_run_in_terminal; then
-    run_terminal "$cmd"
-  else
-    $cmd
-  fi
+    check_installed_toolchain
+
+    local cargo_sub_cmd
+    local args
+    local cmd
+
+    cargo_sub_cmd="$1"
+    shift
+    args=( --features nightly "$@" )
+    cmd=( \
+        rustup run "$RUST_TOOLCHAIN" \
+        cargo "$cargo_sub_cmd" \
+        "${args[@]}" \
+    )
+
+    msg_strong "Running $( colored "$COLOR_CODE" "${cmd[*]}" )"
+    if should_run_in_terminal; then
+        run_terminal "${cmd[*]}"
+    else
+        ${cmd[*]}
+    fi
+}
+
+function check_installed_toolchain {
+    local errmsg
+    errmsg="\
+Rust toolchain $( colored "$COLOR_CODE" "${RUST_TOOLCHAIN}" ) is not installed.
+Install with ...
+    $( colored "$COLOR_CODE" "rustup install ${RUST_TOOLCHAIN}" )"
+
+    (rustup toolchain list \
+        | grep -Ex "${RUST_TOOLCHAIN}-.+" \
+        &> /dev/null) \
+        || err "$errmsg"
 }
 
 LOGFILE="${ROOT}/logs/$( basename "$0" ).log"
-RUST_VERSION="nightly-2019-08-13"
+RUST_TOOLCHAIN="nightly-2019-12-12"
