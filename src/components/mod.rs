@@ -6,6 +6,7 @@ pub mod check_collision;
 pub mod collision;
 pub mod confined;
 pub mod decrease_velocity;
+pub mod follow;
 pub mod gravity;
 pub mod inner_size;
 pub mod loadable;
@@ -35,6 +36,7 @@ pub mod prelude {
     pub use super::Collision;
     pub use super::Confined;
     pub use super::DecreaseVelocity;
+    pub use super::Follow;
     pub use super::Gravity;
     pub use super::InnerSize;
     pub use super::Loadable;
@@ -59,6 +61,7 @@ pub mod component_prelude {
     pub use amethyst::ecs::{
         Component,
         DenseVecStorage,
+        Entity,
         HashMapStorage,
         NullStorage,
         Storage,
@@ -74,6 +77,7 @@ pub use check_collision::CheckCollision;
 pub use collision::Collision;
 pub use confined::Confined;
 pub use decrease_velocity::DecreaseVelocity;
+pub use follow::Follow;
 pub use gravity::Gravity;
 pub use inner_size::InnerSize;
 pub use loadable::Loadable;
