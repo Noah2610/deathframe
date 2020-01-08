@@ -43,9 +43,9 @@ impl Velocity {
     pub fn increase_x_with_max(&mut self, increase: f32, max_opt: Option<f32>) {
         if let Some(max) = max_opt {
             let max = max.abs();
-            if is_under_max(self.x, max) {
+            if is_at_or_under_max(self.x, max) {
                 self.x += increase;
-                if !is_under_max(self.x, max) {
+                if !is_at_or_under_max(self.x, max) {
                     self.x = max * self.x.signum();
                 }
             }
@@ -59,9 +59,9 @@ impl Velocity {
     pub fn increase_y_with_max(&mut self, increase: f32, max_opt: Option<f32>) {
         if let Some(max) = max_opt {
             let max = max.abs();
-            if is_under_max(self.y, max) {
+            if is_at_or_under_max(self.y, max) {
                 self.y += increase;
-                if !is_under_max(self.y, max) {
+                if !is_at_or_under_max(self.y, max) {
                     self.y = max * self.y.signum();
                 }
             }
@@ -72,11 +72,11 @@ impl Velocity {
     }
 }
 
-/// Returns `true` if a positive `num` is smaller than a positive `max`
-/// and if a negative `num` is larger than a negative `max`.
-fn is_under_max(num: f32, max: f32) -> bool {
+/// Returns `true` if a positive `num` is equal to or smaller than a positive `max`
+/// and if a negative `num` is equal to or larger than a negative `max`.
+fn is_at_or_under_max(num: f32, max: f32) -> bool {
     let max = max.abs();
-    num < max && num > -max
+    num <= max && num >= -max
 }
 
 impl Component for Velocity {
