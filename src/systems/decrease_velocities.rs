@@ -35,32 +35,36 @@ impl<'a> System<'a> for DecreaseVelocitiesSystem {
                 let signy = velocity.y.signum();
 
                 // X
-                if velocity.x != 0.0 {
-                    if (signx > 0.0 && decr.should_decrease_x_pos)
-                        || (signx < 0.0 && decr.should_decrease_x_neg)
-                    {
-                        velocity.x -= (decr.x * dt) * signx;
+                if let Some(decr_x) = decr.x {
+                    if velocity.x != 0.0 {
+                        if (signx > 0.0 && decr.should_decrease_x_pos)
+                            || (signx < 0.0 && decr.should_decrease_x_neg)
+                        {
+                            velocity.x -= (decr_x * dt) * signx;
+                        }
                     }
+                    if velocity.x.signum() != signx {
+                        velocity.x = 0.0;
+                    }
+                    decr.should_decrease_x_pos = true;
+                    decr.should_decrease_x_neg = true;
                 }
-                if velocity.x.signum() != signx {
-                    velocity.x = 0.0;
-                }
-                decr.should_decrease_x_pos = true;
-                decr.should_decrease_x_neg = true;
 
                 // Y
-                if velocity.y != 0.0 {
-                    if (signy > 0.0 && decr.should_decrease_y_pos)
-                        || (signy < 0.0 && decr.should_decrease_y_neg)
-                    {
-                        velocity.y -= (decr.y * dt) * signy;
+                if let Some(decr_y) = decr.y {
+                    if velocity.y != 0.0 {
+                        if (signy > 0.0 && decr.should_decrease_y_pos)
+                            || (signy < 0.0 && decr.should_decrease_y_neg)
+                        {
+                            velocity.y -= (decr_y * dt) * signy;
+                        }
                     }
+                    if velocity.y.signum() != signy {
+                        velocity.y = 0.0;
+                    }
+                    decr.should_decrease_y_pos = true;
+                    decr.should_decrease_y_neg = true;
                 }
-                if velocity.y.signum() != signy {
-                    velocity.y = 0.0;
-                }
-                decr.should_decrease_y_pos = true;
-                decr.should_decrease_y_neg = true;
             }
         }
     }

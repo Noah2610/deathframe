@@ -4,14 +4,14 @@ use super::component_prelude::*;
 /// This means, their velocity is increased by the gravity's force (`x`, `y`) every frame.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Gravity {
-    pub x:              f32,
-    pub y:              f32,
+    pub x:              Option<f32>,
+    pub y:              Option<f32>,
     pub(crate) enabled: bool,
 }
 
 impl Gravity {
     /// Create a new `Gravity` component with the given `x` and `y` values.
-    pub fn new(x: f32, y: f32) -> Self {
+    pub fn new(x: Option<f32>, y: Option<f32>) -> Self {
         Self {
             x,
             y,
@@ -36,12 +36,18 @@ impl Component for Gravity {
 
 impl From<(f32, f32)> for Gravity {
     fn from(data: (f32, f32)) -> Self {
-        Self::new(data.0, data.1)
+        Self::new(Some(data.0), Some(data.1))
     }
 }
 
 impl From<Vector<f32>> for Gravity {
     fn from(data: Vector<f32>) -> Self {
+        Self::new(Some(data.0), Some(data.1))
+    }
+}
+
+impl From<(Option<f32>, Option<f32>)> for Gravity {
+    fn from(data: (Option<f32>, Option<f32>)) -> Self {
         Self::new(data.0, data.1)
     }
 }

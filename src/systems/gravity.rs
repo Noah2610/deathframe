@@ -41,25 +41,32 @@ impl<'a> System<'a> for GravitySystem {
                 (loadable_opt, loaded_opt)
             {
                 if gravity.enabled {
-                    if gravity.x != 0.0 {
-                        velocity.x += gravity.x * dt;
-                        decr_velocity.as_mut().map(|decr| {
-                            if gravity.x > 0.0 {
-                                decr.should_decrease_x_pos = false;
-                            } else if gravity.x < 0.0 {
-                                decr.should_decrease_x_neg = false;
-                            }
-                        });
+                    // X
+                    if let Some(grav_x) = gravity.x {
+                        if grav_x != 0.0 {
+                            velocity.x += grav_x * dt;
+                            decr_velocity.as_mut().map(|decr| {
+                                if grav_x > 0.0 {
+                                    decr.should_decrease_x_pos = false;
+                                } else if grav_x < 0.0 {
+                                    decr.should_decrease_x_neg = false;
+                                }
+                            });
+                        }
                     }
-                    if gravity.y != 0.0 {
-                        velocity.y += gravity.y * dt;
-                        decr_velocity.as_mut().map(|decr| {
-                            if gravity.y > 0.0 {
-                                decr.should_decrease_y_pos = false;
-                            } else if gravity.y < 0.0 {
-                                decr.should_decrease_y_neg = false;
-                            }
-                        });
+
+                    // Y
+                    if let Some(grav_y) = gravity.y {
+                        if grav_y != 0.0 {
+                            velocity.y += grav_y * dt;
+                            decr_velocity.as_mut().map(|decr| {
+                                if grav_y > 0.0 {
+                                    decr.should_decrease_y_pos = false;
+                                } else if grav_y < 0.0 {
+                                    decr.should_decrease_y_neg = false;
+                                }
+                            });
+                        }
                     }
                 }
             }
