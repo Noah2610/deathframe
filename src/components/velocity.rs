@@ -39,6 +39,26 @@ impl Velocity {
         }
     }
 
+    /// Increase the velocity of the given axis, with a given max velocity.
+    /// Same as `increase_with_max`, but only affects one of the axes.
+    pub fn increase_axis_with_max(
+        &mut self,
+        axis: Axis,
+        increase: f32,
+        max: Option<f32>,
+    ) {
+        if increase != 0.0 {
+            match axis {
+                Axis::X => {
+                    self.increase_x_with_max(increase, max);
+                }
+                Axis::Y => {
+                    self.increase_y_with_max(increase, max);
+                }
+            }
+        }
+    }
+
     /// Same as `increase_with_max`, but only affects `x` velocity.
     pub fn increase_x_with_max(&mut self, increase: f32, max_opt: Option<f32>) {
         if let Some(max) = max_opt {
