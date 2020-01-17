@@ -1,10 +1,10 @@
 pub extern crate amethyst;
+pub extern crate specs_physics;
 
 extern crate regex;
 #[macro_use]
 extern crate serde;
 extern crate serde_json;
-extern crate specs_physics;
 
 pub mod components;
 pub mod systems;
