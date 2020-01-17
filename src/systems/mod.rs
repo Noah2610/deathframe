@@ -1,14 +1,12 @@
 //! A collection of systems, giving the components in this crate functionality.
 
 mod animation;
-mod confine_entities;
 mod follow;
 mod input_manager;
 mod scale_sprites;
 
 pub mod prelude {
     pub use super::AnimationSystem;
-    pub use super::ConfineEntitiesSystem;
     pub use super::FollowSystem;
     pub use super::InputManagerSystem;
     pub use super::ScaleSpritesSystem;
@@ -47,7 +45,6 @@ pub mod system_prelude {
 }
 
 pub use animation::AnimationSystem;
-pub use confine_entities::ConfineEntitiesSystem;
 pub use follow::FollowSystem;
 pub use input_manager::InputManagerSystem;
 pub use scale_sprites::ScaleSpritesSystem;

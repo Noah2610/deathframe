@@ -23,14 +23,14 @@ impl From<(f32, f32)> for Size {
     }
 }
 
-impl From<Vector<f32>> for Size {
-    fn from(data: Vector<f32>) -> Self {
-        Self::new(data.0, data.1)
+impl From<Vector> for Size {
+    fn from(data: Vector) -> Self {
+        Self::new(data.x, data.y)
     }
 }
 
 impl Into<Vector> for &Size {
     fn into(self) -> Vector {
-        Vector::from((self.w, self.h))
+        Vector::new(self.w, self.h)
     }
 }

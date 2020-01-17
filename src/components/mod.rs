@@ -3,7 +3,6 @@
 pub mod animation;
 pub mod animations_container;
 pub mod check_collision;
-pub mod confined;
 pub mod follow;
 pub mod inner_size;
 pub mod loadable;
@@ -19,7 +18,6 @@ pub mod prelude {
     pub use super::Animation;
     pub use super::AnimationsContainer;
     pub use super::CheckCollision;
-    pub use super::Confined;
     pub use super::Follow;
     pub use super::InnerSize;
     pub use super::Loadable;
@@ -50,7 +48,6 @@ pub mod component_prelude {
 pub use animation::Animation;
 pub use animations_container::AnimationsContainer;
 pub use check_collision::CheckCollision;
-pub use confined::Confined;
 pub use follow::Follow;
 pub use inner_size::InnerSize;
 pub use loadable::Loadable;
