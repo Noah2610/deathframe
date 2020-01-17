@@ -36,6 +36,40 @@ impl DecreaseVelocity {
     }
 
     /// Call this method, when you don't want this entity to decrease
+    /// any velocity at all, in the next frame.
+    pub fn dont_decrease(&mut self) {
+        self.dont_decrease_x();
+        self.dont_decrease_y();
+    }
+
+    /// Call this method, when you don't want this entity to decrease
+    /// the given axis' velocity at all, in the next frame.
+    pub fn dont_decrease_axis(&mut self, axis: Axis) {
+        match axis {
+            Axis::X => self.dont_decrease_x(),
+            Axis::Y => self.dont_decrease_y(),
+        }
+    }
+
+    /// Call this method, when youn don't want this entity to decrease
+    /// the given axis' velocity, when it is _positive_, in the next frame.
+    pub fn dont_decrease_axis_when_pos(&mut self, axis: Axis) {
+        match axis {
+            Axis::X => self.dont_decrease_x_when_pos(),
+            Axis::Y => self.dont_decrease_y_when_pos(),
+        }
+    }
+
+    /// Call this method, when youn don't want this entity to decrease
+    /// the given axis' velocity, when it is _negative_, in the next frame.
+    pub fn dont_decrease_axis_when_neg(&mut self, axis: Axis) {
+        match axis {
+            Axis::X => self.dont_decrease_x_when_neg(),
+            Axis::Y => self.dont_decrease_y_when_neg(),
+        }
+    }
+
+    /// Call this method, when you don't want this entity to decrease
     /// its `x` velocity at all, in the next frame.
     pub fn dont_decrease_x(&mut self) {
         self.dont_decrease_x_when_pos();
