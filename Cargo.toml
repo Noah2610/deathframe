@@ -8,9 +8,9 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies]
-regex      = "1.1.5"
-serde      = { version = "1.0.89", features = ["derive"] }
-serde_json = "1.0.39"
+regex         = "1.1.5"
+serde         = { version = "1.0.89", features = ["derive"] }
+serde_json    = "1.0.39"
 # bitflags   = "=1.0.4"  # https://github.com/rust-lang/rust/issues/59134#issuecomment-489430178
 
 [dependencies.amethyst]
@@ -21,6 +21,12 @@ default-features = false
 # features = ["animation", "audio", "locale", "network", "renderer"]
 features = ["animation", "audio", "renderer"]
 
+[dependencies.specs-physics]
+git = "https://github.com/amethyst/specs-physics"
+branch = "0.4.0"
+default-features = false
+features = ["dim2"]
+
 [features]
 default = []
 
@@ -28,4 +34,4 @@ vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
-nightly = ["amethyst/nightly"]
+nightly = ["amethyst/nightly", "specs-physics/nightly"]
