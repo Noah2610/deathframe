@@ -23,7 +23,7 @@ features = ["animation", "audio", "renderer"]
 
 [dependencies.specs-physics]
 git = "https://github.com/Noah2610/specs-physics"
-branch = "0.4.0"
+branch = "custom"
 default-features = false
 features = ["dim2", "amethyst"]
 
