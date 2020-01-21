@@ -11,6 +11,7 @@ pub mod prelude {
 }
 
 pub type Vector<T = f32> = specs_physics::nphysics::math::Vector<T>;
+pub type Point<T = f32> = specs_physics::nphysics::math::Point<T>;
 
 pub use axis::Axis;
 pub use side::Side;
