@@ -29,6 +29,12 @@ impl From<Vector> for Size {
     }
 }
 
+impl Into<(f32, f32)> for &Size {
+    fn into(self) -> (f32, f32) {
+        (self.w, self.h)
+    }
+}
+
 impl Into<Vector> for &Size {
     fn into(self) -> Vector {
         Vector::new(self.w, self.h)
