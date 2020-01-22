@@ -5,7 +5,6 @@ use amethyst::assets::{AssetStorage, Loader};
 use amethyst::ecs::{World, WorldExt};
 use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
 use amethyst::renderer::{ImageFormat, SpriteSheetFormat, Texture};
-use regex::RegexBuilder;
 
 /// This is a resource wrapper for amethyst's `SpriteSheet`s.
 /// It can load and get `SpriteSheetHandle`s;
@@ -52,58 +51,42 @@ impl SpriteSheetHandles {
                 path
             ));
         }
-        let err_msg_match = format!(
-            "Given image file path must match the pattern \
-             `/.+\\.(png|jpe?g)\\z/i`. Given: '{:?}'",
-            path
-        );
-        let filepath_regex = RegexBuilder::new(r".+\.(png|jpe?g)\z")
-            .case_insensitive(true)
-            .build()
-            .unwrap();
 
-        if filepath_regex.captures(path.to_str().unwrap()).is_some() {
-            let extension =
-                path.extension().expect(&err_msg_match).to_str().unwrap();
-            let extension_with_dot = format!(".{}", extension);
-            let path_ron_string =
-                path.to_str().unwrap().replace(&extension_with_dot, ".ron");
-            let path_ron = Path::new(path_ron_string.as_str());
-            if !path_ron.is_file() {
-                panic!(format!(
-                    "Given image file path does not have a .ron configuration \
-                     file: '{:?}'",
-                    path_ron
-                ));
-            }
+        let path_ron_string =
+            format!("{}.ron", path.file_stem().unwrap().to_str().unwrap());
+        let path_ron = Path::new(path_ron_string.as_str());
+        if !path_ron.is_file() {
+            panic!(format!(
+                "Given image file path does not have a .ron configuration \
+                 file: '{:?}'",
+                path_ron
+            ));
+        }
 
-            let handle = {
-                let loader = world.read_resource::<Loader>();
-                let texture_handle = {
-                    let texture_storage =
-                        world.read_resource::<AssetStorage<Texture>>();
-                    loader.load(
-                        path.to_str().unwrap(),
-                        ImageFormat::default(),
-                        (),
-                        &texture_storage,
-                    )
-                };
-                let spritesheet_store =
-                    world.read_resource::<AssetStorage<SpriteSheet>>();
+        let handle = {
+            let loader = world.read_resource::<Loader>();
+            let texture_handle = {
+                let texture_storage =
+                    world.read_resource::<AssetStorage<Texture>>();
                 loader.load(
-                    path_ron.to_str().unwrap(),
-                    SpriteSheetFormat(texture_handle),
+                    path.to_str().unwrap(),
+                    ImageFormat::default(),
                     (),
-                    &spritesheet_store,
+                    &texture_storage,
                 )
             };
+            let spritesheet_store =
+                world.read_resource::<AssetStorage<SpriteSheet>>();
+            loader.load(
+                path_ron.to_str().unwrap(),
+                SpriteSheetFormat(texture_handle),
+                (),
+                &spritesheet_store,
+            )
+        };
 
-            let key = path.to_str().expect("Should convert path to str");
-            self.insert(key, handle);
-        } else {
-            panic!(err_msg_match)
-        }
+        let key = path.to_str().expect("Should convert path to str");
+        self.insert(key, handle);
     }
 
     /// Get a `SpriteSheetHandle` with the given path to the spritesheet's image file.
