@@ -1,10 +1,9 @@
 pub extern crate amethyst;
 pub extern crate specs_physics;
 
-extern crate regex;
+#[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde;
-extern crate serde_json;
 
 pub mod components;
 pub mod systems;

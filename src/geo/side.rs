@@ -1,5 +1,6 @@
 /// Miscellaneous `Side` enum. Used somewhere related to collision detection.
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Side {
     // `Inner` isn't actually a side, but it makes life easier having this here
     Inner,
