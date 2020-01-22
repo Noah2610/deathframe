@@ -52,8 +52,11 @@ impl SpriteSheetHandles {
             ));
         }
 
-        let path_ron_string =
-            format!("{}.ron", path.file_stem().unwrap().to_str().unwrap());
+        let path_ron_string = format!(
+            "{}/{}.ron",
+            path.parent().map(|p| p.to_str().unwrap()).unwrap_or(""),
+            path.file_stem().unwrap().to_str().unwrap()
+        );
         let path_ron = Path::new(path_ron_string.as_str());
         if !path_ron.is_file() {
             panic!(format!(
