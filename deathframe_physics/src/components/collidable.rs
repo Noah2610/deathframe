@@ -8,3 +8,12 @@ where
 {
     tag: T,
 }
+
+impl<T> Collidable<T>
+where
+    T: 'static + CollisionTag,
+{
+    pub fn new(tag: T) -> Self {
+        Self { tag }
+    }
+}
