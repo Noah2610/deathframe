@@ -1,8 +1,7 @@
-/target
+/target/
 **/*.rs.bk
 Cargo.lock
-/_ignore
-# bin/util.sh is downloaded by bin/download-util.sh
+_ignore/
 /bin/util.sh
 /logs
 *.log

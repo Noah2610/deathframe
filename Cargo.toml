@@ -7,14 +7,24 @@ description = "My game development framework for the amethyst game engine"
 license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
-[dependencies]
-serde = { version = "1.0.89", features = ["derive"], optional = true }
-# bitflags = "=1.0.4"  # https://github.com/rust-lang/rust/issues/59134#issuecomment-489430178
+[workspace]
+members = [
+    "deathframe_physics",
+]
+
+[dependencies.deathframe_physics]
+path = "./deathframe_physics"
+optional = true
 
 [dependencies.amethyst]
 version = "0.14.0"
 default-features = false
 features = ["animation", "audio", "renderer"]
+
+[dependencies.serde]
+version = "1.0.104"
+features = ["derive"]
+optional = true
 
 [features]
 default = []
@@ -22,5 +32,7 @@ default = []
 vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
+
+physics = ["deathframe_physics"]
 
 nightly = ["amethyst/nightly"]
