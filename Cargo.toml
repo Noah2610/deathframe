@@ -12,7 +12,8 @@ members = [
     "deathframe_physics",
 ]
 
-[dependencies.deathframe_physics]
+[dependencies.physics]
+package = "deathframe_physics"
 path = "./deathframe_physics"
 optional = true
 
@@ -33,6 +34,6 @@ vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
-physics = ["deathframe_physics"]
+# physics = []
 
 nightly = ["amethyst/nightly"]
