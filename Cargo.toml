@@ -22,11 +22,6 @@ package = "deathframe_physics"
 path = "./deathframe_physics"
 optional = true
 
-[dependencies.amethyst]
-version = "0.14.0"
-default-features = false
-features = ["animation", "audio", "renderer"]
-
 [dependencies.serde]
 version = "1.0.104"
 features = ["derive"]
@@ -35,10 +30,10 @@ optional = true
 [features]
 default = []
 
-vulkan = ["amethyst/vulkan"]
-metal  = ["amethyst/metal"]
-empty  = ["amethyst/empty"]
+vulkan = ["core/vulkan"]
+metal  = ["core/metal"]
+empty  = ["core/empty"]
 
 # physics = []
 
-nightly = ["amethyst/nightly"]
+nightly = ["core/nightly"]
