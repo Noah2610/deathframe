@@ -1,7 +1,7 @@
 pub mod prelude {
     pub use super::collidable::Collidable;
-    // pub use super::collider::Collider;
-    // pub use super::solid::Solid;
+    pub use super::collider::Collider;
+    pub use super::solid::Solid;
 }
 
 mod component_prelude {

@@ -22,11 +22,6 @@ package = "deathframe_physics"
 path = "./deathframe_physics"
 optional = true
 
-[dependencies.serde]
-version = "1.0.104"
-features = ["derive"]
-optional = true
-
 [features]
 default = []
 
@@ -34,6 +29,5 @@ vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
 empty  = ["core/empty"]
 
-# physics = []
-
+serde   = ["core/serde"]
 nightly = ["core/nightly"]
