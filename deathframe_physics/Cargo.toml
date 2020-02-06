@@ -6,5 +6,6 @@ edition = "2018"
 description = "Deathframe crate for handling collision"
 license = "MIT"
 
-[dependencies.deathframe]
-path = ".."
+[dependencies.core]
+package = "deathframe_core"
+path = "../deathframe_core"
