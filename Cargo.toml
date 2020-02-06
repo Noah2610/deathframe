@@ -12,18 +12,9 @@ serde = { version = "1.0.89", features = ["derive"], optional = true }
 # bitflags = "=1.0.4"  # https://github.com/rust-lang/rust/issues/59134#issuecomment-489430178
 
 [dependencies.amethyst]
-# version = "0.13.2"
-git = "https://github.com/amethyst/amethyst"
-rev = "8c022f464e3d17a4b997cad83c5a1a62c7289ace"
+version = "0.14.0"
 default-features = false
-# features = ["animation", "audio", "locale", "network", "renderer"]
 features = ["animation", "audio", "renderer"]
-
-[dependencies.specs-physics]
-git = "https://github.com/Noah2610/specs-physics"
-branch = "custom"
-default-features = false
-features = ["dim2", "amethyst"]
 
 [features]
 default = []
@@ -32,4 +23,4 @@ vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
-nightly = ["amethyst/nightly", "specs-physics/nightly"]
+nightly = ["amethyst/nightly"]

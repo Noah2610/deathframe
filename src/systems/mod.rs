@@ -41,7 +41,7 @@ pub mod system_prelude {
 
     pub use crate::components::prelude::*;
     pub use crate::geo::prelude::*;
-    pub use crate::input_manager::InputManager;
+    pub use crate::resources::InputManager;
 }
 
 pub use animation::AnimationSystem;
