@@ -15,7 +15,10 @@ function cargo_cmd {
 
     cargo_sub_cmd="$1"
     shift
-    args=( --features "vulkan,nightly" "$@" )
+    args=( \
+        --features "vulkan,nightly,physics" \
+        "$@" \
+    )
     cmd=( \
         rustup run "$RUST_TOOLCHAIN" \
         cargo "$cargo_sub_cmd" \
