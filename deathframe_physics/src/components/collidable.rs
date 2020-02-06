@@ -2,4 +2,9 @@ use super::component_prelude::*;
 
 #[derive(Component)]
 #[storage(VecStorage)]
-pub struct Collidable {}
+pub struct Collidable<T>
+where
+    T: 'static + CollisionTag,
+{
+    tag: T,
+}
