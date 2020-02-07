@@ -47,4 +47,4 @@ Install with ...
 }
 
 LOGFILE="${ROOT}/logs/$( basename "$0" ).log"
-RUST_TOOLCHAIN="nightly-2019-12-12"
+RUST_TOOLCHAIN="nightly-2020-02-06"
