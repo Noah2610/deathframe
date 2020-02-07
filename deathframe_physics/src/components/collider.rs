@@ -1,5 +1,5 @@
 use super::component_prelude::*;
-use crate::collision_data::prelude::*;
+use crate::collision::data::prelude::*;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]

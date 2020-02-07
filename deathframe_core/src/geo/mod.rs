@@ -2,8 +2,10 @@
 //! (or algebra, not sure what to call it exactly).
 
 mod axis;
+mod rect;
 
 pub mod prelude {
+    pub use super::rect::{Rect, RectBuilder};
     pub use super::Axis;
     pub use super::Vector;
 }

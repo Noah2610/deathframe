@@ -5,7 +5,7 @@ pub mod prelude {
 }
 
 mod component_prelude {
-    pub(super) use crate::CollisionTag;
+    pub(super) use crate::collision::tag::CollisionTag;
     pub(super) use core::components::component_prelude::*;
 }
 

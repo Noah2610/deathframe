@@ -1,4 +1,6 @@
 pub extern crate amethyst;
+#[macro_use]
+extern crate derive_builder;
 
 #[cfg(feature = "serde")]
 #[macro_use]
