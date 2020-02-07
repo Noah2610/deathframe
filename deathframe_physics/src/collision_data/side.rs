@@ -2,7 +2,7 @@
 pub enum CollisionSide {
     Left,
     Right,
-    Up,
-    Down,
+    Top,
+    Bottom,
     Inner,
 }
