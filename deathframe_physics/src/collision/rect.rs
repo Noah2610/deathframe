@@ -3,14 +3,6 @@ use specs::world::Index;
 use crate::collision::tag::CollisionTag;
 use core::geo::prelude::*;
 
-fn default_tag<C: CollisionTag>() -> Option<C> {
-    None
-}
-
-fn default_custom<T>() -> Option<T> {
-    None
-}
-
 /// A rectangular collision area with a unique entity ID.
 /// Can also hold optional custom data.
 #[derive(Clone)]
@@ -40,7 +32,7 @@ where
     C: CollisionTag,
 {
     id:     Option<Index>,
-    rect:   Rect,
+    rect:   Option<Rect>,
     tag:    Option<C>,
     custom: Option<T>,
 }
@@ -52,7 +44,7 @@ where
     fn default() -> Self {
         Self {
             id:     None,
-            rect:   Default::default(),
+            rect:   None,
             tag:    None,
             custom: None,
         }
@@ -71,7 +63,7 @@ where
 
     /// Set the `rect`.
     pub fn rect(mut self, rect: Rect) -> Self {
-        self.rect = rect;
+        self.rect = Some(rect);
         self
     }
 
@@ -87,50 +79,6 @@ where
         self
     }
 
-    /// Set the `custom`, given as an `Option`.
-    pub fn custom_maybe(mut self, custom_opt: Option<T>) -> Self {
-        self.custom = custom_opt;
-        self
-    }
-
-    /// Infere the `rect: Rect` field by the given position,
-    /// _assuming there is no size_.
-    pub fn with_pos(mut self, pos: Vector) -> Self {
-        self.rect = Rect {
-            top:    pos.y,
-            bottom: pos.y,
-            left:   pos.x,
-            right:  pos.x,
-        };
-        self
-    }
-
-    /// Infere the `rect: Rect` field by the given position and size;
-    /// the position is the _center_ of the rect.
-    pub fn with_pos_and_size(mut self, pos: Vector, size: Vector) -> Self {
-        self.rect = Rect {
-            top:    pos.y + size.y * 0.5,
-            bottom: pos.y - size.y * 0.5,
-            left:   pos.x - size.x * 0.5,
-            right:  pos.x + size.x * 0.5,
-        };
-        self
-    }
-
-    /// Infere the `rect: Rect` field by the given position and _optional_ size.
-    pub fn with_pos_and_maybe_size(
-        mut self,
-        pos: Vector,
-        size_opt: Option<Vector>,
-    ) -> Self {
-        self = if let Some(size) = size_opt {
-            self.with_pos_and_size(pos, size)
-        } else {
-            self.with_pos(pos)
-        };
-        self
-    }
-
     /// Create a `CollisionRect` from this builder.
     pub fn build(self) -> CollisionRect<C, T> {
         let CollisionRectBuilder {
@@ -141,44 +89,9 @@ where
         } = self;
         CollisionRect {
             id,
-            rect,
+            rect: rect.expect("CollisionRectBuilder requires a Rect"),
             tag,
             custom,
         }
-    }
-}
-
-impl<C, T> From<(Index, Vector, Option<Vector>)> for CollisionRect<C, T>
-where
-    C: CollisionTag,
-{
-    fn from((id, pos, size_opt): (Index, Vector, Option<Vector>)) -> Self {
-        CollisionRectBuilder::default()
-            .id(id)
-            .with_pos_and_maybe_size(pos, size_opt)
-            .build()
-    }
-}
-
-impl<C, T> From<(Index, Vector, Option<Vector>, C, Option<T>)>
-    for CollisionRect<C, T>
-where
-    C: CollisionTag,
-{
-    fn from(
-        (id, pos, size_opt, tag, custom_opt): (
-            Index,
-            Vector,
-            Option<Vector>,
-            C,
-            Option<T>,
-        ),
-    ) -> Self {
-        CollisionRectBuilder::default()
-            .id(id)
-            .with_pos_and_maybe_size(pos, size_opt)
-            .tag(tag)
-            .custom_maybe(custom_opt)
-            .build()
     }
 }

@@ -5,19 +5,19 @@ use crate::collision::tag::CollisionTag;
 use core::geo::prelude::*;
 
 /// A collection of `CollisionRect`, can perform collision detection.
-pub struct CollisionGrid<STag, T>
+pub struct CollisionGrid<C, T>
 where
-    STag: CollisionTag,
+    C: CollisionTag,
 {
-    pub rects: Vec<CollisionRect<STag, T>>,
+    pub rects: Vec<CollisionRect<C, T>>,
 }
 
-impl<STag, T> CollisionGrid<STag, T>
+impl<C, T> CollisionGrid<C, T>
 where
-    STag: CollisionTag,
+    C: CollisionTag,
 {
     /// Create a new `CollisionGrid` by passing in a vector of `CollisionRect`s.
-    pub fn new(rects: Vec<CollisionRect<STag, T>>) -> Self {
+    pub fn new(rects: Vec<CollisionRect<C, T>>) -> Self {
         Self { rects }
     }
 
@@ -27,7 +27,7 @@ where
     }
 
     /// Adds a new `CollisionRect` to the grid.
-    pub fn push(&mut self, rect: CollisionRect<STag, T>) {
+    pub fn push(&mut self, rect: CollisionRect<C, T>) {
         self.rects.push(rect);
     }
 
@@ -37,7 +37,7 @@ where
     }
 
     /// Get a stored `CollisionRect` by its entity ID.
-    pub fn rect_by_id(&self, id: Index) -> Option<&CollisionRect<STag, T>> {
+    pub fn rect_by_id(&self, id: Index) -> Option<&CollisionRect<C, T>> {
         self.rects.iter().find(|rect| {
             if let Some(other_id) = rect.id {
                 id == other_id
@@ -49,7 +49,7 @@ where
 
     /// Returns `true` if the passed `CollisionRect` is colliding with any other
     /// `CollisionRect` stored in this `CollisionGrid`.
-    pub fn collides_any(&self, target_rect: &CollisionRect<STag, T>) -> bool {
+    pub fn collides_any(&self, target_rect: &CollisionRect<C, T>) -> bool {
         self.rects
             .iter()
             .any(|rect| Self::do_rects_collide(&target_rect, rect))
@@ -59,8 +59,8 @@ where
     /// with the passed `CollisionRect` (which may or may not exist in this `CollisionGrid`).
     pub fn colliding_with(
         &self,
-        target_rect: &CollisionRect<STag, T>,
-    ) -> Vec<&CollisionRect<STag, T>> {
+        target_rect: &CollisionRect<C, T>,
+    ) -> Vec<&CollisionRect<C, T>> {
         self.rects
             .iter()
             .filter(|rect| Self::do_rects_collide(&target_rect, rect))
@@ -72,7 +72,7 @@ where
     /// you pass in an entity ID to a `CollisionRect` which is stored inside this `CollisionGrid`.
     /// Note that, if you pass in an ID, which does not exist as a `CollisionRect` in this
     /// `CollisionGrid`, then you will simply receive an empty vector.
-    pub fn colliding_with_id(&self, id: Index) -> Vec<&CollisionRect<STag, T>> {
+    pub fn colliding_with_id(&self, id: Index) -> Vec<&CollisionRect<C, T>> {
         if let Some(target_rect) = self.rect_by_id(id) {
             self.colliding_with(target_rect)
         } else {
@@ -85,8 +85,8 @@ where
     /// and that their tags allow them to collide with each other.
     /// TODO: Maybe make this a standalone function, not associated with the `CollisionGrid` struct?
     pub fn do_rects_collide<U, V>(
-        rect_one: &CollisionRect<STag, U>,
-        rect_two: &CollisionRect<STag, V>,
+        rect_one: &CollisionRect<C, U>,
+        rect_two: &CollisionRect<C, V>,
     ) -> bool {
         !Self::do_rect_ids_match(&rect_one.id, &rect_two.id)
             && Self::do_rect_tags_match(&rect_one.tag, &rect_two.tag)
@@ -108,11 +108,11 @@ where
         }
     }
 
-    /// Returns `true` if the two passed `Option<STag>` Solid Tags may collide with each other.
+    /// Returns `true` if the two passed `Option<C>` Solid Tags may collide with each other.
     /// Returns `true` if any of the passed arguments is `None`.
     pub fn do_rect_tags_match(
-        tag_one_opt: &Option<STag>,
-        tag_two_opt: &Option<STag>,
+        tag_one_opt: &Option<C>,
+        tag_two_opt: &Option<C>,
     ) -> bool {
         if let (Some(tag_one), Some(tag_two)) = (tag_one_opt, tag_two_opt) {
             tag_one.collides_with(tag_two)
@@ -144,33 +144,11 @@ where
     }
 }
 
-impl<STag, T> From<Vec<(Index, Vector, Option<Vector>)>>
-    for CollisionGrid<STag, T>
+impl<C, T> Default for CollisionGrid<C, T>
 where
-    STag: CollisionTag,
+    C: CollisionTag,
 {
-    fn from(data: Vec<(Index, Vector, Option<Vector>)>) -> Self {
-        Self::new(
-            data.iter()
-                .map(|&rect_data| CollisionRect::from(rect_data))
-                .collect(),
-        )
-    }
-}
-
-impl<STag, T> From<Vec<(Index, Vector, Option<Vector>, STag, Option<T>)>>
-    for CollisionGrid<STag, T>
-where
-    STag: CollisionTag,
-    T: Clone,
-{
-    fn from(
-        data: Vec<(Index, Vector, Option<Vector>, STag, Option<T>)>,
-    ) -> Self {
-        Self::new(
-            data.into_iter()
-                .map(|rect_data| CollisionRect::from(rect_data))
-                .collect(),
-        )
+    fn default() -> Self {
+        Self { rects: Vec::new() }
     }
 }

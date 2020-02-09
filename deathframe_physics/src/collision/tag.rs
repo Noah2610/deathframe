@@ -3,13 +3,13 @@
 /// This trait is automatically implemented for all types
 /// implementing `PartialEq`. For those, the `collides_with` function
 /// simply checks for equality between both types.
-pub trait CollisionTag: Send + Sync {
+pub trait CollisionTag: Send + Sync + Clone {
     fn collides_with(&self, other: &Self) -> bool;
 }
 
 impl<T> CollisionTag for T
 where
-    T: Send + Sync + PartialEq,
+    T: Send + Sync + Clone + PartialEq,
 {
     fn collides_with(&self, other: &Self) -> bool {
         self == other

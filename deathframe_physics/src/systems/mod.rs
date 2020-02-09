@@ -11,4 +11,4 @@ mod system_prelude {
 }
 
 // mod move_entities;
-// mod update_collisions;
+mod update_collisions;
