@@ -76,11 +76,11 @@ where
                         .rects
                         .iter()
                         .map(|hitbox_rect| {
-                            let coll_rect = hitbox_rect
+                            let rect = hitbox_rect
                                 .clone()
                                 .with_offset(&entity_pos)
                                 .with_padding(&padding);
-                            base_collision_rect.clone().rect(coll_rect).build()
+                            base_collision_rect.clone().rect(rect).build()
                         })
                         .collect(),
                 );
