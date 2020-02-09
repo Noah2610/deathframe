@@ -17,13 +17,23 @@ impl Rect {
         RectBuilder::default()
     }
 
-    /// Returns a copy of this rect, with all sides offset by the given `Point`.
-    pub fn offset(&self, point: &Point) -> Self {
-        Self {
-            top:    self.top + point.y,
-            bottom: self.top + point.y,
-            left:   self.top + point.x,
-            right:  self.top + point.x,
-        }
+    /// Offsets all sides by the given `Point`.
+    pub fn with_offset(mut self, point: &Point) -> Self {
+        self.top += point.y;
+        self.bottom += point.y;
+        self.left += point.x;
+        self.right += point.x;
+        self
+    }
+
+    /// Adds a padding to all sides.
+    /// Subtracts/adds the `Point`'s x value from/to the `left`/`right` field,
+    /// and the y value from/to the `bottom`/`top` field (respectively).
+    pub fn with_padding(mut self, padding: &Point) -> Self {
+        self.top += padding.y;
+        self.bottom -= padding.y;
+        self.left -= padding.x;
+        self.right += padding.x;
+        self
     }
 }

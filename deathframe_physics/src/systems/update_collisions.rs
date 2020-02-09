@@ -3,7 +3,8 @@
 use super::system_prelude::*;
 use std::marker::PhantomData;
 
-const PADDING: f32 = 1.0;
+/// TODO, don't know what to do with this value.
+const PADDING: (f32, f32) = (1.0, 1.0);
 
 // TODO
 fn is_entity_loaded(
@@ -48,6 +49,8 @@ where
         loadables: &ReadStorage<Loadable>,
         loadeds: &ReadStorage<Loaded>,
     ) -> CollisionGrid<C, ()> {
+        let padding = Point::new(PADDING.0, PADDING.1);
+
         let mut grid = CollisionGrid::<C, ()>::default();
 
         for (entity, transform, hitbox, collidable) in
@@ -65,18 +68,19 @@ where
                     .id(entity_id)
                     .tag(entity_tag.clone());
 
-                // Create the CollisionRect(s) for this entity.
-                // Multiple CollisionRects may exist, because an entity
-                // can have multiple Hitboxes (Hitbox parts).
                 grid.append(
+                    // Create the CollisionRect(s) for this entity.
+                    // Multiple CollisionRects may exist, because an entity
+                    // can have multiple Hitboxes (Hitbox parts).
                     hitbox
                         .rects
                         .iter()
                         .map(|hitbox_rect| {
-                            base_collision_rect
+                            let coll_rect = hitbox_rect
                                 .clone()
-                                .rect(hitbox_rect.offset(&entity_pos))
-                                .build()
+                                .with_offset(&entity_pos)
+                                .with_padding(&padding);
+                            base_collision_rect.clone().rect(coll_rect).build()
                         })
                         .collect(),
                 );
