@@ -142,23 +142,19 @@ where
                             if let Some(side) =
                                 rect_sides.collides_with(&other_rect.rect)
                             {
-                                unimplemented!()
-                                // TODO
-                                // collider.set_collision_with(
-                                //     other_rect.id.expect(
-                                //         "`CollisionRect` should have an `id` \
-                                //          here",
-                                //     ),
-                                //     side,
-                                // );
+                                collider.set_collision_with(
+                                    other_rect.id.expect(
+                                        "`CollisionRect` should have an `id` \
+                                         here",
+                                    ),
+                                    side,
+                                );
                             }
                         }
                     }
                 }
 
-                unimplemented!();
-                // TODO
-                // collider.update();
+                collider.update();
             }
         }
     }

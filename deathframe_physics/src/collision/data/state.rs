@@ -1,6 +1,7 @@
 use super::CollisionSide;
 
 /// The state of a collision between a Collider and a Collidable.
+#[derive(PartialEq)]
 pub enum CollisionState {
     /// The collision has just occured this frame,
     /// or the CollisionSide has changed since the previous frame.

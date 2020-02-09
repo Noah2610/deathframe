@@ -10,10 +10,30 @@ mod state;
 pub use side::CollisionSide;
 pub use state::CollisionState;
 
-use specs::Entity;
-use std::collections::HashMap;
-
-#[derive(Default)]
 pub struct CollisionData {
-    pub collisions: HashMap<Entity, CollisionState>,
+    pub(crate) state:                CollisionState,
+    pub(crate) set_state_this_frame: bool,
+}
+
+impl CollisionData {
+    pub(crate) fn should_remove(&self) -> bool {
+        if let CollisionState::Leave = self.state {
+            !self.set_state_this_frame
+        } else {
+            false
+        }
+    }
+
+    /// Set state of _NOT_ colliding entity to `Leave` if it was previously
+    /// in collision and not `Leave`, otherwise remove the entity from the HashMap.
+    pub(crate) fn unset(&mut self) {
+        match self.state {
+            CollisionState::Leave => self.set_state_this_frame = false, // Stage for removal
+            _ => {
+                // Keep alive for one more frame (at least) with state Leave.
+                self.state = CollisionState::Leave;
+                self.set_state_this_frame = true;
+            }
+        }
+    }
 }
