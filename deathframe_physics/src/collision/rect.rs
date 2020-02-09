@@ -27,6 +27,7 @@ where
 }
 
 /// Builder struct for `CollisionRect`.
+#[derive(Clone)]
 pub struct CollisionRectBuilder<C, T>
 where
     C: CollisionTag,

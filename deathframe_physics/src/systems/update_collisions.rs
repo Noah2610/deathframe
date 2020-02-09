@@ -36,6 +36,57 @@ where
     _collision_tag: PhantomData<C>,
 }
 
+impl<C> UpdateCollisionsSystem<C>
+where
+    C: CollisionTag,
+{
+    fn get_collision_grid(
+        entities: &Entities,
+        transforms: &ReadStorage<Transform>,
+        hitboxes: &ReadStorage<Hitbox>,
+        collidables: &ReadStorage<Collidable<C>>,
+        loadables: &ReadStorage<Loadable>,
+        loadeds: &ReadStorage<Loaded>,
+    ) -> CollisionGrid<C, ()> {
+        let mut grid = CollisionGrid::<C, ()>::default();
+
+        for (entity, transform, hitbox, collidable) in
+            (entities, transforms, hitboxes, collidables).join()
+        {
+            if is_entity_loaded(entity, loadables, loadeds) {
+                let entity_id = entity.id();
+                let entity_pos: Point = {
+                    let trans = transform.translation();
+                    Point::new(trans.x, trans.y)
+                };
+                let entity_tag = &collidable.tag;
+
+                let base_collision_rect = CollisionRect::<C, ()>::builder()
+                    .id(entity_id)
+                    .tag(entity_tag.clone());
+
+                // Create the CollisionRect(s) for this entity.
+                // Multiple CollisionRects may exist, because an entity
+                // can have multiple Hitboxes (Hitbox parts).
+                grid.append(
+                    hitbox
+                        .rects
+                        .iter()
+                        .map(|hitbox_rect| {
+                            base_collision_rect
+                                .clone()
+                                .rect(hitbox_rect.offset(&entity_pos))
+                                .build()
+                        })
+                        .collect(),
+                );
+            }
+        }
+
+        grid
+    }
+}
+
 impl<'a, C> System<'a> for UpdateCollisionsSystem<C>
 where
     C: CollisionTag + 'static,
@@ -62,37 +113,14 @@ where
             loadeds,
         ): Self::SystemData,
     ) {
-        let collision_grid = {
-            let mut grid = CollisionGrid::<C, ()>::default();
-
-            for (entity, transform, hitbox, collidable) in
-                (&entities, &transforms, &hitboxes, &collidables).join()
-            {
-                if is_entity_loaded(entity, &loadables, &loadeds) {
-                    let entity_id = entity.id();
-                    let entity_pos: Point = {
-                        let trans = transform.translation();
-                        Point::new(trans.x, trans.y)
-                    };
-                    let entity_tag = &collidable.tag;
-
-                    // Create the CollisionRect(s) for this entity.
-                    // Multiple CollisionRects may exist, because an entity
-                    // can have multiple Hitboxes (Hitbox parts).
-                    for hitbox_rect in &hitbox.rects {
-                        grid.push(
-                            CollisionRect::<C, ()>::builder()
-                                .id(entity_id)
-                                .tag(entity_tag.clone())
-                                .rect(hitbox_rect.offset(&entity_pos))
-                                .build(),
-                        );
-                    }
-                }
-            }
-
-            grid
-        };
+        let collision_grid = Self::get_collision_grid(
+            &entities,
+            &transforms,
+            &hitboxes,
+            &collidables,
+            &loadables,
+            &loadeds,
+        );
 
         // let collision_grid = CollisionGrid::new(
         //     (

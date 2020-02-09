@@ -31,6 +31,16 @@ where
         self.rects.push(rect);
     }
 
+    /// Appends the given `Vec<CollisionRect>` to the grid.
+    /// Probably more efficient than using `push` in a loop.
+    /// Note that we take ownership of the passed Vec,
+    /// instead of copying `Vec::append`'s signature and only taking
+    /// a mutable reference; I prefer it this way, as this can avoids problems,
+    /// when you pass a mutable reference but try to use the Vec again afterwards (with no items).
+    pub fn append(&mut self, mut rects: Vec<CollisionRect<C, T>>) {
+        self.rects.append(&mut rects);
+    }
+
     /// Clears all `CollisionRect`s from the `rects` field.
     pub fn clear(&mut self) {
         self.rects.clear();
