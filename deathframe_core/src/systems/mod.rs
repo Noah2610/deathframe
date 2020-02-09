@@ -52,8 +52,7 @@ pub use input_manager::InputManagerSystem;
 pub use scale_sprites::ScaleSpritesSystem;
 
 mod helpers {
-    use crate::components::prelude::{Loadable, Loaded};
-    use amethyst::ecs::{Entity, ReadStorage};
+    use super::system_prelude::*;
 
     pub fn is_entity_loaded(
         entity: Entity,

@@ -3,7 +3,7 @@
 use super::system_prelude::*;
 use std::marker::PhantomData;
 
-/// TODO, don't know what to do with this value.
+/// TODO
 const PADDING: (f32, f32) = (1.0, 1.0);
 
 /// The `UpdateCollisionsSystem` is in charge of setting collision states for colliding entities.
@@ -24,60 +24,6 @@ const PADDING: (f32, f32) = (1.0, 1.0);
 pub struct UpdateCollisionsSystem<C>(PhantomData<C>)
 where
     C: CollisionTag;
-
-impl<C> UpdateCollisionsSystem<C>
-where
-    C: CollisionTag,
-{
-    fn get_collision_grid(
-        entities: &Entities,
-        transforms: &ReadStorage<Transform>,
-        hitboxes: &ReadStorage<Hitbox>,
-        collidables: &ReadStorage<Collidable<C>>,
-        loadables: &ReadStorage<Loadable>,
-        loadeds: &ReadStorage<Loaded>,
-    ) -> CollisionGrid<C, ()> {
-        let padding = Point::new(PADDING.0, PADDING.1);
-
-        let mut grid = CollisionGrid::<C, ()>::default();
-
-        for (entity, transform, hitbox, collidable) in
-            (entities, transforms, hitboxes, collidables).join()
-        {
-            if is_entity_loaded(entity, loadables, loadeds) {
-                let entity_id = entity.id();
-                let entity_pos: Point = {
-                    let trans = transform.translation();
-                    Point::new(trans.x, trans.y)
-                };
-                let entity_tag = &collidable.tag;
-
-                let base_collision_rect = CollisionRect::<C, ()>::builder()
-                    .id(entity_id)
-                    .tag(entity_tag.clone());
-
-                grid.append(
-                    // Create the CollisionRect(s) for this entity.
-                    // Multiple CollisionRects may exist, because an entity
-                    // can have multiple Hitboxes (Hitbox parts).
-                    hitbox
-                        .rects
-                        .iter()
-                        .map(|hitbox_rect| {
-                            let rect = hitbox_rect
-                                .clone()
-                                .with_offset(&entity_pos)
-                                .with_padding(&padding);
-                            base_collision_rect.clone().rect(rect).build()
-                        })
-                        .collect(),
-                );
-            }
-        }
-
-        grid
-    }
-}
 
 impl<'a, C> System<'a> for UpdateCollisionsSystem<C>
 where
@@ -106,13 +52,14 @@ where
         ): Self::SystemData,
     ) {
         // Generate the collision grid.
-        let collision_grid = Self::get_collision_grid(
+        let collision_grid = gen_collision_grid(
             &entities,
             &transforms,
             &hitboxes,
             &collidables,
             &loadables,
             &loadeds,
+            Some(Point::new(PADDING.0, PADDING.1)),
         );
 
         // Loop through all Colliders, and check for collision in the CollisionGrid.

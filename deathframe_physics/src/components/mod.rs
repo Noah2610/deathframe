@@ -7,6 +7,7 @@ pub mod prelude {
 }
 
 mod component_prelude {
+    pub(super) use super::helpers::WithCollisionTag;
     pub(super) use crate::collision::tag::CollisionTag;
     pub(super) use core::components::component_prelude::*;
 }
@@ -16,3 +17,14 @@ mod collider;
 mod hitbox;
 mod solid;
 mod velocity;
+
+pub(crate) mod helpers {
+    use crate::collision::tag::CollisionTag;
+
+    pub trait WithCollisionTag<C>
+    where
+        C: CollisionTag,
+    {
+        fn collision_tag(&self) -> &C;
+    }
+}

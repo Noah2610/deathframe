@@ -17,3 +17,12 @@ where
         Self { tag }
     }
 }
+
+impl<C> WithCollisionTag<C> for Collidable<C>
+where
+    C: CollisionTag,
+{
+    fn collision_tag(&self) -> &C {
+        &self.tag
+    }
+}
