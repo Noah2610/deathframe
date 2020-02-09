@@ -45,11 +45,12 @@ where
 
         Self::run_without_collision(
             dt,
+            &entities,
+            &mut transforms,
+            &mut velocities,
             &solids,
             &loadables,
             &loadeds,
-            &mut transforms,
-            &mut velocities,
         );
 
         // Self::run_with_collision(
@@ -67,30 +68,23 @@ where
     }
 }
 
-impl<'a, C> MoveEntitiesSystem<C>
+impl<C> MoveEntitiesSystem<C>
 where
     C: 'static + CollisionTag,
 {
     fn run_without_collision(
         dt: f32,
+        entities: &Entities,
+        transforms: &mut WriteStorage<Transform>,
+        velocities: &mut WriteStorage<Velocity>,
         solids: &ReadStorage<Solid<C>>,
         loadables: &ReadStorage<Loadable>,
         loadeds: &ReadStorage<Loaded>,
-        transforms: &mut WriteStorage<'a, Transform>,
-        velocities: &mut WriteStorage<'a, Velocity>,
     ) {
-        for (velocity, transform, loadable_opt, loaded_opt, _) in (
-            velocities,
-            transforms,
-            loadables.maybe(),
-            loadeds.maybe(),
-            !solids,
-        )
-            .join()
+        for (entity, transform, velocity, _) in
+            (entities, transforms, velocities, !solids).join()
         {
-            if let (None, None) | (Some(_), Some(_)) =
-                (loadable_opt, loaded_opt)
-            {
+            if is_entity_loaded(entity, loadables, loadeds) {
                 transform.prepend_translation_x(velocity.x * dt);
                 transform.prepend_translation_y(velocity.y * dt);
             }
