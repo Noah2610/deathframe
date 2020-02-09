@@ -23,7 +23,7 @@ path = "./deathframe_physics"
 optional = true
 
 [features]
-default = []
+default = ["physics"]
 
 vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
