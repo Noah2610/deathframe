@@ -1,6 +1,6 @@
 pub mod prelude {
     // pub use super::move_entities::MoveEntitiesSystem;
-    // pub use super::update_collisions::UpdateCollisionsSystem;
+    pub use super::update_collisions::UpdateCollisionsSystem;
 }
 
 mod system_prelude {

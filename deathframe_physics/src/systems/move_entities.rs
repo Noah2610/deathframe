@@ -20,14 +20,12 @@ where
     type SystemData = (
         Entities<'a>,
         Read<'a, Time>,
-        ReadStorage<'a, Solid<T>>,
-        ReadStorage<'a, Size>,
-        ReadStorage<'a, Push>,
-        ReadStorage<'a, Pushable>,
-        ReadStorage<'a, Loadable>,
-        ReadStorage<'a, Loaded>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Velocity>,
+        ReadStorage<'a, Hitbox>,
+        ReadStorage<'a, Solid<T>>,
+        ReadStorage<'a, Loadable>,
+        ReadStorage<'a, Loaded>,
     );
 
     fn run(
@@ -35,14 +33,12 @@ where
         (
             entities,
             time,
-            solids,
-            sizes,
-            pushers,
-            pushables,
-            loadables,
-            loadeds,
             mut transforms,
             mut velocities,
+            hitboxes,
+            solids,
+            loadables,
+            loadeds,
         ): Self::SystemData,
     ) {
         let dt = time.delta_seconds();

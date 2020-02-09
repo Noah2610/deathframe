@@ -6,15 +6,6 @@ use std::marker::PhantomData;
 /// TODO, don't know what to do with this value.
 const PADDING: (f32, f32) = (1.0, 1.0);
 
-// TODO
-fn is_entity_loaded(
-    entity: Entity,
-    loadables: &ReadStorage<Loadable>,
-    loadeds: &ReadStorage<Loaded>,
-) -> bool {
-    loadables.contains(entity) == loadeds.contains(entity)
-}
-
 /// The `UpdateCollisionsSystem` is in charge of setting collision states for colliding entities.
 /// Entities with `CheckCollision` (and with `Collision`) check for collision against
 /// other entities with `Collision`.
@@ -30,12 +21,9 @@ fn is_entity_loaded(
 // It would have to re-generate and remove all `CollisionRect`s with moving entities each frame
 // though, so benchmarking would be needed to verify that this would be beneficial.
 #[derive(Default)]
-pub struct UpdateCollisionsSystem<C>
+pub struct UpdateCollisionsSystem<C>(PhantomData<C>)
 where
-    C: CollisionTag,
-{
-    _collision_tag: PhantomData<C>,
-}
+    C: CollisionTag;
 
 impl<C> UpdateCollisionsSystem<C>
 where

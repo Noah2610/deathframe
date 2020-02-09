@@ -42,9 +42,24 @@ pub mod system_prelude {
     pub use crate::components::prelude::*;
     pub use crate::geo::prelude::*;
     pub use crate::resources::InputManager;
+
+    pub use super::helpers::*;
 }
 
 pub use animation::AnimationSystem;
 pub use follow::FollowSystem;
 pub use input_manager::InputManagerSystem;
 pub use scale_sprites::ScaleSpritesSystem;
+
+mod helpers {
+    use crate::components::prelude::{Loadable, Loaded};
+    use amethyst::ecs::{Entity, ReadStorage};
+
+    pub fn is_entity_loaded(
+        entity: Entity,
+        loadables: &ReadStorage<Loadable>,
+        loadeds: &ReadStorage<Loaded>,
+    ) -> bool {
+        loadables.contains(entity) == loadeds.contains(entity)
+    }
+}
