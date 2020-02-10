@@ -2,10 +2,17 @@
 # Build the project for development.
 # All command-line arguments are passed to the executed `cargo` command.
 # Optional environment variables:
-#   $RUN_NEW_TERMINAL
+#   $RUN_TERMINAL
 #     If this variable is not `0` or empty,
 #     then the cargo command is executed in a new terminal.
 #     DEFAULT: ""
+#   $RUST_FEATURES
+#     Comma-separated list of features to tell cargo to build with.
+#     Add additional features with the `--features` command-line option,
+#     because all arguments are passed to the `cargo` command anyway.
+#     Set this environment variable if you want DON'T want to build
+#     with these pre-defined features.
+#     DEFAULT: "nightly,vulkan,physics"
 
 # shellcheck source=./util.sh
 _dir="$( dirname "$0" )"

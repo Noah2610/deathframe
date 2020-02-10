@@ -18,7 +18,7 @@ function cargo_cmd {
     cargo_sub_cmd="$1"
     shift
     args=( \
-        --features "vulkan,nightly,physics" \
+        --features "$RUST_FEATURES" \
         "$@" \
     )
     cmd=( \
@@ -55,3 +55,4 @@ Install automatically with $(clr "${CLR_CODE[@]}")rustup$(clrrs)?"
 
 LOGFILE="${ROOT}/logs/$( basename "$0" ).log"
 RUST_TOOLCHAIN="nightly-2020-02-06"
+[ -z "$RUST_FEATURES" ] && RUST_FEATURES="nightly,vulkan,physics"
