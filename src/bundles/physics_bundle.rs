@@ -5,9 +5,10 @@ use core::amethyst;
 use physics::collision::tag::CollisionTag;
 use std::marker::PhantomData;
 
-/// The `PhysicsBundle` will register
-/// the `MoveEntitiesSystem` (named `"move_entities_system"`) and
-/// the `UpdateCollisionsSystem` (named `"update_collisions_system"`).
+/// The `PhysicsBundle` will register the following systems:
+/// - `MoveEntitiesSystem` (named `"move_entities_system"`)
+/// - `UpdateCollisionsSystem` (named `"update_collisions_system"`)
+/// - `ApplyBaseFrictionSystem` (named `"apply_base_friction_system"`)
 pub struct PhysicsBundle<'a, CU, CM>
 where
     CU: 'static + CollisionTag,
@@ -46,9 +47,14 @@ where
         builder: &mut DispatcherBuilder<'a, 'b>,
     ) -> Result<(), amethyst::Error> {
         builder.add(
+            ApplyBaseFrictionSystem::default(),
+            "apply_base_friction_system",
+            self.deps,
+        );
+        builder.add(
             MoveEntitiesSystem::<CM>::default(),
             "move_entities_system",
-            self.deps,
+            &[self.deps, &["apply_base_friction_system"]].concat(),
         );
         builder.add(
             UpdateCollisionsSystem::<CU>::default(),
