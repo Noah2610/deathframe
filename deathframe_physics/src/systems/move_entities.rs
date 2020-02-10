@@ -154,13 +154,13 @@ where
                     };
 
                 // Move one pixel at a time
-                for _ in 0 .. abs {
+                'pixel_loop: for _ in 0 .. abs {
                     let new_position = next_position(&transform, sign);
                     if is_position_in_collision(&new_position) {
                         // New position would be in collision,
                         // kill the relevant velocity and break out of the loop.
                         velocity.clear(&axis);
-                        break;
+                        break 'pixel_loop;
                     } else {
                         // New position is NOT in collision, apply position
                         transform.set_translation_x(new_position.x);
