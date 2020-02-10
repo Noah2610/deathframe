@@ -6,3 +6,5 @@ extern crate specs_derive;
 pub mod collision;
 pub mod components;
 pub mod systems;
+
+pub use collision::tag::CollisionTag;
