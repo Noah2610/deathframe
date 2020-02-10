@@ -31,4 +31,18 @@ impl Velocity {
             Axis::Y => self.y = (self.y + incr).min(max).max(-max),
         }
     }
+
+    /// Clear the velocity of the given axis.
+    pub fn clear(&mut self, axis: &Axis) {
+        match axis {
+            Axis::X => self.x = 0.0,
+            Axis::Y => self.y = 0.0,
+        }
+    }
+
+    /// Clear both velocity axes.
+    pub fn clear_all(&mut self) {
+        self.x = 0.0;
+        self.y = 0.0;
+    }
 }

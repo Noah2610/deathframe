@@ -157,7 +157,9 @@ where
                 for _ in 0 .. abs {
                     let new_position = next_position(&transform, sign);
                     if is_position_in_collision(&new_position) {
-                        // New position would be in collision, so just break out of loop
+                        // New position would be in collision,
+                        // kill the relevant velocity and break out of the loop.
+                        velocity.clear(&axis);
                         break;
                     } else {
                         // New position is NOT in collision, apply position
@@ -169,7 +171,9 @@ where
                 // Try to move by the floating point remainder
                 if rem != 0.0 {
                     let new_position = next_position(&transform, rem);
-                    if !is_position_in_collision(&new_position) {
+                    if is_position_in_collision(&new_position) {
+                        velocity.clear(&axis);
+                    } else {
                         transform.set_translation_x(new_position.x);
                         transform.set_translation_y(new_position.y);
                     }
