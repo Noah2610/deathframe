@@ -55,6 +55,17 @@ impl BaseFriction {
     }
 }
 
+impl BaseFrictionBuilder {
+    /// Set the friction value for the given `Axis`.
+    pub fn friction(mut self, axis: &Axis, friction: f32) -> Self {
+        match axis {
+            Axis::X => self.friction_x = Some(Some(friction)),
+            Axis::Y => self.friction_y = Some(Some(friction)),
+        }
+        self
+    }
+}
+
 impl Default for BaseFriction {
     fn default() -> Self {
         Self {
