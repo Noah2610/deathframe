@@ -1,5 +1,3 @@
-//! TODO: Rewrite this...
-
 use std::marker::PhantomData;
 
 use super::system_prelude::*;

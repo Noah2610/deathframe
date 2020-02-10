@@ -1,9 +1,6 @@
-//! TODO: Rewrite this...
-
 use super::system_prelude::*;
 use std::marker::PhantomData;
 
-/// TODO
 const PADDING: (f32, f32) = (1.0, 1.0);
 
 /// The `UpdateCollisionsSystem` is in charge of setting collision states for colliding entities.
