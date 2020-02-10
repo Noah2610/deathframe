@@ -1,7 +1,7 @@
 use super::component_prelude::*;
 use core::geo::Axis;
 
-#[derive(Component, Default, Builder)]
+#[derive(Component, Default, Builder, Debug)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned")]
 pub struct Velocity {

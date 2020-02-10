@@ -106,8 +106,8 @@ where
             None,
         );
 
-        for (entity, transform, velocity, solid, hitbox) in
-            (entities, transforms, velocities, solids, hitboxes).join()
+        for (entity, transform, velocity, solid, hitbox_opt) in
+            (entities, transforms, velocities, solids, hitboxes.maybe()).join()
         {
             if !is_entity_loaded(entity, loadables, loadeds) {
                 continue;
@@ -120,14 +120,19 @@ where
                 let base_coll_rect = CollisionRect::builder()
                     .id(entity_id)
                     .tag(solid_tag.clone());
-                // Check for collision with Hitbox
-                hitbox.rects.iter().any(|hitbox_rect| {
-                    let coll_rect = base_coll_rect
-                        .clone()
-                        .rect(hitbox_rect.clone().with_offset(position))
-                        .build();
-                    collision_grid.collides_any(&coll_rect)
-                })
+                if let Some(hitbox) = hitbox_opt {
+                    // Check for collision with Hitbox
+                    hitbox.rects.iter().any(|hitbox_rect| {
+                        let coll_rect = base_coll_rect
+                            .clone()
+                            .rect(hitbox_rect.clone().with_offset(position))
+                            .build();
+                        collision_grid.collides_any(&coll_rect)
+                    })
+                } else {
+                    // If the entity has no hitbox, then they are never in collision
+                    false
+                }
             };
 
             Axis::for_each(|axis| {
