@@ -1,3 +1,4 @@
+use crate::components::Size;
 use crate::geo::Point;
 
 /// A `Rect` is simply an area.
@@ -35,5 +36,17 @@ impl Rect {
         self.left -= padding.x;
         self.right += padding.x;
         self
+    }
+}
+
+impl From<&Size> for Rect {
+    fn from(size: &Size) -> Self {
+        let half_size = (size.w * 0.5, size.h * 0.5);
+        Self {
+            top:    half_size.1,
+            bottom: -half_size.1,
+            left:   -half_size.0,
+            right:  half_size.0,
+        }
     }
 }

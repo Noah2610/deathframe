@@ -10,6 +10,10 @@ pub struct Hitbox {
 }
 
 impl Hitbox {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn with_rect(mut self, rect: Rect) -> Self {
         self.add_rect(rect);
         self
