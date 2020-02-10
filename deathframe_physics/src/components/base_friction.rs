@@ -2,7 +2,7 @@ use super::component_prelude::*;
 
 /// Friction that is applied constantly.
 /// You can disable it with the `set_enabled` function.
-#[derive(Component, Builder)]
+#[derive(Component, Builder, Debug)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
 pub struct BaseFriction {
@@ -39,18 +39,10 @@ impl BaseFriction {
     /// Returns the optional friction for the given `Axis`,
     /// but __ONLY if it is enabled for that axis!__
     pub(crate) fn get(&self, axis: &Axis) -> Option<f32> {
-        if self.is_enabled(axis) {
-            self.friction_x
-        } else {
-            None
-        }
-    }
-
-    /// Returns `true` if the friction for the given `Axis` is enabled.
-    fn is_enabled(&self, axis: &Axis) -> bool {
         match axis {
-            Axis::X => self.enabled.0,
-            Axis::Y => self.enabled.1,
+            Axis::X if self.enabled.0 => self.friction_x,
+            Axis::Y if self.enabled.1 => self.friction_y,
+            _ => None,
         }
     }
 }
