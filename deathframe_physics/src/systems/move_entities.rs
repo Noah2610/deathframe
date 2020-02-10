@@ -1,12 +1,8 @@
 //! TODO: Rewrite this...
 
-use std::collections::HashMap;
 use std::marker::PhantomData;
 
 use super::system_prelude::*;
-
-/// TODO
-const PADDING: (f32, f32) = (1.0, 1.0);
 
 /// This system is responsible for moving all entities with `Transform` and `Velocity`,
 /// by manipulating their `Transform` appropriately.
@@ -66,19 +62,6 @@ where
             &loadables,
             &loadeds,
         );
-
-        // Self::run_with_collision(
-        //     dt,
-        //     &entities,
-        //     &solids,
-        //     &sizes,
-        //     &pushers,
-        //     &pushables,
-        //     &loadables,
-        //     &loadeds,
-        //     &mut transforms,
-        //     &mut velocities,
-        // );
     }
 }
 
@@ -115,35 +98,6 @@ where
         loadables: &ReadStorage<Loadable>,
         loadeds: &ReadStorage<Loaded>,
     ) {
-        // fn new_collision_rect_and_position<C, T>(
-        //     id: Index,
-        //     transform: &Transform,
-        //     size: &Size,
-        //     tag: C,
-        //     axis: &Axis,
-        //     step: f32,
-        // ) -> (CollisionRect<C, T>, Vector)
-        // where
-        //     C: CollisionTag,
-        // {
-        //     // Calculate new position
-        //     let pos = transform.translation();
-        //     let new_position = Vector::new(
-        //         pos.x + if axis.is_x() { step } else { 0.0 },
-        //         pos.y + if axis.is_y() { step } else { 0.0 },
-        //     );
-        //     // Create a CollisionRect with new position
-        //     (
-        //         CollisionRect::builder()
-        //             .id(id)
-        //             .with_pos(new_position)
-        //             .with_size(size)
-        //             .tag(tag)
-        //             .build(),
-        //         new_position,
-        //     )
-        // }
-
         // Generate the collision grid.
         let collision_grid = gen_collision_grid(
             entities,
@@ -155,290 +109,70 @@ where
             None,
         );
 
-        //for (entity, transform, velocity, solid, hitbox) in
-        //    (entities, transforms, velocities, solids, hitboxes).join()
-        //{
-        //    if is_entity_loaded(entity, loadables, loadeds) {
-        //        let entity_id = entity.id();
-        //        Axis::for_each(|axis| {
-        //            let vel = match axis {
-        //                Axis::X => velocity.x * dt,
-        //                Axis::Y => velocity.y * dt,
-        //            };
-        //            let abs = vel.abs() as usize;
-        //            let sign = if vel != 0.0 { vel.signum() } else { 0.0 };
-        //            let rem = vel % 1.0;
+        for (entity, transform, velocity, solid, hitbox) in
+            (entities, transforms, velocities, solids, hitboxes).join()
+        {
+            if !is_entity_loaded(entity, loadables, loadeds) {
+                continue;
+            }
 
-        //            // Try to move by one absolute unit
-        //            for _ in 0 .. abs {
-        //                let (collision_rect, new_position) =
-        //                    new_collision_rect_and_position(
-        //                        entity_id,
-        //                        transform,
-        //                        size_opt,
-        //                        solid.tag.clone(),
-        //                        &axis,
-        //                        sign,
-        //                    );
-        //                // Check for collision in newly calculated position
-        //                let colliding_with =
-        //                    collision_grid.colliding_with(&collision_rect);
-        //                if colliding_with.is_empty() {
-        //                    // New position would NOT be in collision, apply new position
-        //                    transform.set_translation_x(new_position.0);
-        //                    transform.set_translation_y(new_position.1);
-        //                } else {
-        //                    // New position would be in collision, break out of loop and don't apply
-        //                    // new position, unless this entity is `Push`, and all colliding entities
-        //                    // are `Pushable`.
-        //                    if pusher_opt.is_some() {
-        //                        if colliding_with
-        //                            .iter()
-        //                            .all(|rect| rect.custom.unwrap_or(false))
-        //                        {
-        //                            // All colliding entities are `Pushable`, therefor push them.
-        //                            // Afterwards, they will really be pushed (transforms manipulated),
-        //                            // for now we will only note, that the do need to be translated.
-        //                            // Also move itself.
-        //                            for coll_with in colliding_with {
-        //                                let entry = translate_pushables
-        //                                    .entry(
-        //                                        coll_with.id.expect(ERRMSG_ID),
-        //                                    )
-        //                                    .or_insert((0.0, 0.0));
-        //                                //*entry = new_position;
-        //                                match axis {
-        //                                    Axis::X => entry.0 += sign,
-        //                                    Axis::Y => entry.1 += sign,
-        //                                }
-        //                            }
-        //                            transform.set_translation_x(new_position.0);
-        //                            transform.set_translation_y(new_position.1);
-        //                        } else {
-        //                            // None of the entities are `Pushable`, so don't apply new position.
-        //                            break;
-        //                        }
-        //                    } else {
-        //                        break;
-        //                    }
-        //                }
-        //            }
-        //            // Try to move by the floating point remainder
-        //            // Calculate new position
-        //            let (collision_rect, new_position) =
-        //                new_collision_rect_and_position(
-        //                    entity_id,
-        //                    transform,
-        //                    size_opt,
-        //                    solid.tag.clone(),
-        //                    &axis,
-        //                    rem,
-        //                );
-        //            // Check for collision in newly calculated position
-        //            let colliding_with =
-        //                collision_grid.colliding_with(&collision_rect);
-        //            if colliding_with.is_empty() {
-        //                // New position would NOT be in collision, apply new position
-        //                transform.set_translation_x(new_position.0);
-        //                transform.set_translation_y(new_position.1);
-        //            } else {
-        //                // New position would be in collision, check if all collidin entities are pushable.
-        //                if pusher_opt.is_some() {
-        //                    if colliding_with
-        //                        .iter()
-        //                        .all(|rect| rect.custom.unwrap_or(false))
-        //                    {
-        //                        // All colliding entities are `Pushable`, therefor push them.
-        //                        // Afterwards, they will really be pushed (transforms manipulated),
-        //                        // for now we will only note, that the do need to be translated.
-        //                        for coll_with in colliding_with {
-        //                            let entry = translate_pushables
-        //                                .entry(coll_with.id.expect(ERRMSG_ID))
-        //                                .or_insert((0.0, 0.0));
-        //                            //*entry = new_position;
-        //                            match axis {
-        //                                Axis::X => entry.0 += rem,
-        //                                Axis::Y => entry.1 += rem,
-        //                            }
-        //                        }
-        //                        transform.set_translation_x(new_position.0);
-        //                        transform.set_translation_y(new_position.1);
-        //                    }
-        //                }
-        //            }
-        //        });
-        //    }
-        //}
+            let entity_id = entity.id();
+            let solid_tag = &solid.tag;
 
-        // ###############################################################################
+            let is_position_in_collision = |position: &Point| -> bool {
+                let base_coll_rect = CollisionRect::builder()
+                    .id(entity_id)
+                    .tag(solid_tag.clone());
+                // Check for collision with Hitbox
+                hitbox.rects.iter().any(|hitbox_rect| {
+                    let coll_rect = base_coll_rect
+                        .clone()
+                        .rect(hitbox_rect.clone().with_offset(position))
+                        .build();
+                    collision_grid.collides_any(&coll_rect)
+                })
+            };
 
-        //    const ERRMSG_ID: &str = "`CollisionRect` should have an `id` here";
+            Axis::for_each(|axis| {
+                let vel = match axis {
+                    Axis::X => velocity.x * dt,
+                    Axis::Y => velocity.y * dt,
+                };
+                let abs = vel.abs() as usize;
+                let sign = if vel != 0.0 { vel.signum() } else { 0.0 };
+                let rem = vel % 1.0;
 
-        //    // This HashMap will be filled with entity IDs (keys) and a vector (values), by
-        //    // which they must be moved afterwards.
-        //    let mut translate_pushables: HashMap<Index, (f32, f32)> =
-        //        HashMap::new();
+                let next_position =
+                    |transform: &Transform, step: f32| -> Point {
+                        let trans = transform.translation();
+                        match axis {
+                            Axis::X => Point::new(trans.x + step, 0.0),
+                            Axis::Y => Point::new(0.0, trans.y + step),
+                        }
+                    };
 
-        //    // Now check for collisions for all solid entities, using the generated CollisionGrid
-        //    for (
-        //        entity,
-        //        velocity,
-        //        size_opt,
-        //        solid,
-        //        transform,
-        //        pusher_opt,
-        //        loadable_opt,
-        //        loaded_opt,
-        //    ) in (
-        //        entities,
-        //        &*velocities,
-        //        sizes.maybe(),
-        //        solids,
-        //        &mut *transforms,
-        //        pushers.maybe(),
-        //        loadables.maybe(),
-        //        loadeds.maybe(),
-        //    )
-        //        .join()
-        //    {
-        //        if let (None, None) | (Some(_), Some(_)) =
-        //            (loadable_opt, loaded_opt)
-        //        {
-        //            let entity_id = entity.id();
-        //            Axis::for_each(|axis| {
-        //                let vel = match axis {
-        //                    Axis::X => velocity.x * dt,
-        //                    Axis::Y => velocity.y * dt,
-        //                };
-        //                let abs = vel.abs() as usize;
-        //                let sign = if vel != 0.0 { vel.signum() } else { 0.0 };
-        //                let rem = vel % 1.0;
+                // Move one pixel at a time
+                for _ in 0 .. abs {
+                    let new_position = next_position(&transform, sign);
+                    if is_position_in_collision(&new_position) {
+                        // New position would be in collision, so just break out of loop
+                        break;
+                    } else {
+                        // New position is NOT in collision, apply position
+                        transform.set_translation_x(new_position.x);
+                        transform.set_translation_y(new_position.y);
+                    }
+                }
 
-        //                // Try to move by one absolute unit
-        //                for _ in 0 .. abs {
-        //                    let (collision_rect, new_position) =
-        //                        new_collision_rect_and_position(
-        //                            entity_id,
-        //                            transform,
-        //                            size_opt,
-        //                            solid.tag.clone(),
-        //                            &axis,
-        //                            sign,
-        //                        );
-        //                    // Check for collision in newly calculated position
-        //                    let colliding_with =
-        //                        collision_grid.colliding_with(&collision_rect);
-        //                    if colliding_with.is_empty() {
-        //                        // New position would NOT be in collision, apply new position
-        //                        transform.set_translation_x(new_position.0);
-        //                        transform.set_translation_y(new_position.1);
-        //                    } else {
-        //                        // New position would be in collision, break out of loop and don't apply
-        //                        // new position, unless this entity is `Push`, and all colliding entities
-        //                        // are `Pushable`.
-        //                        if pusher_opt.is_some() {
-        //                            if colliding_with
-        //                                .iter()
-        //                                .all(|rect| rect.custom.unwrap_or(false))
-        //                            {
-        //                                // All colliding entities are `Pushable`, therefor push them.
-        //                                // Afterwards, they will really be pushed (transforms manipulated),
-        //                                // for now we will only note, that the do need to be translated.
-        //                                // Also move itself.
-        //                                for coll_with in colliding_with {
-        //                                    let entry = translate_pushables
-        //                                        .entry(
-        //                                            coll_with.id.expect(ERRMSG_ID),
-        //                                        )
-        //                                        .or_insert((0.0, 0.0));
-        //                                    //*entry = new_position;
-        //                                    match axis {
-        //                                        Axis::X => entry.0 += sign,
-        //                                        Axis::Y => entry.1 += sign,
-        //                                    }
-        //                                }
-        //                                transform.set_translation_x(new_position.0);
-        //                                transform.set_translation_y(new_position.1);
-        //                            } else {
-        //                                // None of the entities are `Pushable`, so don't apply new position.
-        //                                break;
-        //                            }
-        //                        } else {
-        //                            break;
-        //                        }
-        //                    }
-        //                }
-        //                // Try to move by the floating point remainder
-        //                // Calculate new position
-        //                let (collision_rect, new_position) =
-        //                    new_collision_rect_and_position(
-        //                        entity_id,
-        //                        transform,
-        //                        size_opt,
-        //                        solid.tag.clone(),
-        //                        &axis,
-        //                        rem,
-        //                    );
-        //                // Check for collision in newly calculated position
-        //                let colliding_with =
-        //                    collision_grid.colliding_with(&collision_rect);
-        //                if colliding_with.is_empty() {
-        //                    // New position would NOT be in collision, apply new position
-        //                    transform.set_translation_x(new_position.0);
-        //                    transform.set_translation_y(new_position.1);
-        //                } else {
-        //                    // New position would be in collision, check if all collidin entities are pushable.
-        //                    if pusher_opt.is_some() {
-        //                        if colliding_with
-        //                            .iter()
-        //                            .all(|rect| rect.custom.unwrap_or(false))
-        //                        {
-        //                            // All colliding entities are `Pushable`, therefor push them.
-        //                            // Afterwards, they will really be pushed (transforms manipulated),
-        //                            // for now we will only note, that the do need to be translated.
-        //                            for coll_with in colliding_with {
-        //                                let entry = translate_pushables
-        //                                    .entry(coll_with.id.expect(ERRMSG_ID))
-        //                                    .or_insert((0.0, 0.0));
-        //                                //*entry = new_position;
-        //                                match axis {
-        //                                    Axis::X => entry.0 += rem,
-        //                                    Axis::Y => entry.1 += rem,
-        //                                }
-        //                            }
-        //                            transform.set_translation_x(new_position.0);
-        //                            transform.set_translation_y(new_position.1);
-        //                        }
-        //                    }
-        //                }
-        //            });
-        //        }
-        //    } // End join loop
-
-        //    // Push all pushable entities, which need pushing
-        //    // Also kill their velocities, if they have one
-        //    for (id, (x, y)) in translate_pushables {
-        //        for (entity, transform, mut velocity_opt, _) in (
-        //            entities,
-        //            &mut *transforms,
-        //            (&mut *velocities).maybe(),
-        //            pushables,
-        //        )
-        //            .join()
-        //        {
-        //            if entity.id() == id {
-        //                velocity_opt.as_mut().map(|velocity| {
-        //                    if x != 0.0 {
-        //                        velocity.x = 0.0;
-        //                    }
-        //                    if y != 0.0 {
-        //                        velocity.y = 0.0;
-        //                    }
-        //                });
-        //                transform.prepend_translation_x(x);
-        //                transform.prepend_translation_y(y);
-        //            }
-        //        }
-        //    }
+                // Try to move by the floating point remainder
+                if rem != 0.0 {
+                    let new_position = next_position(&transform, rem);
+                    if !is_position_in_collision(&new_position) {
+                        transform.set_translation_x(new_position.x);
+                        transform.set_translation_y(new_position.y);
+                    }
+                }
+            });
+        }
     }
 }
