@@ -23,9 +23,10 @@ impl<'a> System<'a> for ApplyBaseFrictionSystem {
         {
             Axis::for_each(|axis| {
                 if let Some(fric) = base_friction.get(&axis) {
-                    // Exponential function
                     let vel = velocity.get(&axis);
-                    let reduced_vel = vel - vel * (fric * dt).exp();
+                    // Exponential function
+                    // let reduced_vel = vel - vel * (fric * dt).exp();
+                    let reduced_vel = vel - vel * fric * dt;
                     velocity.set(&axis, reduced_vel);
                 }
             });
