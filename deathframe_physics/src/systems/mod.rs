@@ -1,4 +1,5 @@
 pub mod prelude {
+    pub use super::apply_base_friction::ApplyBaseFrictionSystem;
     pub use super::move_entities::MoveEntitiesSystem;
     pub use super::update_collisions::UpdateCollisionsSystem;
 }
@@ -13,6 +14,7 @@ mod system_prelude {
     pub use super::helpers::*;
 }
 
+mod apply_base_friction;
 mod move_entities;
 mod update_collisions;
 
