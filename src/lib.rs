@@ -34,6 +34,6 @@ pub mod resources {
     pub use core::resources::*;
 }
 
-mod bundles;
+pub mod bundles;
 
 pub use core::amethyst;
