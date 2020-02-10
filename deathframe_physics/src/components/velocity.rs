@@ -15,6 +15,22 @@ impl Velocity {
         Self { x, y }
     }
 
+    /// Set the velocity for the given `Axis` to the given value.
+    pub fn set(&mut self, axis: &Axis, vel: f32) {
+        match axis {
+            Axis::X => self.x = vel,
+            Axis::Y => self.y = vel,
+        }
+    }
+
+    /// Get the current velocity for the given `Axis`.
+    pub fn get(&self, axis: &Axis) -> f32 {
+        match axis {
+            Axis::X => self.x,
+            Axis::Y => self.y,
+        }
+    }
+
     /// Increase the velocity for the given `Axis`, by the given increment.
     pub fn increase(&mut self, axis: &Axis, incr: f32) {
         match axis {

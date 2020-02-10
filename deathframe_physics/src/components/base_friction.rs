@@ -9,7 +9,7 @@ pub struct BaseFriction {
     pub(crate) friction_x: Option<f32>,
     pub(crate) friction_y: Option<f32>,
     #[builder(setter(skip))]
-    pub(crate) enabled:    bool,
+    pub(crate) enabled:    (bool, bool),
 }
 
 impl BaseFriction {
@@ -24,13 +24,34 @@ impl BaseFriction {
         Self {
             friction_x,
             friction_y,
-            enabled: true,
+            enabled: Default::default(),
         }
     }
 
-    /// Set the enabled state of this `BaseFriction`.
-    pub fn set_enabled(&mut self, enabled: bool) {
-        self.enabled = enabled;
+    /// Set the enabled state for the given `Axis` of this `BaseFriction`.
+    pub fn set_enabled(&mut self, axis: &Axis, enabled: bool) {
+        match axis {
+            Axis::X => self.enabled.0 = enabled,
+            Axis::Y => self.enabled.1 = enabled,
+        }
+    }
+
+    /// Returns the optional friction for the given `Axis`,
+    /// but __ONLY if it is enabled for that axis!__
+    pub(crate) fn get(&self, axis: &Axis) -> Option<f32> {
+        if self.is_enabled(axis) {
+            self.friction_x
+        } else {
+            None
+        }
+    }
+
+    /// Returns `true` if the friction for the given `Axis` is enabled.
+    fn is_enabled(&self, axis: &Axis) -> bool {
+        match axis {
+            Axis::X => self.enabled.0,
+            Axis::Y => self.enabled.1,
+        }
     }
 }
 
@@ -39,7 +60,7 @@ impl Default for BaseFriction {
         Self {
             friction_x: None,
             friction_y: None,
-            enabled:    true,
+            enabled:    (true, true),
         }
     }
 }
