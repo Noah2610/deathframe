@@ -148,8 +148,8 @@ where
                     |transform: &Transform, step: f32| -> Point {
                         let trans = transform.translation();
                         match axis {
-                            Axis::X => Point::new(trans.x + step, 0.0),
-                            Axis::Y => Point::new(0.0, trans.y + step),
+                            Axis::X => Point::new(trans.x + step, trans.y),
+                            Axis::Y => Point::new(trans.x, trans.y + step),
                         }
                     };
 
