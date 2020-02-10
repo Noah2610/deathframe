@@ -8,20 +8,20 @@ use std::marker::PhantomData;
 /// The `PhysicsBundle` will register
 /// the `MoveEntitiesSystem` (named `"move_entities_system"`) and
 /// the `UpdateCollisionsSystem` (named `"update_collisions_system"`).
-pub struct PhysicsBundle<'a, CM, CU>
+pub struct PhysicsBundle<'a, CU, CM>
 where
-    CM: 'static + CollisionTag,
     CU: 'static + CollisionTag,
+    CM: 'static + CollisionTag,
 {
     deps: &'a [&'a str],
     _cm:  PhantomData<CM>,
     _cu:  PhantomData<CU>,
 }
 
-impl<'a, CM, CU> PhysicsBundle<'a, CM, CU>
+impl<'a, CU, CM> PhysicsBundle<'a, CU, CM>
 where
-    CM: 'static + CollisionTag,
     CU: 'static + CollisionTag,
+    CM: 'static + CollisionTag,
 {
     /// Create new `PhysicsBundle` with no dependencies.
     pub fn new() -> Self {
@@ -35,10 +35,10 @@ where
     }
 }
 
-impl<'a, 'b, 'c, CM, CU> SystemBundle<'a, 'b> for PhysicsBundle<'c, CM, CU>
+impl<'a, 'b, 'c, CU, CM> SystemBundle<'a, 'b> for PhysicsBundle<'c, CU, CM>
 where
-    CM: 'static + CollisionTag,
     CU: 'static + CollisionTag,
+    CM: 'static + CollisionTag,
 {
     fn build(
         self,
@@ -59,10 +59,10 @@ where
     }
 }
 
-impl<'a, CM, CU> Default for PhysicsBundle<'a, CM, CU>
+impl<'a, CU, CM> Default for PhysicsBundle<'a, CU, CM>
 where
-    CM: 'static + CollisionTag,
     CU: 'static + CollisionTag,
+    CM: 'static + CollisionTag,
 {
     fn default() -> Self {
         Self {
