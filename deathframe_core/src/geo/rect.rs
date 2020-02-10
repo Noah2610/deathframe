@@ -50,3 +50,15 @@ impl From<&Size> for Rect {
         }
     }
 }
+
+impl From<&Size> for RectBuilder {
+    fn from(size: &Size) -> Self {
+        let half_size = (size.w * 0.5, size.h * 0.5);
+        Self {
+            top:    Some(half_size.1),
+            bottom: Some(-half_size.1),
+            left:   Some(-half_size.0),
+            right:  Some(half_size.0),
+        }
+    }
+}
