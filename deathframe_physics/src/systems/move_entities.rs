@@ -5,10 +5,9 @@ use super::system_prelude::*;
 /// This system is responsible for moving all entities with `Transform` and `Velocity`,
 /// by manipulating their `Transform` appropriately.
 /// It also handles collision with `Solid` entities; Solid entities may not move into each other.
-#[derive(Default)]
-pub struct MoveEntitiesSystem<T>(PhantomData<T>)
+pub struct MoveEntitiesSystem<C>(PhantomData<C>)
 where
-    T: CollisionTag;
+    C: CollisionTag;
 
 impl<'a, C> System<'a> for MoveEntitiesSystem<C>
 where
@@ -172,5 +171,14 @@ where
                 }
             });
         }
+    }
+}
+
+impl<C> Default for MoveEntitiesSystem<C>
+where
+    C: 'static + CollisionTag,
+{
+    fn default() -> Self {
+        Self(Default::default())
     }
 }

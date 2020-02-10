@@ -17,14 +17,13 @@ const PADDING: (f32, f32) = (1.0, 1.0);
 // This might improve performance, as the `CollisionGrid` wouldn't be re-generated every frame.
 // It would have to re-generate and remove all `CollisionRect`s with moving entities each frame
 // though, so benchmarking would be needed to verify that this would be beneficial.
-#[derive(Default)]
 pub struct UpdateCollisionsSystem<C>(PhantomData<C>)
 where
     C: CollisionTag;
 
 impl<'a, C> System<'a> for UpdateCollisionsSystem<C>
 where
-    C: CollisionTag + 'static,
+    C: 'static + CollisionTag,
 {
     type SystemData = (
         Entities<'a>,
@@ -142,5 +141,14 @@ impl RectSides {
         } else {
             None
         }
+    }
+}
+
+impl<C> Default for UpdateCollisionsSystem<C>
+where
+    C: 'static + CollisionTag,
+{
+    fn default() -> Self {
+        Self(Default::default())
     }
 }
