@@ -1,15 +1,10 @@
 #!/bin/bash
 # Run `cargo test` on the project for development.
 # All command-line arguments are passed to the executed `cargo` command.
-# Optional environment variables:
-#   $RUN_NEW_TERMINAL
-#     If this variable is not `0` or empty,
-#     then the cargo command is executed in a new terminal.
-#     DEFAULT: ""
 
 # shellcheck source=./util.sh
 _dir="$( dirname "$0" )"
 source "${_dir}/share.sh"
 unset _dir
 
-cargo_cmd test "$@"
+cargo_cmd test --workspace "$@"
