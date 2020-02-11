@@ -19,6 +19,11 @@ impl Axis {
         iterate(Axis::Y);
     }
 
+    /// Returns an `Iterator` over both axes.
+    pub fn iter() -> Iter {
+        Iter::default()
+    }
+
     /// Returns `true` if this is the `X` variant.
     pub fn is_x(&self) -> bool {
         Axis::X == *self
@@ -27,6 +32,23 @@ impl Axis {
     /// Returns `true` if this is the `Y` variant.
     pub fn is_y(&self) -> bool {
         Axis::Y == *self
+    }
+}
+
+/// An iterator over both axes.
+#[derive(Default)]
+pub struct Iter(u8);
+
+impl Iterator for Iter {
+    type Item = Axis;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0 += 1;
+        match self.0 {
+            1 => Some(Axis::X),
+            2 => Some(Axis::Y),
+            _ => None,
+        }
     }
 }
 
