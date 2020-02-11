@@ -9,3 +9,6 @@ pub mod data;
 pub mod grid;
 pub mod rect;
 pub mod tag;
+
+#[cfg(test)]
+mod tests;

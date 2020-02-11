@@ -5,6 +5,7 @@ use crate::collision::tag::CollisionTag;
 use core::geo::prelude::*;
 
 /// A collection of `CollisionRect`, can perform collision detection.
+#[derive(Debug)]
 pub struct CollisionGrid<C, T>
 where
     C: CollisionTag,

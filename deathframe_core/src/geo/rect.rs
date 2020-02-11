@@ -3,7 +3,7 @@ use crate::geo::Point;
 
 /// A `Rect` is simply an area.
 /// It has positions bounding sides (top, bottom, left, right).
-#[derive(Clone, PartialEq, Default, Builder)]
+#[derive(Clone, PartialEq, Default, Builder, Debug)]
 #[builder(pattern = "owned", derive(Clone))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rect {

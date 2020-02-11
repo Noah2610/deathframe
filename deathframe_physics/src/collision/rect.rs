@@ -1,11 +1,12 @@
 use specs::world::Index;
 
 use crate::collision::tag::CollisionTag;
+use core::amethyst;
 use core::geo::prelude::*;
 
 /// A rectangular collision area with a unique entity ID.
 /// Can also hold optional custom data.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CollisionRect<C, T>
 where
     C: CollisionTag,
@@ -81,18 +82,20 @@ where
     }
 
     /// Create a `CollisionRect` from this builder.
-    pub fn build(self) -> CollisionRect<C, T> {
+    pub fn build(self) -> Result<CollisionRect<C, T>, amethyst::Error> {
         let CollisionRectBuilder {
             id,
             rect,
             tag,
             custom,
         } = self;
-        CollisionRect {
+        Ok(CollisionRect {
             id,
-            rect: rect.expect("CollisionRectBuilder requires a Rect"),
+            rect: rect.ok_or(amethyst::Error::from_string(
+                "CollisionRectBuilder requires a Rect",
+            ))?,
             tag,
             custom,
-        }
+        })
     }
 }
