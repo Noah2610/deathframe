@@ -1,7 +1,7 @@
 use std::fmt;
 
 /// Just a plain `Axis` enum with `X` and `Y` variants.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Axis {
     X,
