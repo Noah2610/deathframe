@@ -1,8 +1,8 @@
-use super::component_prelude::*;
-use core::geo::Axis;
-
 #[cfg(test)]
 mod tests;
+
+use super::component_prelude::*;
+use core::geo::Axis;
 
 #[derive(Component, Default, Builder, Debug)]
 #[storage(VecStorage)]
@@ -16,6 +16,11 @@ impl Velocity {
     /// Creates a new `Velocity` with the given initial `x` and `y` velocities.
     pub fn new(x: f32, y: f32) -> Self {
         Self { x, y }
+    }
+
+    /// Creates a new `VelocityBuilder`.
+    pub fn builder() -> VelocityBuilder {
+        VelocityBuilder::default()
     }
 
     /// Set the velocity for the given `Axis` to the given value.
