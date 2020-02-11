@@ -38,3 +38,11 @@ fn can_set_gravity_values() {
     assert_eq!(gravity.get(&Axis::X), Some(x));
     assert_eq!(gravity.get(&Axis::Y), Some(y));
 }
+
+#[test]
+fn create_gravity_from_tuple() {
+    let _gravity = Gravity::from((Some(10.0), Some(-20.0)));
+    let _gravity = Gravity::from((None, Some(-20.0)));
+    let _gravity = Gravity::from((Some(10.0), None));
+    let _gravity = Gravity::from((None, None));
+}

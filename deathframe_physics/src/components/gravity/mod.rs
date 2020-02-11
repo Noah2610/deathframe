@@ -36,3 +36,12 @@ impl Gravity {
         }
     }
 }
+
+impl From<(Option<f32>, Option<f32>)> for Gravity {
+    fn from(gravs: (Option<f32>, Option<f32>)) -> Self {
+        Self {
+            x: gravs.0,
+            y: gravs.1,
+        }
+    }
+}
