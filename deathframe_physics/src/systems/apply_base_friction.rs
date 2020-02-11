@@ -12,18 +12,32 @@ pub struct ApplyBaseFrictionSystem;
 impl<'a> System<'a> for ApplyBaseFrictionSystem {
     type SystemData = (
         Read<'a, Time>,
+        Entities<'a>,
         WriteStorage<'a, Velocity>,
         WriteStorage<'a, BaseFriction>,
+        ReadStorage<'a, Loadable>,
+        ReadStorage<'a, Loaded>,
     );
 
     fn run(
         &mut self,
-        (time, mut velocities, mut base_frictions): Self::SystemData,
+        (
+            time,
+            entities,
+            mut velocities,
+            mut base_frictions,
+            loadables,
+            loadeds,
+        ): Self::SystemData,
     ) {
         let dt = time.delta_seconds() as f32;
 
-        for (velocity, base_friction) in
-            (&mut velocities, &mut base_frictions).join()
+        for (_, velocity, base_friction) in
+            (&entities, &mut velocities, &mut base_frictions)
+                .join()
+                .filter(|(entity, _, _)| {
+                    is_entity_loaded(*entity, &loadables, &loadeds)
+                })
         {
             Axis::for_each(|axis| {
                 let vel = velocity.get(&axis);

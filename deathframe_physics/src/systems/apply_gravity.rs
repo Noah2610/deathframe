@@ -6,14 +6,25 @@ pub struct ApplyGravitySystem;
 impl<'a> System<'a> for ApplyGravitySystem {
     type SystemData = (
         Read<'a, Time>,
+        Entities<'a>,
         ReadStorage<'a, Gravity>,
         WriteStorage<'a, Velocity>,
+        ReadStorage<'a, Loadable>,
+        ReadStorage<'a, Loaded>,
     );
 
-    fn run(&mut self, (time, gravities, mut velocities): Self::SystemData) {
+    fn run(
+        &mut self,
+        (time, entities, gravities, mut velocities, loadables, loadeds): Self::SystemData,
+    ) {
         let dt = time.delta_seconds() as f32;
 
-        for (gravity, velocity) in (&gravities, &mut velocities).join() {
+        for (_, gravity, velocity) in (&entities, &gravities, &mut velocities)
+            .join()
+            .filter(|(entity, _, _)| {
+                is_entity_loaded(*entity, &loadables, &loadeds)
+            })
+        {
             Axis::for_each(|axis| {
                 if let Some(grav) = gravity.get(&axis) {
                     if grav != 0.0 {

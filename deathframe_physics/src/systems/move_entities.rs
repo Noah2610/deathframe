@@ -75,13 +75,15 @@ where
         loadables: &ReadStorage<Loadable>,
         loadeds: &ReadStorage<Loaded>,
     ) {
-        for (entity, transform, velocity, _) in
-            (entities, transforms, velocities, !solids).join()
+        for (_, transform, velocity, _) in
+            (entities, transforms, velocities, !solids).join().filter(
+                |(entity, _, _, _)| {
+                    is_entity_loaded(*entity, &loadables, &loadeds)
+                },
+            )
         {
-            if is_entity_loaded(entity, loadables, loadeds) {
-                transform.prepend_translation_x(velocity.x * dt);
-                transform.prepend_translation_y(velocity.y * dt);
-            }
+            transform.prepend_translation_x(velocity.x * dt);
+            transform.prepend_translation_y(velocity.y * dt);
         }
     }
 
@@ -107,12 +109,12 @@ where
         );
 
         for (entity, transform, velocity, solid, hitbox_opt) in
-            (entities, transforms, velocities, solids, hitboxes.maybe()).join()
+            (entities, transforms, velocities, solids, hitboxes.maybe())
+                .join()
+                .filter(|(entity, _, _, _, _)| {
+                    is_entity_loaded(*entity, &loadables, &loadeds)
+                })
         {
-            if !is_entity_loaded(entity, loadables, loadeds) {
-                continue;
-            }
-
             let entity_id = entity.id();
             let solid_tag = &solid.tag;
 
