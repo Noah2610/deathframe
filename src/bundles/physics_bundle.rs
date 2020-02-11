@@ -9,6 +9,7 @@ use std::marker::PhantomData;
 /// - `MoveEntitiesSystem` (named `"move_entities_system"`)
 /// - `UpdateCollisionsSystem` (named `"update_collisions_system"`)
 /// - `ApplyBaseFrictionSystem` (named `"apply_base_friction_system"`)
+/// - `ApplyGravitySystem` (named `"apply_gravity_system"`)
 pub struct PhysicsBundle<'a, CU, CM>
 where
     CU: 'static + CollisionTag,
@@ -47,19 +48,28 @@ where
         builder: &mut DispatcherBuilder<'a, 'b>,
     ) -> Result<(), amethyst::Error> {
         builder.add(
+            ApplyGravitySystem::default(),
+            "apply_gravity_system",
+            self.deps,
+        );
+        builder.add(
             ApplyBaseFrictionSystem::default(),
             "apply_base_friction_system",
-            self.deps,
+            &[self.deps, &["apply_gravity_system"]].concat(),
         );
         builder.add(
             MoveEntitiesSystem::<CM>::default(),
             "move_entities_system",
-            &[self.deps, &["apply_base_friction_system"]].concat(),
+            &[self.deps, &[
+                "apply_base_friction_system",
+                "apply_gravity_system",
+            ]]
+            .concat(),
         );
         builder.add(
             UpdateCollisionsSystem::<CU>::default(),
             "update_collisions_system",
-            self.deps,
+            &[self.deps, &["move_entities_system"]].concat(),
         );
         Ok(())
     }
