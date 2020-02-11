@@ -9,7 +9,7 @@
 //! # use amethyst::ui::{UiCreator, UiEvent, UiEventType, UiTransform};
 //! # use amethyst::{State, StateData, StateEvent, Trans};
 //!
-//! use deathframe::menu::{Menu, UiData};
+//! use deathframe_core::menu::prelude::*;
 //!
 //! type MyGameData = ();
 //! type MyStateEvent = ();
@@ -24,6 +24,7 @@
 //!         &mut self,
 //!         data: &mut StateData<MyGameData>,
 //!         event_name: String,
+//!         _event: UiEvent,
 //!     ) -> Option<Trans<MyGameData, MyStateEvent>> {
 //!         match event_name.as_ref() {
 //!             "btn_quit" => Some(Trans::Pop),
