@@ -47,7 +47,7 @@ mod collision_rect_tests {
     #[test]
     fn can_build_collision_rect_with_only_rect() {
         let rect = Rect::default();
-        let collision_rect = CollisionRect::<(), ()>::builder()
+        let _collision_rect = CollisionRect::<(), ()>::builder()
             .rect(rect)
             .build()
             .expect("Couldn't build CollisionRect with only Rect");

@@ -126,7 +126,8 @@ where
                         let coll_rect = base_coll_rect
                             .clone()
                             .rect(hitbox_rect.clone().with_offset(position))
-                            .build();
+                            .build()
+                            .unwrap();
                         collision_grid.collides_any(&coll_rect)
                     })
                 } else {

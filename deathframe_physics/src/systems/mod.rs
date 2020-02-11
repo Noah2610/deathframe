@@ -68,7 +68,11 @@ pub(crate) mod helpers {
                             if let Some(padding) = padding_opt {
                                 rect = rect.with_padding(&padding);
                             }
-                            base_collision_rect.clone().rect(rect).build()
+                            base_collision_rect
+                                .clone()
+                                .rect(rect)
+                                .build()
+                                .unwrap()
                         })
                         .collect(),
                 );
