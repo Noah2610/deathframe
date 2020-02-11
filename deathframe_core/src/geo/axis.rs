@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// Just a plain `Axis` enum with `X` and `Y` variants.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -25,5 +27,14 @@ impl Axis {
     /// Returns `true` if this is the `Y` variant.
     pub fn is_y(&self) -> bool {
         Axis::Y == *self
+    }
+}
+
+impl fmt::Display for Axis {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Axis::X => write!(f, "x"),
+            Axis::Y => write!(f, "y"),
+        }
     }
 }

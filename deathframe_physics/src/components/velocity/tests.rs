@@ -76,3 +76,42 @@ fn increase_velocity_with_max() {
         "Velocity should have expected, increased y value, at max"
     );
 }
+
+#[test]
+fn clear_velocity() {
+    let (x, y) = (10.0, 10.0);
+    let mut velocity = Velocity::new(x, y);
+
+    assert_eq!(velocity.get(&Axis::X), x);
+    assert_eq!(velocity.get(&Axis::Y), y);
+
+    Axis::for_each(|axis| {
+        velocity.clear(&axis);
+        assert_eq!(
+            velocity.get(&axis),
+            0.0,
+            "{} velocity should be cleared",
+            &axis
+        );
+    });
+}
+
+#[test]
+fn clear_all_velocities() {
+    let (x, y) = (10.0, 10.0);
+    let mut velocity = Velocity::new(x, y);
+
+    assert_eq!(velocity.get(&Axis::X), x);
+    assert_eq!(velocity.get(&Axis::Y), y);
+
+    velocity.clear_all();
+
+    Axis::for_each(|axis| {
+        assert_eq!(
+            velocity.get(&axis),
+            0.0,
+            "{} velocity should be cleared (clear_all)",
+            &axis
+        );
+    });
+}
