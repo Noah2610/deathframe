@@ -40,6 +40,16 @@ pub trait ByAxis {
     fn by_axis(self, axis: &Axis) -> Self::Item;
 }
 
+impl<T> ByAxis for (T, T) {
+    type Item = T;
+    fn by_axis(self, axis: &Axis) -> Self::Item {
+        match axis {
+            Axis::X => self.0,
+            Axis::Y => self.1,
+        }
+    }
+}
+
 impl<'a, T> ByAxis for &'a (T, T) {
     type Item = &'a T;
     fn by_axis(self, axis: &Axis) -> Self::Item {
@@ -56,6 +66,19 @@ impl<'a, T> ByAxis for &'a mut (T, T) {
         match axis {
             Axis::X => &mut self.0,
             Axis::Y => &mut self.1,
+        }
+    }
+}
+
+impl<T> ByAxis for [T; 2]
+where
+    T: Copy,
+{
+    type Item = T;
+    fn by_axis(self, axis: &Axis) -> Self::Item {
+        match axis {
+            Axis::X => self[0],
+            Axis::Y => self[1],
         }
     }
 }
