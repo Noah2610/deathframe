@@ -1,5 +1,6 @@
 /// Just a plain `Axis` enum with `X` and `Y` variants.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Axis {
     X,
     Y,

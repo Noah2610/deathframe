@@ -19,6 +19,11 @@ impl Hitbox {
         self
     }
 
+    pub fn with_rects(mut self, rects: Vec<Rect>) -> Self {
+        self.rects = rects;
+        self
+    }
+
     pub fn add_rect(&mut self, rect: Rect) {
         self.rects.push(rect);
     }
