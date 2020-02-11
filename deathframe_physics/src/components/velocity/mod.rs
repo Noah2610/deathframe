@@ -1,6 +1,9 @@
 use super::component_prelude::*;
 use core::geo::Axis;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Component, Default, Builder, Debug)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned")]

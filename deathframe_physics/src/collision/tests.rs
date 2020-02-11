@@ -1,4 +1,4 @@
-//! `deathframe_physics::collision` tests
+//! Test module `deathframe_physics::collision`
 
 /// `CollisionRect` tests
 mod collision_rect_tests {
