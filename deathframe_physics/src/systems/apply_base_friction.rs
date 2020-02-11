@@ -2,7 +2,7 @@ use super::system_prelude::*;
 
 /// If the velocity is smaller than or equal to this margin,
 /// then just set the velocity to 0.0
-const VELOCITY_MARGIN: f32 = 0.01;
+const VELOCITY_MARGIN: f32 = 0.001;
 
 /// Constantly applies friction to entities with `BaseFriction`, for each axis.
 /// Only if friction is enabled for the axis (see `BaseFriction`).
@@ -41,7 +41,7 @@ impl<'a> System<'a> for ApplyBaseFrictionSystem {
         {
             Axis::for_each(|axis| {
                 let vel = velocity.get(&axis);
-                if vel > VELOCITY_MARGIN {
+                if vel.abs() > VELOCITY_MARGIN {
                     if let Some(fric) = base_friction.get(&axis) {
                         // Exponential function
                         // let reduced_vel = vel - vel * (fric * dt).exp();
