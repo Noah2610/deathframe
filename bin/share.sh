@@ -54,5 +54,8 @@ Install automatically with $(clr "${CLR_CODE[@]}")rustup$(clrrs)?"
 }
 
 LOGFILE="${ROOT}/logs/$( basename "$0" ).log"
+_logdir="$( dirname "${LOGFILE}" )"
+[ -d "$_logdir" ] || mkdir -p "$_logdir"
+unset _logdir
 RUST_TOOLCHAIN="nightly-2020-02-06"
 [ -z "$RUST_FEATURES" ] && RUST_FEATURES="nightly,vulkan,physics"

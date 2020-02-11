@@ -35,10 +35,12 @@ mod collision_rect_tests {
         let colliding_rects = get_intersecting_rects();
         let one = CollisionRect::builder()
             .rect(colliding_rects.0)
+            .id(0)
             .build()
             .unwrap();
         let two = CollisionRect::builder()
             .rect(colliding_rects.1)
+            .id(1)
             .build()
             .unwrap();
         (one, two)
@@ -51,6 +53,13 @@ mod collision_rect_tests {
             .rect(rect)
             .build()
             .expect("Couldn't build CollisionRect with only Rect");
+    }
+
+    #[test]
+    #[should_panic]
+    fn can_not_build_collision_rect_with_nothing() {
+        let _collision_rect =
+            CollisionRect::<(), ()>::builder().build().unwrap();
     }
 
     #[test]
@@ -76,8 +85,9 @@ mod collision_rect_tests {
             "Second CollisionRect should collide with any other"
         );
         let colliding_with_one = grid.colliding_with(&one);
-        assert!(
-            colliding_with_one.len() == 1,
+        assert_eq!(
+            colliding_with_one.len(),
+            1,
             "First CollisionRect should be colliding with one other \
              CollisionRect in CollisionGrid"
         );
