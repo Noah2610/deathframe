@@ -1,3 +1,11 @@
+pub mod prelude {
+    pub use super::by_axis::ByAxis;
+    pub use super::Axis;
+    pub use super::Iter as AxisIter;
+}
+
+mod by_axis;
+
 use std::fmt;
 
 /// Just a plain `Axis` enum with `X` and `Y` variants.

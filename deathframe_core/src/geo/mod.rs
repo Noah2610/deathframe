@@ -5,8 +5,8 @@ mod axis;
 mod rect;
 
 pub mod prelude {
+    pub use super::axis::prelude::*;
     pub use super::rect::{Rect, RectBuilder};
-    pub use super::Axis;
     pub use super::Point;
     pub use super::Vector;
 }
