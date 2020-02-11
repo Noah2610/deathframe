@@ -43,9 +43,27 @@ impl<'a> System<'a> for ApplyBaseFrictionSystem {
                 let vel = velocity.get(&axis);
                 if vel.abs() > VELOCITY_MARGIN {
                     if let Some(fric) = base_friction.get(&axis) {
-                        // Exponential function
-                        // let reduced_vel = vel - vel * (fric * dt).exp();
-                        let reduced_vel = vel - vel * fric * dt;
+                        // Exponential, but may cause side-effects /
+                        // problems with frame rate discrepancies:
+                        // let reduced_vel = vel - vel * fric * dt;
+
+                        // Exponential, but uncomprehensive configuration (friction value).
+                        // The configured value is also exponential,
+                        // so small changes can have a big impact.
+                        // let reduced_vel = vel * (-fric * dt).exp();
+
+                        // Exponential and easily configured.
+                        // The value is configured linearly, so doubling the friction factor
+                        // will also half the friction effectiveness.
+                        // BUT, the value has to be `1.0` or larger, or weird stuff happens!
+                        assert!(
+                            fric >= 1.0,
+                            "The friction value has to be larger than or \
+                             equal to 1.0"
+                        );
+                        let reduced_vel =
+                            vel * (-(fric.log((1.0_f32).exp())) * dt).exp();
+
                         velocity.set(&axis, reduced_vel);
                     }
                 } else {
