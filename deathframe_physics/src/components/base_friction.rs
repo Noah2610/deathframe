@@ -67,3 +67,9 @@ impl Default for BaseFriction {
         }
     }
 }
+
+impl From<(Option<f32>, Option<f32>)> for BaseFriction {
+    fn from(fricts: (Option<f32>, Option<f32>)) -> Self {
+        Self::new(fricts.0, fricts.1)
+    }
+}
