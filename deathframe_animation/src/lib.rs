@@ -1,3 +1,4 @@
+extern crate climer;
 extern crate core;
 #[macro_use]
 extern crate derive_builder;

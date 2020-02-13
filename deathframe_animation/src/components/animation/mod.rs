@@ -8,6 +8,7 @@ mod animation_frame;
 mod tests;
 
 use super::component_prelude::*;
+use climer::Timer;
 use prelude::*;
 
 /// Animates an entity with `SpriteRender` frame-by-frame.
@@ -18,6 +19,7 @@ use prelude::*;
 #[builder(pattern = "owned", default)]
 pub struct Animation {
     pub(crate) frames: Vec<AnimationFrame>,
+    pub(crate) timer:  Option<Timer>,
 }
 
 impl Animation {
