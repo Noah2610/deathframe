@@ -1,27 +1,18 @@
 //! A collection of components.
 
-pub mod animation;
-pub mod animations_container;
-pub mod check_collision;
-pub mod follow;
-pub mod loadable;
-pub mod loaded;
-pub mod scale_once;
-pub mod size;
-
 pub mod prelude {
     pub use amethyst::core::transform::Transform;
     pub use amethyst::core::Hidden;
     pub use amethyst::renderer::Transparent;
 
-    pub use super::Animation;
-    pub use super::AnimationsContainer;
-    pub use super::CheckCollision;
-    pub use super::Follow;
-    pub use super::Loadable;
-    pub use super::Loaded;
-    pub use super::ScaleOnce;
-    pub use super::Size;
+    pub use super::animation::Animation;
+    pub use super::animations_container::AnimationsContainer;
+    pub use super::check_collision::CheckCollision;
+    pub use super::follow::Follow;
+    pub use super::loadable::Loadable;
+    pub use super::loaded::Loaded;
+    pub use super::scale_once::ScaleOnce;
+    pub use super::size::Size;
 }
 
 pub mod component_prelude {
@@ -43,11 +34,11 @@ pub mod component_prelude {
     pub use crate::geo::prelude::*;
 }
 
-pub use animation::Animation;
-pub use animations_container::AnimationsContainer;
-pub use check_collision::CheckCollision;
-pub use follow::Follow;
-pub use loadable::Loadable;
-pub use loaded::Loaded;
-pub use scale_once::ScaleOnce;
-pub use size::Size;
+mod animation;
+mod animations_container;
+mod check_collision;
+mod follow;
+mod loadable;
+mod loaded;
+mod scale_once;
+mod size;

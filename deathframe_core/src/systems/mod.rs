@@ -6,10 +6,10 @@ mod input_manager;
 mod scale_sprites;
 
 pub mod prelude {
-    pub use super::AnimationSystem;
-    pub use super::FollowSystem;
-    pub use super::InputManagerSystem;
-    pub use super::ScaleSpritesSystem;
+    pub use super::animation::AnimationSystem;
+    pub use super::follow::FollowSystem;
+    pub use super::input_manager::InputManagerSystem;
+    pub use super::scale_sprites::ScaleSpritesSystem;
 }
 
 pub mod system_prelude {
@@ -45,11 +45,6 @@ pub mod system_prelude {
 
     pub use super::helpers::*;
 }
-
-pub use animation::AnimationSystem;
-pub use follow::FollowSystem;
-pub use input_manager::InputManagerSystem;
-pub use scale_sprites::ScaleSpritesSystem;
 
 mod helpers {
     use super::system_prelude::*;

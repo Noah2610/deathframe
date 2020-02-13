@@ -1,4 +1,4 @@
-use crate::components::Size;
+use crate::components::prelude::Size;
 use crate::geo::Point;
 
 /// A `Rect` is simply an area.

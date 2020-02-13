@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use super::component_prelude::*;
-use super::Animation;
+use super::prelude::Animation;
 
 #[derive(Default)]
 pub struct AnimationsContainer {
