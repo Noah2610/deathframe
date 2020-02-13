@@ -3,9 +3,9 @@
 use super::*;
 
 #[test]
-fn can_build_animation() {
+fn can_build_animation_with_frames() {
     let _ = Animation::builder().build().unwrap();
-    let _ = Animation::builder()
+    let anim = Animation::builder()
         .frame(
             AnimationFrame::builder()
                 .sprite_id(0)
@@ -18,4 +18,10 @@ fn can_build_animation() {
         .frame((3_usize, 9999999_u64))
         .build()
         .unwrap();
+
+    assert_eq!(
+        anim.frames.len(),
+        4,
+        "Expect proper amount of frames for built Animation"
+    );
 }
