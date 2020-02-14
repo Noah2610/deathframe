@@ -1,15 +1,8 @@
-pub mod prelude {
-    pub use super::animation_frame::{AnimationFrame, AnimationFrameBuilder};
-    pub use super::{Animation, AnimationBuilder};
-}
-
-mod animation_frame;
 #[cfg(test)]
 mod tests;
 
 use super::component_prelude::*;
 use climer::{Time, Timer};
-use prelude::*;
 
 /// Animates an entity with `SpriteRender` frame-by-frame.
 /// Iterates through different sprites __in the same spritesheet__.
