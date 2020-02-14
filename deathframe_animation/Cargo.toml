@@ -11,7 +11,11 @@ package = "deathframe_core"
 path = "../deathframe_core"
 
 [dependencies.climer]
-version = "0.5.0"
+# version = "0.5.0"
+version = "*"
+git = "https://github.com/Noah2610/climer"
+branch = "master"
+default-features = false
 
 [dependencies.specs]
 version = "0.15.1"

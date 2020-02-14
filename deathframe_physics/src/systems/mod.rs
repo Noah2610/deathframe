@@ -6,13 +6,13 @@ pub mod prelude {
 }
 
 mod system_prelude {
-    pub use crate::collision::prelude::*;
-    pub use crate::components::helpers::WithCollisionTag;
-    pub use crate::components::prelude::*;
-    pub use core::geo::prelude::*;
-    pub use core::systems::system_prelude::*;
+    pub(crate) use crate::collision::prelude::*;
+    pub(crate) use crate::components::helpers::WithCollisionTag;
+    pub(crate) use crate::components::prelude::*;
+    pub(crate) use core::geo::prelude::*;
+    pub(crate) use core::systems::system_prelude::*;
 
-    pub use super::helpers::*;
+    pub(crate) use super::helpers::*;
 }
 
 mod apply_base_friction;

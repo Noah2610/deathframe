@@ -5,8 +5,9 @@ pub mod prelude {
     pub use amethyst::core::Hidden;
     pub use amethyst::renderer::Transparent;
 
-    pub use super::animation::Animation;
-    pub use super::animations_container::AnimationsContainer;
+    pub(super) use super::animation::Animation; // TODO
+    pub(super) use super::animations_container::AnimationsContainer; // TODO
+
     pub use super::check_collision::CheckCollision;
     pub use super::follow::Follow;
     pub use super::loadable::Loadable;

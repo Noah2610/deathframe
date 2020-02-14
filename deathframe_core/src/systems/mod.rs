@@ -1,12 +1,14 @@
 //! A collection of systems, giving the components in this crate functionality.
 
-mod animation;
+// mod animation; // TODO
+
 mod follow;
 mod input_manager;
 mod scale_sprites;
 
 pub mod prelude {
-    pub use super::animation::AnimationSystem;
+    // use super::animation::AnimationSystem; // TODO
+
     pub use super::follow::FollowSystem;
     pub use super::input_manager::InputManagerSystem;
     pub use super::scale_sprites::ScaleSpritesSystem;

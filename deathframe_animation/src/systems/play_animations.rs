@@ -23,5 +23,15 @@ impl<'a> System<'a> for PlayAnimationsSystem {
             loadeds,
         ): Self::SystemData,
     ) {
+        for (entity, animation, sprite_render) in
+            (&entities, &mut animations, &mut sprite_renders)
+                .join()
+                .filter(|(entity, _, _)| {
+                    is_entity_loaded(*entity, &loadables, &loadeds)
+                })
+        {
+            animation.update();
+            if let Some(sprite_id) = animation.current_sprite_id() {}
+        }
     }
 }

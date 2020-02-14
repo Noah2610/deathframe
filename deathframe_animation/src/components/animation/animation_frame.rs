@@ -1,6 +1,6 @@
 /// An `AnimationFrame` holds information on the _sprite\_id_ for this frame,
 /// and the _duration\_ms_ for how long this frame should be rendered.
-#[derive(Builder)]
+#[derive(Clone, Builder)]
 #[builder(pattern = "owned")]
 pub struct AnimationFrame {
     pub(crate) sprite_id:   usize,
