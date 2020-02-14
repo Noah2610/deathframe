@@ -1,7 +1,7 @@
 use super::system_prelude::*;
-use climer::{Timer, TimerBuilder};
 
 /// Handles the playing of animations for entities with `Animation`.
+#[derive(Default)]
 pub struct PlayAnimationsSystem;
 
 impl<'a> System<'a> for PlayAnimationsSystem {
@@ -23,7 +23,7 @@ impl<'a> System<'a> for PlayAnimationsSystem {
             loadeds,
         ): Self::SystemData,
     ) {
-        for (entity, animation, sprite_render) in
+        for (_, animation, sprite_render) in
             (&entities, &mut animations, &mut sprite_renders)
                 .join()
                 .filter(|(entity, _, _)| {
@@ -31,7 +31,11 @@ impl<'a> System<'a> for PlayAnimationsSystem {
                 })
         {
             animation.update();
-            if let Some(sprite_id) = animation.current_sprite_id() {}
+            if let Some(sprite_id) = animation.current_sprite_id() {
+                if sprite_id != sprite_render.sprite_number {
+                    sprite_render.sprite_number = sprite_id;
+                }
+            }
         }
     }
 }
