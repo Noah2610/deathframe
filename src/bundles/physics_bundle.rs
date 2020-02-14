@@ -1,11 +1,11 @@
-use crate::systems::prelude::*;
 use amethyst::core::bundle::SystemBundle;
 use amethyst::ecs::{DispatcherBuilder, World};
 use core::amethyst;
 use physics::collision::tag::CollisionTag;
+use physics::systems::prelude::*;
 use std::marker::PhantomData;
 
-/// The `PhysicsBundle` will register the following systems:
+/// The `PhysicsBundle` registers the following systems:
 /// - `MoveEntitiesSystem` (named `"move_entities_system"`)
 /// - `UpdateCollisionsSystem` (named `"update_collisions_system"`)
 /// - `ApplyBaseFrictionSystem` (named `"apply_base_friction_system"`)
@@ -30,7 +30,7 @@ where
         Self::default()
     }
 
-    /// Set system dependencies for both registered physics systems.
+    /// Set system dependencies for all registered systems.
     pub fn with_deps(mut self, deps: &'a [&'a str]) -> Self {
         self.deps = deps;
         self
