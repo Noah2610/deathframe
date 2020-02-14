@@ -5,9 +5,6 @@ pub mod prelude {
     pub use amethyst::core::Hidden;
     pub use amethyst::renderer::Transparent;
 
-    pub(super) use super::animation::Animation; // TODO
-    pub(super) use super::animations_container::AnimationsContainer; // TODO
-
     pub use super::check_collision::CheckCollision;
     pub use super::follow::Follow;
     pub use super::loadable::Loadable;
@@ -35,8 +32,6 @@ pub mod component_prelude {
     pub use crate::geo::prelude::*;
 }
 
-mod animation;
-mod animations_container;
 mod check_collision;
 mod follow;
 mod loadable;
