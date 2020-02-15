@@ -5,7 +5,6 @@ use std::hash::Hash;
 
 /// The `SwitchAnimationsSystem` handles entities'
 /// `Animation`s with their `AnimationsContainer`s.
-#[derive(Default)]
 pub struct SwitchAnimationsSystem<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
@@ -93,5 +92,16 @@ where
         }
 
         self.entity_animations.insert(entity, key);
+    }
+}
+
+impl<K> Default for SwitchAnimationsSystem<K>
+where
+    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+{
+    fn default() -> Self {
+        Self {
+            entity_animations: Default::default(),
+        }
     }
 }
