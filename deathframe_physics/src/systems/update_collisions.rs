@@ -91,6 +91,10 @@ where
                                          here",
                                     ),
                                     side,
+                                    other_rect.tag.clone().expect(
+                                        "`CollisionRect` should have a \
+                                         `CollisionTag` here",
+                                    ),
                                 );
                             }
                         }

@@ -5,19 +5,19 @@ use std::collections::HashMap;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
-pub struct Collider<T>
+pub struct Collider<C>
 where
-    T: 'static + CollisionTag,
+    C: 'static + CollisionTag,
 {
-    pub(crate) tag: T,
-    data:           HashMap<Index, CollisionData>,
+    pub(crate) tag: C,
+    data:           HashMap<Index, CollisionData<C>>,
 }
 
-impl<T> Collider<T>
+impl<C> Collider<C>
 where
-    T: 'static + CollisionTag,
+    C: 'static + CollisionTag,
 {
-    pub fn new(tag: T) -> Self {
+    pub fn new(tag: C) -> Self {
         Self {
             tag,
             data: Default::default(),
@@ -29,28 +29,32 @@ where
         &mut self,
         entity_id: Index,
         side: CollisionSide,
+        tag: C,
     ) {
+        let state_data = CollisionStateData { side, tag };
         if let Some(data) = self.data.get_mut(&entity_id) {
             // Set state of colliding entity to ...
             data.state = match data.state {
                 // `Enter` if it was `Leave` previously
-                CollisionState::Leave => CollisionState::Enter(side),
+                CollisionState::Leave => CollisionState::Enter(state_data),
                 // `Steady` if it was `Enter` or `Steady` with the same side previously
-                CollisionState::Enter(prev_side)
-                | CollisionState::Steady(prev_side)
-                    if side == prev_side =>
-                {
-                    CollisionState::Steady(side)
-                }
+                CollisionState::Enter(CollisionStateData {
+                    side: prev_side,
+                    tag: _,
+                })
+                | CollisionState::Steady(CollisionStateData {
+                    side: prev_side,
+                    tag: _,
+                }) if side == prev_side => CollisionState::Steady(state_data),
                 // `Enter` with new side, if it was `Enter` or `Steady` with a _different_ side previously
                 CollisionState::Enter(_) | CollisionState::Steady(_) => {
-                    CollisionState::Enter(side)
+                    CollisionState::Enter(state_data)
                 }
             };
             data.set_state_this_frame = true;
         } else {
             self.data.insert(entity_id, CollisionData {
-                state:                CollisionState::Enter(side),
+                state:                CollisionState::Enter(state_data),
                 set_state_this_frame: true,
             });
         }

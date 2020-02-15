@@ -2,20 +2,29 @@ pub mod prelude {
     pub use super::CollisionData;
     pub use super::CollisionSide;
     pub use super::CollisionState;
+    pub use super::CollisionStateData;
 }
 
 mod side;
 mod state;
 
 pub use side::CollisionSide;
-pub use state::CollisionState;
+pub use state::{CollisionState, CollisionStateData};
 
-pub struct CollisionData {
-    pub(crate) state:                CollisionState,
+use crate::collision::tag::CollisionTag;
+
+pub struct CollisionData<C>
+where
+    C: CollisionTag,
+{
+    pub(crate) state:                CollisionState<C>,
     pub(crate) set_state_this_frame: bool,
 }
 
-impl CollisionData {
+impl<C> CollisionData<C>
+where
+    C: CollisionTag,
+{
     pub(crate) fn should_remove(&self) -> bool {
         if let CollisionState::Leave = self.state {
             !self.set_state_this_frame
