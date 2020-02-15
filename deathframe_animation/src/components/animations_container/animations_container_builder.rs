@@ -1,10 +1,11 @@
 use crate::components::prelude::{Animation, AnimationsContainer};
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::hash::Hash;
 
 pub struct AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync,
+    K: 'static + Hash + Eq + Send + Sync + Debug,
 {
     animations:        HashMap<K, Animation>,
     current_animation: Option<K>,
@@ -12,7 +13,7 @@ where
 
 impl<K> AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync,
+    K: 'static + Hash + Eq + Send + Sync + Debug,
 {
     /// Add an `Animation` associated to a _key_ to the `AnimationsContainer`.
     pub fn with(mut self, key: K, animation: Animation) -> Self {
@@ -44,7 +45,7 @@ where
 
 impl<K> Default for AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync,
+    K: 'static + Hash + Eq + Send + Sync + Debug,
 {
     fn default() -> Self {
         Self {
