@@ -5,7 +5,6 @@ pub mod prelude {
     pub use amethyst::core::Hidden;
     pub use amethyst::renderer::Transparent;
 
-    pub use super::check_collision::CheckCollision;
     pub use super::follow::Follow;
     pub use super::loadable::Loadable;
     pub use super::loaded::Loaded;
@@ -32,7 +31,6 @@ pub mod component_prelude {
     pub use crate::geo::prelude::*;
 }
 
-mod check_collision;
 mod follow;
 mod loadable;
 mod loaded;

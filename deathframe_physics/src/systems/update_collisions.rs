@@ -59,15 +59,27 @@ where
         );
 
         // Loop through all Colliders, and check for collision in the CollisionGrid.
-        for (entity, collider) in (&entities, &mut colliders).join() {
+        for (entity, collider, hitbox, transform) in
+            (&entities, &mut colliders, &hitboxes, &transforms).join()
+        {
             if is_entity_loaded(entity, &loadables, &loadeds) {
                 let entity_id = entity.id();
+                let entity_pos: Point = {
+                    let trans = transform.translation();
+                    Point::new(trans.x, trans.y)
+                };
+                let collider_base_rect = CollisionRect::<C, ()>::builder()
+                    .id(entity_id)
+                    .tag(collider.tag.clone());
 
-                if let Some(coll_rect) = collision_grid.rect_by_id(entity_id) {
+                for hitbox_rect in hitbox.rects.iter() {
+                    let rect = hitbox_rect.clone().with_offset(&entity_pos);
+                    let collider_rect =
+                        collider_base_rect.clone().rect(rect).build().unwrap();
                     let colliding_rects =
-                        collision_grid.colliding_with(coll_rect);
+                        collision_grid.colliding_with(&collider_rect);
                     if !colliding_rects.is_empty() {
-                        let rect_sides = RectSides::new(&coll_rect.rect);
+                        let rect_sides = RectSides::new(&collider_rect.rect);
                         for other_rect in colliding_rects {
                             // Check which side is in collision
                             if let Some(side) =

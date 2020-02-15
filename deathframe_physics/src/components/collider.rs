@@ -9,8 +9,8 @@ pub struct Collider<T>
 where
     T: 'static + CollisionTag,
 {
-    tag:  T,
-    data: HashMap<Index, CollisionData>,
+    pub(crate) tag: T,
+    data:           HashMap<Index, CollisionData>,
 }
 
 impl<T> Collider<T>
