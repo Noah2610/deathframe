@@ -10,7 +10,7 @@ where
     C: 'static + CollisionTag,
 {
     pub(crate) tag: C,
-    data:           HashMap<Index, CollisionData<C>>,
+    pub collisions: HashMap<Index, CollisionData<C>>,
 }
 
 impl<C> Collider<C>
@@ -20,7 +20,7 @@ where
     pub fn new(tag: C) -> Self {
         Self {
             tag,
-            data: Default::default(),
+            collisions: Default::default(),
         }
     }
 
@@ -32,7 +32,7 @@ where
         tag: C,
     ) {
         let state_data = CollisionStateData { side, tag };
-        if let Some(data) = self.data.get_mut(&entity_id) {
+        if let Some(data) = self.collisions.get_mut(&entity_id) {
             // Set state of colliding entity to ...
             data.state = match data.state {
                 // `Enter` if it was `Leave` previously
@@ -53,7 +53,7 @@ where
             };
             data.set_state_this_frame = true;
         } else {
-            self.data.insert(entity_id, CollisionData {
+            self.collisions.insert(entity_id, CollisionData {
                 state:                CollisionState::Enter(state_data),
                 set_state_this_frame: true,
             });
@@ -64,7 +64,7 @@ where
     /// This is handled by the appropriate system.
     pub(crate) fn update(&mut self) {
         let mut to_remove = Vec::new();
-        for (&id, collision) in self.data.iter_mut() {
+        for (&id, collision) in self.collisions.iter_mut() {
             if collision.set_state_this_frame {
                 // Entity collision data was modified this frame, stage for possible deletion next frame
                 collision.set_state_this_frame = false;
@@ -77,7 +77,7 @@ where
             }
         }
         for id in to_remove {
-            self.data.remove(&id);
+            self.collisions.remove(&id);
         }
     }
 }

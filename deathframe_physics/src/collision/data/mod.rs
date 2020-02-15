@@ -17,7 +17,7 @@ pub struct CollisionData<C>
 where
     C: CollisionTag,
 {
-    pub(crate) state:                CollisionState<C>,
+    pub state:                       CollisionState<C>,
     pub(crate) set_state_this_frame: bool,
 }
 
