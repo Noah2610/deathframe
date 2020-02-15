@@ -16,15 +16,16 @@ use std::hash::Hash;
 #[storage(DenseVecStorage)]
 pub struct AnimationsContainer<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug,
+    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
 {
-    animations:        HashMap<K, Animation>,
+    animations:
+        HashMap<K, Box<dyn Fn() -> Box<dyn AnimationFramesIter> + Send + Sync>>,
     current_animation: Option<K>,
 }
 
 impl<K> AnimationsContainer<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug,
+    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
 {
     /// Returns an `AnimationsContainerBuilder`
     pub fn builder() -> AnimationsContainerBuilder<K> {
@@ -43,5 +44,20 @@ where
                 key
             )))
         }
+    }
+
+    /// Returns the _key_ of the currently active animation, if any.
+    pub fn current(&self) -> Option<&K> {
+        self.current_animation.as_ref()
+    }
+
+    /// Returns a new `Animation` associated to the given _key_, if any.
+    pub fn animation(&self, key: &K) -> Option<Animation> {
+        self.animations.get(key).map(|func| func().into())
+    }
+
+    /// Returns a new `Animation`, for the current animation _key_, if any.
+    pub fn current_animation(&self) -> Option<Animation> {
+        self.current().and_then(|key| self.animation(key))
     }
 }

@@ -5,11 +5,12 @@ pub mod prelude {
 }
 
 mod component_prelude {
-    pub(super) use super::animation::Animation;
-    pub(super) use super::animation_frame::AnimationFrame;
+    pub(super) use super::animation_frames_iter::AnimationFramesIter;
+    pub(super) use super::prelude::*;
     pub(super) use core::components::component_prelude::*;
 }
 
 mod animation;
 mod animation_frame;
+mod animation_frames_iter;
 mod animations_container;

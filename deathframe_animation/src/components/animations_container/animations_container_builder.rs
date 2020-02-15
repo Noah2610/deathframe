@@ -1,23 +1,29 @@
-use crate::components::prelude::{Animation, AnimationsContainer};
+use crate::components::component_prelude::*;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 
 pub struct AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug,
+    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
 {
-    animations:        HashMap<K, Animation>,
+    animations:
+        HashMap<K, Box<dyn Fn() -> Box<dyn AnimationFramesIter> + Send + Sync>>,
     current_animation: Option<K>,
 }
 
 impl<K> AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug,
+    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
 {
     /// Add an `Animation` associated to a _key_ to the `AnimationsContainer`.
-    pub fn with(mut self, key: K, animation: Animation) -> Self {
-        self.animations.insert(key, animation);
+    /// You add an animation, by giving this method a `Fn`, which _returns_
+    /// a new `AnimationFramesIter` (`Box`ed).
+    pub fn with<F>(mut self, key: K, animation_gen: F) -> Self
+    where
+        F: 'static + Fn() -> Box<dyn AnimationFramesIter> + Send + Sync,
+    {
+        self.animations.insert(key, Box::new(animation_gen));
         self
     }
 
@@ -45,7 +51,7 @@ where
 
 impl<K> Default for AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug,
+    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
 {
     fn default() -> Self {
         Self {

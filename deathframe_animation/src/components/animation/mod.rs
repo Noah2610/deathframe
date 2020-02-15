@@ -11,7 +11,7 @@ use climer::{Time, Timer};
 #[storage(DenseVecStorage)]
 #[builder(pattern = "owned")]
 pub struct Animation {
-    frames:        Box<dyn Iterator<Item = AnimationFrame> + Send + Sync>,
+    frames:        Box<dyn AnimationFramesIter>,
     #[builder(setter(skip), default)]
     current_frame: Option<AnimationFrame>,
     #[builder(setter(skip), default)]
@@ -64,6 +64,19 @@ impl Animation {
             // Call the update method again, now that we _know_
             // that we have a `current_frame` set.
             self.update();
+        }
+    }
+}
+
+impl<I> From<I> for Animation
+where
+    I: Into<Box<dyn AnimationFramesIter>>,
+{
+    fn from(iter: I) -> Self {
+        Self {
+            frames:        iter.into(),
+            current_frame: None,
+            timer:         Timer::default(),
         }
     }
 }
