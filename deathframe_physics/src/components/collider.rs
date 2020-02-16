@@ -9,7 +9,7 @@ pub struct Collider<C>
 where
     C: 'static + CollisionTag,
 {
-    pub(crate) tag: C,
+    pub tag:        C,
     pub collisions: HashMap<Index, CollisionData<C>>,
 }
 

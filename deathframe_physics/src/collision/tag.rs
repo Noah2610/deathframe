@@ -7,6 +7,14 @@ pub trait CollisionTag: Send + Sync + Clone {
     fn collides_with(&self, other: &Self) -> bool;
 }
 
+impl CollisionTag for () {
+    fn collides_with(&self, _: &Self) -> bool {
+        true
+    }
+}
+
+// TODO
+#[cfg(feature = "debug")]
 impl<T> CollisionTag for T
 where
     T: Send + Sync + Clone + PartialEq,
