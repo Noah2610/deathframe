@@ -1,5 +1,6 @@
 use super::component_prelude::*;
 use crate::collision::data::prelude::*;
+use crate::query::Query;
 use specs::world::Index;
 use std::collections::HashMap;
 
@@ -22,6 +23,10 @@ where
             tag,
             collisions: Default::default(),
         }
+    }
+
+    pub fn query(&self) -> Query<C> {
+        Query::new(&self)
     }
 
     /// Is called when an entity is colliding with this entity.
