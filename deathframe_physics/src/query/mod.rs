@@ -1,17 +1,9 @@
+pub mod exp;
+
 use crate::collision::prelude::*;
 use crate::collision::tag::CollisionTag;
 use crate::components::prelude::Collider;
-
-enum CheckOperation {
-    Any,
-    All,
-}
-
-impl Default for CheckOperation {
-    fn default() -> Self {
-        CheckOperation::Any
-    }
-}
+use exp::QueryExpression as QExp;
 
 /// The `Query` can be used to check for collisions
 /// on a `Collider`.
@@ -19,10 +11,9 @@ pub struct Query<'a, C>
 where
     C: 'static + CollisionTag,
 {
-    collider:        &'a Collider<C>,
-    check_states:    Vec<CollisionState<C>>,
-    check_states_op: CheckOperation,
-    return_op:       CheckOperation,
+    collider:       &'a Collider<C>,
+    expression_any: Option<QExp<C>>,
+    expression_all: Option<QExp<C>>,
 }
 
 impl<'a, C> Query<'a, C>
@@ -33,97 +24,75 @@ where
     pub fn new(collider: &'a Collider<C>) -> Self {
         Self {
             collider,
-            check_states: Vec::new(),
-            check_states_op: CheckOperation::default(),
-            return_op: CheckOperation::default(),
+            expression_any: None,
+            expression_all: None,
         }
     }
 
-    /// Query returns `true` if _any_ collisions matched.
-    /// _(default)_
-    pub fn any(mut self) -> Self {
-        self.return_op = CheckOperation::Any;
+    /// Checks if the given `QExp` matches _any_ collision.
+    pub fn any(mut self, exp: QExp<C>) -> Self {
+        self.expression_any = Some(exp);
         self
     }
 
-    /// Runs the query against _all_ collisions,
-    /// and returns `true` if _all_ matched.
-    pub fn all(mut self) -> Self {
-        self.return_op = CheckOperation::All;
+    /// Checks if the given `QExp` matches _all_ collisions.
+    pub fn all(mut self, exp: QExp<C>) -> Self {
+        self.expression_all = Some(exp);
         self
     }
 
-    /// A collision's query passes, as long as _any_ given
-    /// `CollisionState` (via `.state()`) matches each collision.
-    /// _(default)_
-    pub fn any_state(mut self) -> Self {
-        self.check_states_op = CheckOperation::Any;
-        self
-    }
+    fn run_expression_on(
+        &self,
+        exp: &QExp<C>,
+        collision: &CollisionData<C>,
+    ) -> bool {
+        match exp {
+            QExp::And(exps) => exps
+                .into_iter()
+                .all(|e| self.run_expression_on(e, collision)),
 
-    /// A collision's query passes, only if _all_ given
-    /// `CollisionState`s (via `.state()`) match each collision.
-    pub fn all_states(mut self) -> Self {
-        self.check_states_op = CheckOperation::All;
-        self
-    }
+            QExp::Or(exps) => exps
+                .into_iter()
+                .any(|e| self.run_expression_on(e, collision)),
 
-    /// Check collisions against given state.
-    /// Multiple states checks can be added.
-    pub fn state(mut self, state: CollisionState<C>) -> Self {
-        self.check_states.push(state);
-        self
+            QExp::IsSide(target_side_qval) => {
+                let target_side: CollisionSide = target_side_qval.into();
+                if let Some(side) = collision.side() {
+                    target_side == side
+                } else {
+                    false
+                }
+            }
+
+            QExp::IsState(target_state_qval) => {
+                target_state_qval == collision.state
+            }
+
+            QExp::IsTag(target_tag) => target_tag == &collision.tag,
+        }
     }
 
     /// Run the query.
-    pub fn run(self) -> bool {
-        let mut values = self.collider.collisions.values();
-        let condition = |collision: &CollisionData<C>| {
-            let check_state_condition = |state: &CollisionState<C>| match state
-            {
-                CollisionState::Enter(check_state_data) => {
-                    if let CollisionState::Enter(state_data) = &collision.state
-                    {
-                        check_state_data.side == state_data.side
-                            && check_state_data
-                                .tag
-                                .collides_with(&state_data.tag)
-                    } else {
-                        false
-                    }
-                }
-                CollisionState::Steady(check_state_data) => {
-                    if let CollisionState::Steady(state_data) = &collision.state
-                    {
-                        check_state_data.side == state_data.side
-                            && check_state_data
-                                .tag
-                                .collides_with(&state_data.tag)
-                    } else {
-                        false
-                    }
-                }
-                CollisionState::Leave => {
-                    if let CollisionState::Leave = collision.state {
-                        true
-                    } else {
-                        false
-                    }
-                }
-            };
-
-            match self.check_states_op {
-                CheckOperation::Any => {
-                    self.check_states.iter().any(check_state_condition)
-                }
-                CheckOperation::All => {
-                    self.check_states.iter().all(check_state_condition)
-                }
-            }
-        };
-        match self.return_op {
-            CheckOperation::Any => values.any(condition),
-            CheckOperation::All => values.all(condition),
-        }
+    /// Runs both _any_ and _all_ queries (if both exist) and checks
+    /// if both queries return `true`.  A non-existent query returns `true`.
+    pub fn run(mut self) -> bool {
+        self.expression_any
+            .take()
+            .map(|exp| {
+                self.collider
+                    .collisions
+                    .values()
+                    .any(|collision| self.run_expression_on(&exp, collision))
+            })
+            .unwrap_or(true)
+            && self
+                .expression_all
+                .take()
+                .map(|exp| {
+                    self.collider.collisions.values().all(|collision| {
+                        self.run_expression_on(&exp, collision)
+                    })
+                })
+                .unwrap_or(true)
     }
 }

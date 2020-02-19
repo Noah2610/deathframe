@@ -36,30 +36,28 @@ where
         side: CollisionSide,
         tag: C,
     ) {
-        let state_data = CollisionStateData { side, tag };
         if let Some(data) = self.collisions.get_mut(&entity_id) {
             // Set state of colliding entity to ...
             data.state = match data.state {
                 // `Enter` if it was `Leave` previously
-                CollisionState::Leave => CollisionState::Enter(state_data),
+                CollisionState::Leave => CollisionState::Enter(side),
                 // `Steady` if it was `Enter` or `Steady` with the same side previously
-                CollisionState::Enter(CollisionStateData {
-                    side: prev_side,
-                    tag: _,
-                })
-                | CollisionState::Steady(CollisionStateData {
-                    side: prev_side,
-                    tag: _,
-                }) if side == prev_side => CollisionState::Steady(state_data),
+                CollisionState::Enter(prev_side)
+                | CollisionState::Steady(prev_side)
+                    if side == prev_side =>
+                {
+                    CollisionState::Steady(side)
+                }
                 // `Enter` with new side, if it was `Enter` or `Steady` with a _different_ side previously
                 CollisionState::Enter(_) | CollisionState::Steady(_) => {
-                    CollisionState::Enter(state_data)
+                    CollisionState::Enter(side)
                 }
             };
             data.set_state_this_frame = true;
         } else {
             self.collisions.insert(entity_id, CollisionData {
-                state:                CollisionState::Enter(state_data),
+                state:                CollisionState::Enter(side),
+                tag:                  tag,
                 set_state_this_frame: true,
             });
         }

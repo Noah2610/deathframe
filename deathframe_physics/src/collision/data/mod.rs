@@ -2,14 +2,13 @@ pub mod prelude {
     pub use super::CollisionData;
     pub use super::CollisionSide;
     pub use super::CollisionState;
-    pub use super::CollisionStateData;
 }
 
 mod side;
 mod state;
 
 pub use side::CollisionSide;
-pub use state::{CollisionState, CollisionStateData};
+pub use state::CollisionState;
 
 use crate::collision::tag::CollisionTag;
 
@@ -17,7 +16,8 @@ pub struct CollisionData<C>
 where
     C: CollisionTag,
 {
-    pub state:                       CollisionState<C>,
+    pub state:                       CollisionState,
+    pub tag:                         C,
     pub(crate) set_state_this_frame: bool,
 }
 
@@ -43,6 +43,17 @@ where
                 self.state = CollisionState::Leave;
                 self.set_state_this_frame = true;
             }
+        }
+    }
+
+    /// Maybe returns the `CollisionSide` of this collision,
+    /// depending on which `CollisionState` it is.
+    pub(crate) fn side(&self) -> Option<CollisionSide> {
+        match &self.state {
+            CollisionState::Enter(side) | CollisionState::Steady(side) => {
+                Some(side.clone())
+            }
+            CollisionState::Leave => None,
         }
     }
 }
