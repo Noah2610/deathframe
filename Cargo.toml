@@ -35,5 +35,5 @@ vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
 empty  = ["core/empty"]
 
-serde   = ["core/serde"]
+serde   = ["core/serde", "physics/serde"]
 nightly = ["core/nightly"]

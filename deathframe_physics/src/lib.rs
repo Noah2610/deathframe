@@ -1,3 +1,6 @@
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde;
 #[macro_use]
 extern crate derive_builder;
 extern crate specs;
