@@ -98,7 +98,7 @@ where
                 result_any == true && result_all == true
             }
             (Some(result), None) | (None, Some(result)) => result,
-            (None, None) | (Some(false), Some(false)) => false,
+            (None, None) => false,
         }
     }
 }
