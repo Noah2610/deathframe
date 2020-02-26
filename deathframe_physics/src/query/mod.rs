@@ -74,25 +74,31 @@ where
 
     /// Run the query.
     /// Runs both _any_ and _all_ queries (if both exist) and checks
-    /// if both queries return `true`.  A non-existent query returns `true`.
+    /// if all existing queries return `true`.
     pub fn run(mut self) -> bool {
-        self.expression_any
-            .take()
-            .map(|exp| {
-                self.collider
-                    .collisions
-                    .values()
-                    .any(|collision| self.run_expression_on(&exp, collision))
-            })
-            .unwrap_or(true)
-            && self
-                .expression_all
-                .take()
-                .map(|exp| {
-                    self.collider.collisions.values().all(|collision| {
-                        self.run_expression_on(&exp, collision)
+        let query_any =
+            |query: &mut Self| {
+                query.expression_any.take().map(|exp| {
+                    query.collider.collisions.values().any(|collision| {
+                        query.run_expression_on(&exp, collision)
                     })
                 })
-                .unwrap_or(true)
+            };
+        let query_all =
+            |query: &mut Self| {
+                query.expression_all.take().map(|exp| {
+                    query.collider.collisions.values().all(|collision| {
+                        query.run_expression_on(&exp, collision)
+                    })
+                })
+            };
+
+        match (query_any(&mut self), query_all(&mut self)) {
+            (Some(result_any), Some(result_all)) => {
+                result_any == true && result_all == true
+            }
+            (Some(result), None) | (None, Some(result)) => result,
+            (None, None) | (Some(false), Some(false)) => false,
+        }
     }
 }
