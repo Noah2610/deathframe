@@ -1,7 +1,7 @@
 use super::system_prelude::*;
 use std::marker::PhantomData;
 
-const PADDING: (f32, f32) = (1.0, 1.0);
+const PADDING: (f32, f32) = (2.0, 2.0);
 
 /// The `UpdateCollisionsSystem` is in charge of setting collision states for colliding entities.
 /// Entities with `CheckCollision` (and with `Collision`) check for collision against
