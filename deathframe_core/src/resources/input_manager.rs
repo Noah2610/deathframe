@@ -47,14 +47,16 @@ where
         self.is_action_in_state(action, ActionState::Down)
     }
 
-    /// Returns `true` if the action with the given name was released (_down_).
+    /// Returns `true` if the action with the given name was released (_up_).
     pub fn is_up(&self, action: B::Action) -> bool {
         self.is_action_in_state(action, ActionState::Up)
     }
 
-    /// Returns `true` if the action with the given name is being _pressed_ down.
+    /// Returns `true` if the action with the given name is being _pressed_ down,
+    /// or if it was pressed _down_.
     pub fn is_pressed(&self, action: B::Action) -> bool {
-        self.is_action_in_state(action, ActionState::Pressed)
+        self.is_action_in_state(action.clone(), ActionState::Pressed)
+            || self.is_action_in_state(action, ActionState::Down)
     }
 
     /// Behaves identically to `amethyst::input::InputHandler::axis_value`.
