@@ -43,29 +43,26 @@ impl<'a> System<'a> for EntityLoaderSystem {
                     && dist.1 <= loader.loading_distance.1
             };
 
-            // Unload entities
-            for (target_entity, target_transform, _, _) in
-                (&entities, &transforms, &loadables, &loadeds).join()
+            for (target_entity, target_transform, _, target_loaded_maybe) in
+                (&entities, &transforms, &loadables, loadeds.maybe()).join()
             {
                 let target_pos = {
                     let trans = target_transform.translation();
                     (trans.x, trans.y)
                 };
-                if !in_loading_distance(target_pos) {
-                    entity_loader.unload(target_entity)
-                }
-            }
 
-            // Load entities
-            for (target_entity, target_transform, _, _) in
-                (&entities, &transforms, &loadables, !&loadeds).join()
-            {
-                let target_pos = {
-                    let trans = target_transform.translation();
-                    (trans.x, trans.y)
-                };
-                if in_loading_distance(target_pos) {
-                    entity_loader.load(target_entity)
+                let is_in_loading_distance = in_loading_distance(target_pos);
+
+                if target_loaded_maybe.is_none() {
+                    if is_in_loading_distance {
+                        entity_loader.load(target_entity);
+                    }
+                } else if target_loaded_maybe.is_some() {
+                    if is_in_loading_distance {
+                        entity_loader.ignore(target_entity);
+                    } else {
+                        entity_loader.unload(target_entity);
+                    }
                 }
             }
         }

@@ -8,6 +8,7 @@ use std::collections::HashMap;
 enum LoadAction {
     Load,
     Unload,
+    Ignore,
 }
 
 // TODO: This isn't really a resource. It's not inserted into the world.
@@ -26,21 +27,31 @@ pub struct EntityLoader {
 impl EntityLoader {
     /// The given entity should be loaded, if it was unloaded.
     pub fn load(&mut self, entity: Entity) {
-        self.load_actions.insert(entity, LoadAction::Load);
+        self.load_actions
+            .entry(entity)
+            .and_modify(|action| {
+                if action != &mut LoadAction::Ignore {
+                    *action = LoadAction::Load
+                }
+            })
+            .or_insert(LoadAction::Load);
     }
 
     /// The given entity should be unloaded, if it was loaded.
     pub fn unload(&mut self, entity: Entity) {
-        // Only unload if it isn't already staged for loading.
-        let is_staged_for_loading = self
-            .load_actions
-            .get(&entity)
-            .map(|action| action == &LoadAction::Load)
-            .unwrap_or(false);
+        self.load_actions
+            .entry(entity)
+            .and_modify(|action| {
+                if action != &mut LoadAction::Ignore {
+                    *action = LoadAction::Unload
+                }
+            })
+            .or_insert(LoadAction::Unload);
+    }
 
-        if !is_staged_for_loading {
-            self.load_actions.insert(entity, LoadAction::Unload);
-        }
+    /// The given entity isn't loaded or unloaded.
+    pub fn ignore(&mut self, entity: Entity) {
+        self.load_actions.insert(entity, LoadAction::Ignore);
     }
 
     /// Run all load actions, with the given `Loaded` storage.
@@ -51,17 +62,12 @@ impl EntityLoader {
         for (entity, load_action) in self.load_actions {
             match load_action {
                 LoadAction::Load => {
-                    // Load, unless it is already loaded
-                    if !loadeds.contains(entity) {
-                        loadeds.insert(entity, Loaded)?;
-                    }
+                    loadeds.insert(entity, Loaded)?;
                 }
                 LoadAction::Unload => {
-                    // Unload, unless it is already unloaded
-                    if loadeds.contains(entity) {
-                        loadeds.remove(entity);
-                    }
+                    loadeds.remove(entity);
                 }
+                LoadAction::Ignore => (),
             }
         }
         Ok(())
