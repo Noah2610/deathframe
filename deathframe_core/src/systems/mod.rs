@@ -1,10 +1,12 @@
 //! A collection of systems, giving the components in this crate functionality.
 
+mod entity_loader;
 mod follow;
 mod input_manager;
 mod scale_sprites;
 
 pub mod prelude {
+    pub use super::entity_loader::EntityLoaderSystem;
     pub use super::follow::FollowSystem;
     pub use super::input_manager::InputManagerSystem;
     pub use super::scale_sprites::ScaleSpritesSystem;
@@ -39,7 +41,7 @@ pub mod system_prelude {
 
     pub use crate::components::prelude::*;
     pub use crate::geo::prelude::*;
-    pub use crate::resources::InputManager;
+    pub use crate::resources::prelude::*;
 
     pub use super::helpers::*;
 }
