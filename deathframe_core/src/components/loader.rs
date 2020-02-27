@@ -1,8 +1,9 @@
 use super::component_prelude::*;
 
 /// `Loader` entities can load `Loadable` entities,
-/// that are within a loading distance from
-/// the `Loader` entity's transform.
+/// that are within a loading distance from the `Loader`
+/// entity's transform. Checks the half loading distance
+/// in all directions.
 #[derive(Component)]
 #[storage(VecStorage)]
 pub struct Loader {

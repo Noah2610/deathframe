@@ -12,7 +12,8 @@ impl<'a> System<'a> for EntityLoaderSystem {
     type SystemData = (
         Entities<'a>,
         Write<'a, EntityLoader>,
-        // ReadStorage<'a, Loader>, // TODO: Loader component
+        ReadStorage<'a, Transform>,
+        ReadStorage<'a, Loader>,
         ReadStorage<'a, Loadable>,
         WriteStorage<'a, Loaded>,
     );
@@ -22,7 +23,8 @@ impl<'a> System<'a> for EntityLoaderSystem {
         (
             entities,
             entity_loader,
-            // loaders,
+            transforms,
+            loaders,
             loadables,
             mut loadeds,
         ): Self::SystemData,
