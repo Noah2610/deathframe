@@ -28,3 +28,4 @@ metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
 nightly = ["amethyst/nightly"]
+debug = []

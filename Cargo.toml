@@ -37,3 +37,4 @@ empty  = ["core/empty"]
 
 serde   = ["core/serde", "physics/serde"]
 nightly = ["core/nightly"]
+debug = ["core/debug", "physics/debug", "animation/debug"]
