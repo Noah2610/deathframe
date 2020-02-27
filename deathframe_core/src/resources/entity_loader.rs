@@ -10,6 +10,9 @@ enum LoadAction {
     Unload,
 }
 
+// TODO: This isn't really a resource. It's not inserted into the world.
+//       It's just used in `EntityLoaderSystem`.
+
 /// The `EntityLoader` is filled with entities that need to be
 /// loaded, unloaded, and executes all loading
 /// actions at once with the `run` method.
