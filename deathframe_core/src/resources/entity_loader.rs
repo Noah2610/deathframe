@@ -8,7 +8,7 @@ use std::collections::HashMap;
 enum LoadAction {
     Load,
     Unload,
-    Ignore,
+    KeepLoaded,
 }
 
 // TODO: This isn't really a resource. It's not inserted into the world.
@@ -29,29 +29,32 @@ impl EntityLoader {
     pub fn load(&mut self, entity: Entity) {
         self.load_actions
             .entry(entity)
-            .and_modify(|action| {
-                if action != &mut LoadAction::Ignore {
-                    *action = LoadAction::Load
-                }
-            })
+            .and_modify(|action| *action = LoadAction::Load)
             .or_insert(LoadAction::Load);
     }
 
     /// The given entity should be unloaded, if it was loaded.
+    /// Don't unload if it is supposed to be loaded or kept loaded.
     pub fn unload(&mut self, entity: Entity) {
         self.load_actions
             .entry(entity)
             .and_modify(|action| {
-                if action != &mut LoadAction::Ignore {
+                if action != &LoadAction::KeepLoaded
+                    && action != &LoadAction::Load
+                {
                     *action = LoadAction::Unload
                 }
             })
             .or_insert(LoadAction::Unload);
     }
 
-    /// The given entity isn't loaded or unloaded.
-    pub fn ignore(&mut self, entity: Entity) {
-        self.load_actions.insert(entity, LoadAction::Ignore);
+    /// Keep this entity loaded. This doesn't load or unload the entity,
+    /// but prevents it from being unloaded.
+    /// This is primarily used for performance, so the entity
+    /// isn't loaded multiple times, once the EntityLoaderSystem has
+    /// already determined, that it is already loaded.
+    pub fn keep_loaded(&mut self, entity: Entity) {
+        self.load_actions.insert(entity, LoadAction::KeepLoaded);
     }
 
     /// Run all load actions, with the given `Loaded` storage.
@@ -67,7 +70,7 @@ impl EntityLoader {
                 LoadAction::Unload => {
                     loadeds.remove(entity);
                 }
-                LoadAction::Ignore => (),
+                LoadAction::KeepLoaded => (),
             }
         }
         Ok(())

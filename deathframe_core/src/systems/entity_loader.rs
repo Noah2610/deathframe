@@ -51,17 +51,18 @@ impl<'a> System<'a> for EntityLoaderSystem {
                     (trans.x, trans.y)
                 };
 
+                let is_loaded = target_loaded_maybe.is_some();
                 let is_in_loading_distance = in_loading_distance(target_pos);
 
-                if target_loaded_maybe.is_none() {
+                if is_loaded {
                     if is_in_loading_distance {
-                        entity_loader.load(target_entity);
-                    }
-                } else if target_loaded_maybe.is_some() {
-                    if is_in_loading_distance {
-                        entity_loader.ignore(target_entity);
+                        entity_loader.keep_loaded(target_entity);
                     } else {
                         entity_loader.unload(target_entity);
+                    }
+                } else {
+                    if is_in_loading_distance {
+                        entity_loader.load(target_entity);
                     }
                 }
             }
