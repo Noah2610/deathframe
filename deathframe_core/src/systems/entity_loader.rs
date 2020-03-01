@@ -15,6 +15,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
         ReadStorage<'a, Loader>,
         ReadStorage<'a, Loadable>,
         WriteStorage<'a, Loaded>,
+        WriteStorage<'a, Hidden>,
     );
 
     fn run(
@@ -25,6 +26,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
             loaders,
             loadables,
             mut loadeds,
+            mut hiddens,
         ): Self::SystemData,
     ) {
         let mut entity_loader = EntityLoader::default();
@@ -69,7 +71,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
         }
 
         entity_loader
-            .run(&mut loadeds)
+            .run(&mut loadeds, Some(&mut hiddens))
             .expect("EntityLoader didn't run successfully");
     }
 }

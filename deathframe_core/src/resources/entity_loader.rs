@@ -1,4 +1,5 @@
 use crate::components::prelude::Loaded;
+use amethyst::core::Hidden;
 use amethyst::ecs::error::Error as SpecsError;
 use amethyst::ecs::{Entity, WriteStorage};
 use std::collections::HashMap;
@@ -57,18 +58,27 @@ impl EntityLoader {
         self.load_actions.insert(entity, LoadAction::KeepLoaded);
     }
 
-    /// Run all load actions, with the given `Loaded` storage.
+    /// Run all load actions, with the given `Loaded` storage,
+    /// and the optionally given `Hidden` storage.
     pub fn run(
         self,
         loadeds: &mut WriteStorage<Loaded>,
+        mut hiddens_opt: Option<&mut WriteStorage<Hidden>>,
     ) -> Result<(), SpecsError> {
         for (entity, load_action) in self.load_actions {
             match load_action {
                 LoadAction::Load => {
                     loadeds.insert(entity, Loaded)?;
+                    hiddens_opt.as_mut().map(|hiddens| hiddens.remove(entity));
                 }
                 LoadAction::Unload => {
                     loadeds.remove(entity);
+                    hiddens_opt
+                        .as_mut()
+                        .map(|hiddens| {
+                            hiddens.insert(entity, Hidden).map(|_| ())
+                        })
+                        .unwrap_or(Ok(()))?;
                 }
                 LoadAction::KeepLoaded => (),
             }
