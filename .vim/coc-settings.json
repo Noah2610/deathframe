@@ -1,4 +1,4 @@
 {
   "rust-client.channel": "nightly-2020-02-06",
-  "rust.features": ["vulkan", "nightly", "debug", "physics", "animation"]
+  "rust.features": ["vulkan", "nightly", "debug", "serde", "physics", "animation"]
 }
