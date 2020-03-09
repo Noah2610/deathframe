@@ -5,6 +5,7 @@ use std::marker::PhantomData;
 
 use amethyst::core::deferred_dispatcher_operation::{
     AddBundle,
+    AddSystem,
     AddSystemDesc,
     DispatcherOperation,
 };
@@ -97,9 +98,17 @@ where
         dependencies: &[&str],
     ) -> amethyst::Result<Self>
     where
-        for<'c> S: System<'c> + Send + 'a,
+        for<'c> S: System<'c> + Send + 'static,
     {
-        self.core_dispatcher.add(system, name, dependencies);
+        let name = name.to_string();
+        let dependencies =
+            dependencies.into_iter().map(ToString::to_string).collect();
+
+        self.core_dispatcher_operations.push(Box::new(AddSystem {
+            system,
+            name,
+            dependencies,
+        }));
         Ok(self)
     }
 
@@ -112,10 +121,21 @@ where
         dependencies: &[&str],
     ) -> amethyst::Result<Self>
     where
-        for<'c> S: System<'c> + Send + 'a,
+        for<'c> S: System<'c> + Send + 'static,
     {
-        if let Some(dispatcher) = self.dispatchers.get_mut(&dispatcher_name) {
-            dispatcher.add(system, name, dependencies);
+        if self.dispatchers.contains_key(&dispatcher_name) {
+            let name = name.to_string();
+            let dependencies =
+                dependencies.into_iter().map(ToString::to_string).collect();
+
+            self.dispatcher_operations
+                .entry(dispatcher_name)
+                .or_insert_with(Vec::new)
+                .push(Box::new(AddSystem {
+                    system,
+                    name,
+                    dependencies,
+                }));
             Ok(self)
         } else {
             Err(dispatcher_not_found(dispatcher_name))
