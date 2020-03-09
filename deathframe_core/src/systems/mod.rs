@@ -1,6 +1,7 @@
 //! A collection of systems, giving the components in this crate functionality.
 
 pub mod prelude {
+    pub use super::confine_entities::ConfineEntitiesSystem;
     pub use super::entity_loader::EntityLoaderSystem;
     pub use super::follow::FollowSystem;
     pub use super::input_manager::InputManagerSystem;
