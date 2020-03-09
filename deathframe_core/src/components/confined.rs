@@ -7,7 +7,7 @@ use super::component_prelude::*;
 #[builder(pattern = "owned")]
 pub struct Confined {
     pub(crate) rect: Rect,
-};
+}
 
 impl Confined {
     pub fn builder() -> ConfinedBuilder {
@@ -15,7 +15,10 @@ impl Confined {
     }
 }
 
-impl<R> From<R> for Confined where R: Into<Rect> {
+impl<R> From<R> for Confined
+where
+    R: Into<Rect>,
+{
     fn from(rect: R) -> Self {
         Self { rect: rect.into() }
     }
