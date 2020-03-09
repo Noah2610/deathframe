@@ -12,6 +12,14 @@ impl Size {
     pub fn new(w: f32, h: f32) -> Self {
         Self { w, h }
     }
+
+    /// Returns a new `Size` with the width and height fields the half of this `Size`.
+    pub fn half(&self) -> Self {
+        Self {
+            w: self.w * 0.5,
+            h: self.h * 0.5,
+        }
+    }
 }
 
 impl Component for Size {
