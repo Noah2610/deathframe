@@ -3,6 +3,7 @@ use crate::collision::data::prelude::*;
 use crate::query::Query;
 use specs::world::Index;
 use std::collections::HashMap;
+use std::hash::Hash;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
@@ -25,7 +26,11 @@ where
         }
     }
 
-    pub fn query(&self) -> Query<C> {
+    pub fn query<NA, NB>(&self) -> Query<C, NA, NB>
+    where
+        NA: Eq + Hash,
+        NB: Eq + Hash,
+    {
         Query::new(&self)
     }
 

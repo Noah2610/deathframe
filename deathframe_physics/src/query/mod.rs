@@ -4,21 +4,27 @@ use crate::collision::prelude::*;
 use crate::collision::tag::CollisionTag;
 use crate::components::prelude::Collider;
 use exp::QueryExpression as QExp;
+use std::collections::HashMap;
+use std::hash::Hash;
 
 /// The `Query` can be used to check for collisions
 /// on a `Collider`.
-pub struct Query<'a, C>
+pub struct Query<'a, C, NA, NB>
 where
     C: 'static + CollisionTag,
+    NA: Eq + Hash,
+    NB: Eq + Hash,
 {
     collider:           &'a Collider<C>,
-    find_expressions:   Vec<QExp<C>>,
-    filter_expressions: Vec<QExp<C>>,
+    find_expressions:   HashMap<NA, QExp<C>>,
+    filter_expressions: HashMap<NB, QExp<C>>,
 }
 
-impl<'a, C> Query<'a, C>
+impl<'a, C, NA, NB> Query<'a, C, NA, NB>
 where
     C: 'static + CollisionTag,
+    NA: Eq + Hash,
+    NB: Eq + Hash,
 {
     /// Returns a new `Query` for the given `Collider`.
     pub fn new(collider: &'a Collider<C>) -> Self {
@@ -30,30 +36,81 @@ where
     }
 
     /// Checks and adds the _first_ collision that matches the given `QExp`.
-    pub fn find(mut self, exp: QExp<C>) -> Self {
-        self.find_expressions.push(exp);
+    /// Adds the matched collision under the `name` key.
+    pub fn find(mut self, name: NA, exp: QExp<C>) -> Self {
+        self.find_expressions.insert(name, exp);
         self
     }
 
     /// Checks and adds _all_ collisions that match the given `QExp`.
-    pub fn filter(mut self, exp: QExp<C>) -> Self {
-        self.filter_expressions.push(exp);
+    /// Adds the matched collisions under the `name` key.
+    pub fn filter(mut self, name: NB, exp: QExp<C>) -> Self {
+        self.filter_expressions.insert(name, exp);
         self
     }
 
-    fn run_expression_on(
-        &self,
+    /// Run the query.
+    /// Runs both _any_ and _all_ queries (if both exist)
+    /// and returns a `QueryMatches` struct, containing hashmaps
+    /// for both _find_ and _filter_ queries, with the keys
+    /// registered in the `find` and `filter` methods,
+    /// where the expressions where added.
+    pub fn run(self) -> QueryMatches<'a, C, NA, NB> {
+        let Self {
+            collider,
+            find_expressions,
+            filter_expressions,
+        } = self;
+
+        let find_collisions = find_expressions
+            .into_iter()
+            .filter_map(|(exp_name, exp)| {
+                collider
+                    .collisions
+                    .values()
+                    .find(|collision| {
+                        Self::does_expression_match_collision(&exp, collision)
+                    })
+                    .map(|collision| (exp_name, collision))
+            })
+            .collect();
+
+        let filter_collisions = filter_expressions
+            .into_iter()
+            .filter_map(|(exp_name, exp)| {
+                let filtered_collisions: Vec<_> = collider
+                    .collisions
+                    .values()
+                    .filter(|collision| {
+                        Self::does_expression_match_collision(&exp, collision)
+                    })
+                    .collect();
+                if !filtered_collisions.is_empty() {
+                    Some((exp_name, filtered_collisions))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        QueryMatches {
+            find:   find_collisions,
+            filter: filter_collisions,
+        }
+    }
+
+    fn does_expression_match_collision(
         exp: &QExp<C>,
         collision: &CollisionData<C>,
     ) -> bool {
         match exp {
             QExp::And(exps) => exps
                 .into_iter()
-                .all(|e| self.run_expression_on(e, collision)),
+                .all(|e| Self::does_expression_match_collision(e, collision)),
 
             QExp::Or(exps) => exps
                 .into_iter()
-                .any(|e| self.run_expression_on(e, collision)),
+                .any(|e| Self::does_expression_match_collision(e, collision)),
 
             QExp::IsSide(target_side_qval) => {
                 let target_side: CollisionSide = target_side_qval.into();
@@ -71,37 +128,19 @@ where
             QExp::IsTag(target_tag) => target_tag == &collision.tag,
         }
     }
+}
 
-    /// Run the query.
-    /// Runs both _any_ and _all_ queries (if both exist)
-    /// and returns all collisions that match the queries.
-    pub fn run(mut self) -> Vec<&'a CollisionData<C>> {
-        let query_find = |query: &Self| -> Vec<&'a CollisionData<C>> {
-            query
-                .find_expressions
-                .iter()
-                .filter_map(|exp| {
-                    query.collider.collisions.values().find(move |collision| {
-                        query.run_expression_on(exp, collision)
-                    })
-                })
-                .collect()
-        };
-        let query_filter = |query: &Self| -> Vec<&'a CollisionData<C>> {
-            query
-                .filter_expressions
-                .iter()
-                .map(|exp| {
-                    query.collider.collisions.values().filter(
-                        move |collision| {
-                            query.run_expression_on(exp, collision)
-                        },
-                    )
-                })
-                .flatten()
-                .collect()
-        };
-
-        [query_find(&mut self), query_filter(&mut self)].concat()
-    }
+/// Created when running the `Query` with the `Query::run` function.
+/// Returns all matched collisions, split into `find` and `filter`
+/// fields, depending on which expression type was used to match the collision.
+pub struct QueryMatches<'a, C, NA, NB>
+where
+    C: 'static + CollisionTag,
+    NA: Eq + Hash,
+    NB: Eq + Hash,
+{
+    /// Single collisions that were matched with a _find_ expression.
+    pub find:   HashMap<NA, &'a CollisionData<C>>,
+    /// Multiple collisions that were matched with a _filter_ expression.
+    pub filter: HashMap<NB, Vec<&'a CollisionData<C>>>,
 }
