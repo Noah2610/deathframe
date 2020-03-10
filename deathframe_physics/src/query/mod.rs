@@ -17,7 +17,7 @@ use std::hash::Hash;
 
 /// The `Query` can be used to check for collisions
 /// on a `Collider`.
-pub struct Query<'a, C, NA, NB>
+pub struct Query<'a, C, NA = (), NB = ()>
 where
     C: 'static + CollisionTag,
     NA: Eq + Hash,
