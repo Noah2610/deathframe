@@ -2,6 +2,12 @@ use super::*;
 use std::cmp::PartialEq;
 
 pub mod prelude {
+    pub use super::QueryExpression;
+    pub use super::QueryValueSide;
+    pub use super::QueryValueState;
+}
+
+pub mod prelude_variants {
     pub use super::QueryExpression::*;
     pub use super::QueryValueSide::*;
     pub use super::QueryValueState::*;

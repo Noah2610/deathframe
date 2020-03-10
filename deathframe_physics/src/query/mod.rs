@@ -1,9 +1,17 @@
 pub mod exp;
+pub mod matches;
+
+pub mod prelude {
+    pub use super::exp::prelude::*;
+    pub use super::matches::QueryMatches;
+    pub use super::Query;
+}
 
 use crate::collision::prelude::*;
 use crate::collision::tag::CollisionTag;
 use crate::components::prelude::Collider;
 use exp::QueryExpression as QExp;
+use matches::QueryMatches;
 use std::collections::HashMap;
 use std::hash::Hash;
 
@@ -128,19 +136,4 @@ where
             QExp::IsTag(target_tag) => target_tag == &collision.tag,
         }
     }
-}
-
-/// Created when running the `Query` with the `Query::run` function.
-/// Returns all matched collisions, split into `find` and `filter`
-/// fields, depending on which expression type was used to match the collision.
-pub struct QueryMatches<'a, C, NA, NB>
-where
-    C: 'static + CollisionTag,
-    NA: Eq + Hash,
-    NB: Eq + Hash,
-{
-    /// Single collisions that were matched with a _find_ expression.
-    pub find:   HashMap<NA, &'a CollisionData<C>>,
-    /// Multiple collisions that were matched with a _filter_ expression.
-    pub filter: HashMap<NB, Vec<&'a CollisionData<C>>>,
 }
