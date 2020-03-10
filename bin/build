@@ -14,7 +14,7 @@
 #     with these pre-defined features.
 #     DEFAULT: "nightly,vulkan,physics"
 
-# shellcheck source=./util.sh
+# shellcheck source=./share.sh
 _dir="$( dirname "$0" )"
 source "${_dir}/share.sh"
 unset _dir
