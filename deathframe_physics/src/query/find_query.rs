@@ -1,5 +1,3 @@
-// TODO: Documentation!
-
 pub mod prelude {
     pub use super::FindQuery;
 }
@@ -14,7 +12,7 @@ where
     C: 'static + CollisionTag,
 {
     collider:   &'a Collider<C>,
-    expression: Option<QExp<C>>,
+    expression: Option<QueryExpression<C>>,
 }
 
 impl<'a, C> Query<'a, C> for FindQuery<'a, C>
@@ -22,6 +20,11 @@ where
     C: 'static + CollisionTag,
 {
     type Matches = Option<&'a CollisionData<C>>;
+
+    fn exp(mut self, exp: QueryExpression<C>) -> Self {
+        self.expression = Some(exp);
+        self
+    }
 
     fn run(self) -> Self::Matches {
         let Self {

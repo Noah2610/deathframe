@@ -10,11 +10,17 @@ pub mod prelude {
 }
 
 mod query_prelude {
-    pub(super) use super::exp::QueryExpression as QExp;
+    pub(super) use super::exp::QueryExpression;
+    pub(super) use super::query_helpers::*;
     pub(super) use super::Query;
     pub(super) use crate::collision::prelude::*;
     pub(super) use crate::collision::tag::CollisionTag;
     pub(super) use crate::components::prelude::Collider;
+}
+
+mod query_helpers {
+    use super::query_prelude::*;
+    use QueryExpression as QExp;
 
     pub(super) fn does_expression_match_collision<C>(
         exp: &QExp<C>,
@@ -62,8 +68,14 @@ pub trait Query<'a, C>: From<&'a Collider<C>>
 where
     C: 'static + CollisionTag,
 {
+    /// The type that is returned from `run`.
     type Matches;
 
+    /// This function should register the given `QueryExpression`,
+    /// to be used in the `run` function.
+    fn exp(self, exp: QExp<C>) -> Self;
+
+    /// Run the query with the `QueryExpression` given with the `exp` function.
     fn run(self) -> Self::Matches;
 }
 
