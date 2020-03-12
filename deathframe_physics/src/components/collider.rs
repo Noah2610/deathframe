@@ -26,13 +26,14 @@ where
         }
     }
 
-    pub fn query<NA, NB>(&self) -> Query<C, NA, NB>
-    where
-        NA: Eq + Hash,
-        NB: Eq + Hash,
-    {
-        Query::new(&self)
-    }
+    // TODO
+    // pub fn query<NA, NB>(&self) -> Query<C, NA, NB>
+    // where
+    //     NA: Eq + Hash,
+    //     NB: Eq + Hash,
+    // {
+    //     Query::new(&self)
+    // }
 
     /// Is called when an entity is colliding with this entity.
     pub(crate) fn set_collision_with(

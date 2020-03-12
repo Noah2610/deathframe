@@ -1,10 +1,53 @@
 pub mod exp;
+pub mod find_query;
 pub mod matches;
 
 pub mod prelude {
     pub use super::exp::prelude::*;
+    pub use super::find_query::prelude::*;
     pub use super::matches::QueryMatches;
     pub use super::Query;
+}
+
+mod query_prelude {
+    pub(super) use super::exp::QueryExpression as QExp;
+    pub(super) use super::Query;
+    pub(super) use crate::collision::prelude::*;
+    pub(super) use crate::collision::tag::CollisionTag;
+    pub(super) use crate::components::prelude::Collider;
+
+    pub(super) fn does_expression_match_collision<C>(
+        exp: &QExp<C>,
+        collision: &CollisionData<C>,
+    ) -> bool
+    where
+        C: 'static + CollisionTag,
+    {
+        match exp {
+            QExp::And(exps) => exps
+                .into_iter()
+                .all(|e| does_expression_match_collision(e, collision)),
+
+            QExp::Or(exps) => exps
+                .into_iter()
+                .any(|e| does_expression_match_collision(e, collision)),
+
+            QExp::IsSide(target_side_qval) => {
+                let target_side: CollisionSide = target_side_qval.into();
+                if let Some(side) = collision.side() {
+                    target_side == side
+                } else {
+                    false
+                }
+            }
+
+            QExp::IsState(target_state_qval) => {
+                target_state_qval == collision.state
+            }
+
+            QExp::IsTag(target_tag) => target_tag == &collision.tag,
+        }
+    }
 }
 
 use crate::collision::prelude::*;
@@ -15,9 +58,19 @@ use matches::QueryMatches;
 use std::collections::HashMap;
 use std::hash::Hash;
 
+pub trait Query<'a, C>: From<&'a Collider<C>>
+where
+    C: 'static + CollisionTag,
+{
+    type Matches;
+
+    fn run(self) -> Self::Matches;
+}
+
+// TODO: Remove
 /// The `Query` can be used to check for collisions
 /// on a `Collider`.
-pub struct Query<'a, C, NA = (), NB = ()>
+pub struct _Query<'a, C, NA = (), NB = ()>
 where
     C: 'static + CollisionTag,
     NA: Eq + Hash,
@@ -28,7 +81,7 @@ where
     filter_expressions: HashMap<NB, QExp<C>>,
 }
 
-impl<'a, C, NA, NB> Query<'a, C, NA, NB>
+impl<'a, C, NA, NB> _Query<'a, C, NA, NB>
 where
     C: 'static + CollisionTag,
     NA: Eq + Hash,
