@@ -6,6 +6,9 @@ pub mod prelude {
 
 use super::query_prelude::*;
 
+/// The `FindQuery` runs a given `QueryExpression` on all
+/// collisions, and returns the first match.
+/// Finds a collision matching an expression.
 pub struct FindQuery<'a, C>
 where
     C: 'static + CollisionTag,
