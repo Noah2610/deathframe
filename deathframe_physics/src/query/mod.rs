@@ -1,13 +1,11 @@
 pub mod exp;
 pub mod filter_query;
 pub mod find_query;
-pub mod matches;
 
 pub mod prelude {
     pub use super::exp::prelude::*;
     pub use super::filter_query::prelude::*;
     pub use super::find_query::prelude::*;
-    pub use super::matches::QueryMatches;
     pub use super::Query;
 }
 

@@ -25,14 +25,13 @@ where
         }
     }
 
-    // TODO
-    // pub fn query<NA, NB>(&self) -> Query<C, NA, NB>
-    // where
-    //     NA: Eq + Hash,
-    //     NB: Eq + Hash,
-    // {
-    //     Query::new(&self)
-    // }
+    /// Returns a `Query` type for this collider.
+    pub fn query<'a, Q>(&'a self) -> Q
+    where
+        Q: Query<'a, C>,
+    {
+        Q::from(&self)
+    }
 
     /// Is called when an entity is colliding with this entity.
     pub(crate) fn set_collision_with(
