@@ -1,12 +1,15 @@
 pub mod prelude {
+    pub use super::CollisionCustomData;
     pub use super::CollisionData;
     pub use super::CollisionSide;
     pub use super::CollisionState;
 }
 
+mod custom_data;
 mod side;
 mod state;
 
+pub use custom_data::CollisionCustomData;
 pub use side::CollisionSide;
 pub use state::CollisionState;
 
@@ -18,6 +21,7 @@ where
 {
     pub state:                       CollisionState,
     pub tag:                         C,
+    pub custom:                      Option<Box<dyn CollisionCustomData>>,
     pub(crate) set_state_this_frame: bool,
 }
 

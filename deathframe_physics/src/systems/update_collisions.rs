@@ -31,6 +31,7 @@ where
         ReadStorage<'a, Hitbox>,
         WriteStorage<'a, Collider<C>>,
         ReadStorage<'a, Collidable<C>>,
+        ReadStorage<'a, CollidableCustomData>,
         ReadStorage<'a, Loadable>,
         ReadStorage<'a, Loaded>,
     );
@@ -43,20 +44,22 @@ where
             hitboxes,
             mut colliders,
             collidables,
+            collidable_custom_data_store,
             loadables,
             loadeds,
         ): Self::SystemData,
     ) {
         // Generate the collision grid.
-        let collision_grid = gen_collision_grid(
-            &entities,
-            &transforms,
-            &hitboxes,
-            &collidables,
-            &loadables,
-            &loadeds,
-            Some(Point::new(PADDING.0, PADDING.1)),
-        );
+        let collision_grid = gen_collision_grid(GenCollisionGridData {
+            entities:                 &entities,
+            transforms:               &transforms,
+            hitboxes:                 &hitboxes,
+            with_collision_tag_comps: &collidables,
+            loadables:                &loadables,
+            loadeds:                  &loadeds,
+            padding:                  Some(Point::new(PADDING.0, PADDING.1)),
+            _c:                       Default::default(),
+        });
 
         // Loop through all Colliders, and check for collision in the CollisionGrid.
         for (entity, collider, hitbox, transform) in

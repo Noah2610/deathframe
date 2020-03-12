@@ -1,6 +1,7 @@
 pub mod prelude {
     pub use super::base_friction::BaseFriction;
     pub use super::collidable::Collidable;
+    pub use super::collidable_custom_data::CollidableCustomData;
     pub use super::collider::Collider;
     pub use super::gravity::Gravity;
     pub use super::hitbox::Hitbox;
@@ -16,6 +17,7 @@ mod component_prelude {
 
 mod base_friction;
 mod collidable;
+mod collidable_custom_data;
 mod collider;
 mod gravity;
 mod hitbox;

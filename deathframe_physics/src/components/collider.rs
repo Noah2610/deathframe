@@ -40,6 +40,7 @@ where
         entity_id: Index,
         side: CollisionSide,
         tag: C,
+        custom: Option<Box<dyn CollisionCustomData>>,
     ) {
         if let Some(data) = self.collisions.get_mut(&entity_id) {
             // Set state of colliding entity to ...

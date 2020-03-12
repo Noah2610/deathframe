@@ -24,16 +24,39 @@ pub(crate) mod helpers {
     use super::system_prelude::*;
     use specs::storage::MaskedStorage;
     use specs::Component;
+    use std::marker::PhantomData;
     use std::ops::Deref;
 
+    pub struct GenCollisionGridData<'a, C, W, DT>
+    where
+        C: CollisionTag,
+        W: WithCollisionTag<C> + Component,
+        DT: Deref<Target = MaskedStorage<Transform>>,
+    {
+        pub(crate) entities:                     &'a Entities<'a>,
+        pub(crate) transforms:                   &'a Storage<'a, Transform, DT>,
+        pub(crate) hitboxes:                     &'a ReadStorage<'a, Hitbox>,
+        pub(crate) with_collision_tag_comps:     &'a ReadStorage<'a, W>,
+        pub(crate) loadables:                    &'a ReadStorage<'a, Loadable>,
+        pub(crate) loadeds:                      &'a ReadStorage<'a, Loaded>,
+        pub(crate) padding:                      Option<Point>,
+        pub(crate) collidable_custom_data_store:
+            Option<&'a ReadStorage<'a, CollidableCustomData>>,
+        pub(crate) _c:                           PhantomData<C>,
+    }
+
     pub fn gen_collision_grid<C, W, DT>(
-        entities: &Entities,
-        transforms: &Storage<Transform, DT>,
-        hitboxes: &ReadStorage<Hitbox>,
-        with_collision_tag_comps: &ReadStorage<W>,
-        loadables: &ReadStorage<Loadable>,
-        loadeds: &ReadStorage<Loaded>,
-        padding_opt: Option<Point>,
+        GenCollisionGridData {
+            entities,
+            transforms,
+            hitboxes,
+            with_collision_tag_comps,
+            collidable_custom_data_store,
+            loadables,
+            loadeds,
+            padding,
+            _c: _,
+        }: GenCollisionGridData<C, W, DT>,
     ) -> CollisionGrid<C, ()>
     where
         C: CollisionTag,
@@ -67,7 +90,7 @@ pub(crate) mod helpers {
                         .map(|hitbox_rect| {
                             let mut rect =
                                 hitbox_rect.clone().with_offset(&entity_pos);
-                            if let Some(padding) = padding_opt {
+                            if let Some(padding) = padding {
                                 rect = rect.with_padding(&padding);
                             }
                             base_collision_rect
