@@ -1,4 +1,5 @@
-use super::*;
+use crate::collision::data::prelude::*;
+use crate::collision::tag::CollisionTag;
 use std::cmp::PartialEq;
 
 pub mod prelude {

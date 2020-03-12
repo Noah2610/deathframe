@@ -3,7 +3,6 @@ use crate::collision::data::prelude::*;
 use crate::query::Query;
 use specs::world::Index;
 use std::collections::HashMap;
-use std::hash::Hash;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]

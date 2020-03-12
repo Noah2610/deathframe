@@ -1,13 +1,13 @@
 pub mod prelude {
-    pub use super::FindQuery;
+    pub use super::FilterQuery;
 }
 
 use super::query_prelude::*;
 
-/// The `FindQuery` runs a given `QueryExpression` on all
-/// collisions, and returns the first match.
-/// Finds a collision matching an expression.
-pub struct FindQuery<'a, C>
+/// The `FilterQuery` runs a given `QueryExpression` on all
+/// collisions, and returns all that match.
+/// Filters collisions matching an expression.
+pub struct FilterQuery<'a, C>
 where
     C: 'static + CollisionTag,
 {
@@ -15,7 +15,7 @@ where
     expression: Option<QueryExpression<C>>,
 }
 
-impl<'a, C> FindQuery<'a, C>
+impl<'a, C> FilterQuery<'a, C>
 where
     C: 'static + CollisionTag,
 {
@@ -26,11 +26,11 @@ where
     }
 }
 
-impl<'a, C> Query<'a, C> for FindQuery<'a, C>
+impl<'a, C> Query<'a, C> for FilterQuery<'a, C>
 where
     C: 'static + CollisionTag,
 {
-    type Matches = Option<&'a CollisionData<C>>;
+    type Matches = Vec<&'a CollisionData<C>>;
 
     fn run(self) -> Self::Matches {
         let Self {
@@ -38,18 +38,25 @@ where
             expression,
         } = self;
 
-        let exp = expression?;
+        let exp = if let Some(exp) = expression {
+            exp
+        } else {
+            return Vec::new();
+        };
 
         let matched_collisions = collider
             .collisions
             .values()
-            .find(|collision| does_expression_match_collision(&exp, collision));
+            .filter(|collision| {
+                does_expression_match_collision(&exp, collision)
+            })
+            .collect();
 
         matched_collisions
     }
 }
 
-impl<'a, C> From<&'a Collider<C>> for FindQuery<'a, C>
+impl<'a, C> From<&'a Collider<C>> for FilterQuery<'a, C>
 where
     C: 'static + CollisionTag,
 {
