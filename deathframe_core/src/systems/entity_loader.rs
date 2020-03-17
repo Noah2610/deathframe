@@ -12,6 +12,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
     type SystemData = (
         Entities<'a>,
         ReadStorage<'a, Transform>,
+        ReadStorage<'a, Size>,
         ReadStorage<'a, Loader>,
         ReadStorage<'a, Loadable>,
         WriteStorage<'a, Loaded>,
@@ -23,6 +24,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
         (
             entities,
             transforms,
+            sizes,
             loaders,
             loadables,
             mut loadeds,
@@ -36,17 +38,37 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 let trans = loader_transform.translation();
                 (trans.x, trans.y)
             };
-            let in_loading_distance = |target_pos: (f32, f32)| -> bool {
-                let dist = (
-                    (loader_pos.0 - target_pos.0).abs(),
-                    (loader_pos.1 - target_pos.1).abs(),
-                );
+            let in_loading_distance = |target_pos: (f32, f32),
+                                       target_size_opt: Option<&Size>|
+             -> bool {
+                let dist = {
+                    let size = target_size_opt
+                        .map(|s| (s.w, s.h))
+                        .unwrap_or((0.0, 0.0));
+                    (
+                        ((loader_pos.0 - target_pos.0).abs() - size.0 * 0.5),
+                        ((loader_pos.1 - target_pos.1).abs() - size.1 * 0.5),
+                    )
+                };
+
                 dist.0 <= loader.loading_distance.0
                     && dist.1 <= loader.loading_distance.1
             };
 
-            for (target_entity, target_transform, _, target_loaded_maybe) in
-                (&entities, &transforms, &loadables, loadeds.maybe()).join()
+            for (
+                target_entity,
+                target_transform,
+                target_size_maybe,
+                _,
+                target_loaded_maybe,
+            ) in (
+                &entities,
+                &transforms,
+                sizes.maybe(),
+                &loadables,
+                loadeds.maybe(),
+            )
+                .join()
             {
                 let target_pos = {
                     let trans = target_transform.translation();
@@ -54,7 +76,8 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 };
 
                 let is_loaded = target_loaded_maybe.is_some();
-                let is_in_loading_distance = in_loading_distance(target_pos);
+                let is_in_loading_distance =
+                    in_loading_distance(target_pos, target_size_maybe);
 
                 if is_loaded {
                     if is_in_loading_distance {
