@@ -23,6 +23,14 @@ impl Velocity {
         VelocityBuilder::default()
     }
 
+    /// Get the current velocity for the given `Axis`.
+    pub fn get(&self, axis: &Axis) -> f32 {
+        match axis {
+            Axis::X => self.x,
+            Axis::Y => self.y,
+        }
+    }
+
     /// Set the velocity for the given `Axis` to the given value.
     pub fn set(&mut self, axis: &Axis, vel: f32) {
         match axis {
@@ -31,11 +39,12 @@ impl Velocity {
         }
     }
 
-    /// Get the current velocity for the given `Axis`.
-    pub fn get(&self, axis: &Axis) -> f32 {
+    /// Set the velocity for the given `Axis`, to the given value,
+    /// but the velocity can not go above (or below the negative of) the given `max` velocity.
+    pub fn set_with_max(&mut self, axis: &Axis, vel: f32, max: f32) {
         match axis {
-            Axis::X => self.x,
-            Axis::Y => self.y,
+            Axis::X => self.x = vel.min(max).max(-max),
+            Axis::Y => self.y = vel.min(max).max(-max),
         }
     }
 
