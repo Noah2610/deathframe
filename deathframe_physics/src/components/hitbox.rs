@@ -36,3 +36,15 @@ impl From<Vec<Rect>> for Hitbox {
         Self { rects }
     }
 }
+
+impl Into<Vec<Rect>> for Hitbox {
+    fn into(self) -> Vec<Rect> {
+        self.rects
+    }
+}
+
+impl<'a> Into<&'a Vec<Rect>> for &'a Hitbox {
+    fn into(self) -> &'a Vec<Rect> {
+        &self.rects
+    }
+}
