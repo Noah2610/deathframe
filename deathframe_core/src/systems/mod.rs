@@ -13,6 +13,7 @@ pub mod system_prelude {
 
     pub use amethyst::assets::{AssetStorage, Handle};
     pub use amethyst::core::timing::Time;
+    pub use amethyst::ecs::shred::ResourceId;
     pub use amethyst::ecs::world::Index;
     pub use amethyst::ecs::{
         Entities,
@@ -27,6 +28,7 @@ pub mod system_prelude {
         WriteExpect,
         WriteStorage,
     };
+    pub use amethyst::ecs::{SystemData, World};
     pub use amethyst::input::InputHandler;
     pub use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
     pub use amethyst::renderer::{

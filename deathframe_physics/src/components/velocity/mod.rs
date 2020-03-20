@@ -79,3 +79,9 @@ impl Velocity {
         self.y = 0.0;
     }
 }
+
+impl From<(f32, f32)> for Velocity {
+    fn from((x, y): (f32, f32)) -> Self {
+        Self { x, y }
+    }
+}
