@@ -1,6 +1,7 @@
 //! Test `AnimationsContainer` component
 
 use crate::components::prelude::*;
+use crate::data::prelude::*;
 
 #[test]
 fn can_build_empty_animations_container() {
