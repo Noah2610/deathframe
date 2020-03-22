@@ -7,7 +7,7 @@ use std::hash::Hash;
 /// `Animation`s with their `AnimationsContainer`s.
 pub struct SwitchAnimationsSystem<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: Hash + Eq + Send + Sync + Debug + Clone,
 {
     entity_animations: HashMap<Entity, K>,
 }
@@ -71,7 +71,7 @@ where
 
 impl<K> SwitchAnimationsSystem<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: Hash + Eq + Send + Sync + Debug + Clone,
 {
     fn play_animation(
         &mut self,
@@ -97,7 +97,7 @@ where
 
 impl<K> Default for SwitchAnimationsSystem<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: Hash + Eq + Send + Sync + Debug + Clone,
 {
     fn default() -> Self {
         Self {

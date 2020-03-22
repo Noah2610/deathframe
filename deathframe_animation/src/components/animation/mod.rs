@@ -9,22 +9,24 @@ use climer::{Time, Timer};
 /// Each sprite has a _duration_, in milliseconds, for how long it will be rendered.
 #[derive(Component, Clone)]
 #[storage(DenseVecStorage)]
-pub struct Animation<'a> {
+pub struct Animation {
     frames:        Vec<AnimationFrame>,
-    frames_iter:   Option<AnimationFramesIter<'a>>,
-    current_frame: Option<&'a AnimationFrame>,
+    frames_iter:   Option<AnimationFramesIter>,
+    current_frame: Option<AnimationFrame>,
     timer:         Timer,
 }
 
-impl<'a> Animation<'a> {
+impl Animation {
     /// Play the animation once.
     pub fn play_once(&mut self) {
-        self.frames_iter = Some(self.frames.iter().into());
+        self.frames_iter = Some(self.frames.clone().into_iter().into());
+        self.current_frame = None;
     }
 
     /// Play the animation endlessly.
     pub fn play_cycle(&mut self) {
-        self.frames_iter = Some(self.frames.iter().cycle().into());
+        self.frames_iter = Some(self.frames.clone().into_iter().cycle().into());
+        self.current_frame = None;
     }
 
     /// Returns the sprite ID of the current frame of animation,
@@ -91,7 +93,7 @@ impl<'a> Animation<'a> {
     }
 }
 
-impl<'a, A> From<Vec<A>> for Animation<'a>
+impl<A> From<Vec<A>> for Animation
 where
     A: Into<AnimationFrame>,
 {

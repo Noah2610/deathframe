@@ -1,24 +1,34 @@
 use super::prelude::AnimationFrame;
 use std::iter::Cycle;
-use std::slice::Iter;
+use std::vec::IntoIter;
 
 /// Type of animation frames iterator.
 #[derive(Clone)]
-pub enum AnimationFramesIter<'a> {
+pub enum AnimationFramesIter {
     /// Makes animation frames iterate endlessly.
-    Cylce(Cycle<Iter<'a, AnimationFrame>>),
+    Cycle(Cycle<IntoIter<AnimationFrame>>),
     /// Makes the animation play only once.
-    Once(Iter<'a, AnimationFrame>),
+    Once(IntoIter<AnimationFrame>),
 }
 
-impl<'a> From<Cycle<Iter<'a, AnimationFrame>>> for AnimationFramesIter<'a> {
-    fn from(frames_iter: Cycle<Iter<'a, AnimationFrame>>) -> Self {
+impl Iterator for AnimationFramesIter {
+    type Item = AnimationFrame;
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            AnimationFramesIter::Cycle(iter) => iter.next(),
+            AnimationFramesIter::Once(iter) => iter.next(),
+        }
+    }
+}
+
+impl From<Cycle<IntoIter<AnimationFrame>>> for AnimationFramesIter {
+    fn from(frames_iter: Cycle<IntoIter<AnimationFrame>>) -> Self {
         AnimationFramesIter::Cycle(frames_iter)
     }
 }
 
-impl<'a> From<Iter<'a, AnimationFrame>> for AnimationFramesIter<'a> {
-    fn from(frames_iter: Iter<'a, AnimationFrame>) -> Self {
+impl From<IntoIter<AnimationFrame>> for AnimationFramesIter {
+    fn from(frames_iter: IntoIter<AnimationFrame>) -> Self {
         AnimationFramesIter::Once(frames_iter)
     }
 }

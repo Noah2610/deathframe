@@ -5,25 +5,22 @@ use std::hash::Hash;
 
 pub struct AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
-    animations:
-        HashMap<K, Box<dyn Fn() -> Box<dyn AnimationFramesIter> + Send + Sync>>,
+    animations:        HashMap<K, Animation>,
     current_animation: Option<K>,
 }
 
 impl<K> AnimationsContainerBuilder<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
     /// Add an `Animation` associated to a _key_ to the `AnimationsContainer`.
-    /// You add an animation, by giving this method a `Fn`, which _returns_
-    /// a new `AnimationFramesIter` (`Box`ed).
-    pub fn with<F>(mut self, key: K, animation_gen: F) -> Self
+    pub fn with<A>(mut self, key: K, anim: A) -> Self
     where
-        F: 'static + Fn() -> Box<dyn AnimationFramesIter> + Send + Sync,
+        A: Into<Animation>,
     {
-        self.animations.insert(key, Box::new(animation_gen));
+        self.animations.insert(key, anim.into());
         self
     }
 

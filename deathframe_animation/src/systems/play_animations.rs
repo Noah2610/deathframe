@@ -4,10 +4,10 @@ use super::system_prelude::*;
 #[derive(Default)]
 pub struct PlayAnimationsSystem;
 
-impl<'a, 'b> System<'a> for PlayAnimationsSystem {
+impl<'a> System<'a> for PlayAnimationsSystem {
     type SystemData = (
         Entities<'a>,
-        WriteStorage<'a, Animation<'b>>,
+        WriteStorage<'a, Animation>,
         WriteStorage<'a, SpriteRender>,
         ReadStorage<'a, Loadable>,
         ReadStorage<'a, Loaded>,

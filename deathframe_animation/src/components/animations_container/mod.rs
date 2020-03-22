@@ -12,20 +12,19 @@ use std::hash::Hash;
 /// It knows which `Animation` is currently active / playing.
 /// The `SwitchAnimationsSystem` will switch out the entity's
 /// `Animation` component with the active animation from this component.
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone)]
 #[storage(DenseVecStorage)]
 pub struct AnimationsContainer<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
-    animations:
-        HashMap<K, Box<dyn Fn() -> Box<dyn AnimationFramesIter> + Send + Sync>>,
+    animations:        HashMap<K, Animation>,
     current_animation: Option<K>,
 }
 
 impl<K> AnimationsContainer<K>
 where
-    K: 'static + Hash + Eq + Send + Sync + Debug + Clone,
+    K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
     /// Returns an `AnimationsContainerBuilder`
     pub fn builder() -> AnimationsContainerBuilder<K> {
@@ -53,7 +52,7 @@ where
 
     /// Returns a new `Animation` associated to the given _key_, if any.
     pub fn animation(&self, key: &K) -> Option<Animation> {
-        self.animations.get(key).map(|func| func().into())
+        self.animations.get(key).cloned()
     }
 
     /// Returns a new `Animation`, for the current animation _key_, if any.
