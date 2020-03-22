@@ -41,7 +41,7 @@ mod tests {
     #[test]
     fn into_animation() {
         let anim = vec![(0_u8, 100_u32), (1_u8, 100_u32), (2_u8, 100_u32)];
-        let cycle = AnimationTypeWrapper::Cycle(anim);
+        let cycle = AnimationTypeWrapper::Cycle(anim.clone());
         let _: Animation = cycle.into();
         let once = AnimationTypeWrapper::Once(anim);
         let _: Animation = once.into();
