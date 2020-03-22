@@ -3,6 +3,7 @@
 #[derive(Clone, Builder)]
 #[builder(pattern = "owned")]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", serde(from = "(usize, u64)"))]
 pub struct AnimationFrame {
     pub(crate) sprite_id:   usize,
     pub(crate) duration_ms: u64,

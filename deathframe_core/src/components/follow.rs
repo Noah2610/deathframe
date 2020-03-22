@@ -5,7 +5,6 @@ use std::cmp;
 /// _follow_ another entity with a `Transform`.
 /// Gives this component to an entity, which should _follow_ another entity.
 #[derive(PartialEq)]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct Follow {
     pub(crate) to_follow: Entity,
     pub(crate) priority:  i32,

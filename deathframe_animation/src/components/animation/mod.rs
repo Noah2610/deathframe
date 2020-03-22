@@ -10,10 +10,14 @@ use climer::{Time, Timer};
 #[derive(Component, Clone)]
 #[storage(DenseVecStorage)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", serde(from = "Vec<(usize, u64)>"))]
 pub struct Animation {
     frames:        Vec<AnimationFrame>,
+    #[serde(skip)]
     frames_iter:   Option<AnimationFramesIter>,
+    #[serde(skip)]
     current_frame: Option<AnimationFrame>,
+    #[serde(skip)]
     timer:         Timer,
 }
 

@@ -4,7 +4,6 @@ use std::vec::IntoIter;
 
 /// Type of animation frames iterator.
 #[derive(Clone)]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub enum AnimationFramesIter {
     /// Makes animation frames iterate endlessly.
     Cycle(Cycle<IntoIter<AnimationFrame>>),
