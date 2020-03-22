@@ -60,3 +60,19 @@ where
         self.current().and_then(|key| self.animation(key))
     }
 }
+
+impl<K, A> From<HashMap<K, A>> for AnimationsContainer<K>
+where
+    K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
+    A: Into<Animation>,
+{
+    fn from(animations: HashMap<K, A>) -> Self {
+        Self {
+            animations:        animations
+                .into_iter()
+                .map(|(k, a)| (k, a.into()))
+                .collect(),
+            current_animation: Default::default(),
+        }
+    }
+}

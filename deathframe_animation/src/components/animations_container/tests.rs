@@ -3,10 +3,35 @@
 use crate::components::prelude::*;
 use crate::data::prelude::*;
 
-// #[test]
-// fn animations_container_from() {
-//     let _ = Animations
-// }
+#[test]
+fn animations_container_from() {
+    use std::collections::HashMap;
+
+    #[derive(PartialEq, Eq, Hash, Clone, Debug)]
+    enum AnimKey {
+        First,
+        Second,
+        Third,
+    };
+
+    let mut animations = HashMap::new();
+    animations.insert(AnimKey::First, vec![
+        (1_u8, 500_u32),
+        (2_u8, 500_u32),
+        (3_u8, 500_u32),
+    ]);
+    animations.insert(AnimKey::Second, vec![
+        (1_u8, 500_u32),
+        (2_u8, 500_u32),
+        (3_u8, 500_u32),
+    ]);
+    animations.insert(AnimKey::Third, vec![
+        (1_u8, 500_u32),
+        (2_u8, 500_u32),
+        (3_u8, 500_u32),
+    ]);
+    let _ = AnimationsContainer::from(animations);
+}
 
 #[test]
 fn can_build_empty_animations_container() {
