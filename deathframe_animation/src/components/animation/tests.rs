@@ -3,6 +3,17 @@
 use super::*;
 
 #[test]
+fn animation_from() {
+    let _ = Animation::from(vec![
+        (0, 1000),
+        (1, 1000),
+        (2, 500),
+        (3, 500),
+        (4, 500),
+    ]);
+}
+
+#[test]
 fn can_build_animation_with_frames() {
     let _ = Animation::builder()
         .frames(Box::new(

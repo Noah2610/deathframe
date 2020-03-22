@@ -7,21 +7,24 @@ use climer::{Time, Timer};
 /// Animates an entity with `SpriteRender` frame-by-frame.
 /// Iterates through different sprites __in the same spritesheet__.
 /// Each sprite has a _duration_, in milliseconds, for how long it will be rendered.
-#[derive(Component, Builder)]
+#[derive(Component, Clone)]
 #[storage(DenseVecStorage)]
-#[builder(pattern = "owned")]
-pub struct Animation {
-    frames:        Box<dyn AnimationFramesIter>,
-    #[builder(setter(skip), default)]
-    current_frame: Option<AnimationFrame>,
-    #[builder(setter(skip), default)]
+pub struct Animation<'a> {
+    frames:        Vec<AnimationFrame>,
+    frames_iter:   Option<AnimationFramesIter<'a>>,
+    current_frame: Option<&'a AnimationFrame>,
     timer:         Timer,
 }
 
-impl Animation {
-    /// Returns an `AnimationBuilder`.
-    pub fn builder() -> AnimationBuilder {
-        AnimationBuilder::default()
+impl<'a> Animation<'a> {
+    /// Play the animation once.
+    pub fn play_once(&mut self) {
+        self.frames_iter = Some(self.frames.iter().into());
+    }
+
+    /// Play the animation endlessly.
+    pub fn play_cycle(&mut self) {
+        self.frames_iter = Some(self.frames.iter().cycle().into());
     }
 
     /// Returns the sprite ID of the current frame of animation,
@@ -32,35 +35,55 @@ impl Animation {
 
     /// Updates the timer and goes to the next frame, if necessary.
     pub(crate) fn update(&mut self) {
-        if self.current_frame.is_some() {
-            self.timer.update().expect("Couldn't update timer");
-            if self.timer.state.is_finished() {
-                self.next_frame();
+        if self.is_playing() {
+            if self.current_frame.is_some() {
+                self.timer.update().expect("Couldn't update timer");
+                if self.timer.state.is_finished() {
+                    self.next_frame();
+                }
+            } else {
+                self.setup_first_frame();
             }
-        } else {
-            self.setup_first_frame();
         }
+    }
+
+    fn is_playing(&self) -> bool {
+        self.frames_iter.is_some()
+    }
+
+    fn stop_playing(&mut self) {
+        self.frames_iter = None;
+        self.current_frame = None;
     }
 
     /// Calls `.next()` on the frames Iterator,
     /// and sets up the timer for the new frame.
     fn next_frame(&mut self) {
-        if let Some(next_frame) = self.frames.next() {
-            // Setup timer
-            self.timer.set_target_time(
-                Time::builder().milliseconds(next_frame.duration_ms).build(),
-            );
-            self.timer.start().expect("Couldn't start timer");
-            self.current_frame = Some(next_frame);
-        } else {
-            // TODO: figure out what to do in this situation.
-            eprintln!("NO MORE FRAMES IN ANIMATION!");
+        let mut stop_playing = false;
+
+        if let Some(frames_iter) = self.frames_iter.as_mut() {
+            if let Some(next_frame) = frames_iter.next() {
+                // Setup timer
+                self.timer.set_target_time(
+                    Time::builder()
+                        .milliseconds(next_frame.duration_ms)
+                        .build(),
+                );
+                self.timer.start().expect("Couldn't start timer");
+                self.current_frame = Some(next_frame);
+            } else {
+                stop_playing = true;
+            }
+        }
+
+        if stop_playing {
+            self.stop_playing();
         }
     }
 
     fn setup_first_frame(&mut self) {
         self.next_frame();
-        if self.current_frame.is_some() {
+        if self.is_playing() {
             // Call the update method again, now that we _know_
             // that we have a `current_frame` set.
             self.update();
@@ -68,15 +91,16 @@ impl Animation {
     }
 }
 
-impl<I> From<I> for Animation
+impl<'a, A> From<Vec<A>> for Animation<'a>
 where
-    I: Into<Box<dyn AnimationFramesIter>>,
+    A: Into<AnimationFrame>,
 {
-    fn from(iter: I) -> Self {
+    fn from(frames: Vec<A>) -> Self {
         Self {
-            frames:        iter.into(),
-            current_frame: None,
-            timer:         Timer::default(),
+            frames:        frames.into_iter().map(Into::into).collect(),
+            frames_iter:   Default::default(),
+            current_frame: Default::default(),
+            timer:         Default::default(),
         }
     }
 }
