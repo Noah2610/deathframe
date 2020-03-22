@@ -16,11 +16,8 @@ where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
     /// Add an `Animation` associated to a _key_ to the `AnimationsContainer`.
-    pub fn with<A>(mut self, key: K, anim: A) -> Self
-    where
-        A: Into<Animation>,
-    {
-        self.animations.insert(key, anim.into());
+    pub fn with(mut self, key: K, anim: Animation) -> Self {
+        self.animations.insert(key, anim);
         self
     }
 
