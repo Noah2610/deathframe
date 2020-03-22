@@ -2,6 +2,7 @@ use super::component_prelude::*;
 
 #[derive(Component)]
 #[storage(VecStorage)]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct Solid<C>
 where
     C: 'static + CollisionTag,

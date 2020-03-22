@@ -6,6 +6,7 @@ use std::collections::HashMap;
 
 #[derive(Component)]
 #[storage(DenseVecStorage)]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct Collider<C>
 where
     C: 'static + CollisionTag,

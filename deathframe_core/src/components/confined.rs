@@ -5,6 +5,7 @@ use super::component_prelude::*;
 #[derive(Component, Builder)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned")]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct Confined {
     pub(crate) rect: Rect,
 }

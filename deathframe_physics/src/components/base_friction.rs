@@ -5,6 +5,7 @@ use super::component_prelude::*;
 #[derive(Component, Builder, Debug)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct BaseFriction {
     pub(crate) friction_x: Option<f32>,
     pub(crate) friction_y: Option<f32>,

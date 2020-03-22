@@ -14,6 +14,7 @@ use std::hash::Hash;
 /// `Animation` component with the active animation from this component.
 #[derive(Component, Default, Clone)]
 #[storage(DenseVecStorage)]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct AnimationsContainer<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
