@@ -17,15 +17,15 @@ pub struct Animation {
 }
 
 impl Animation {
-    /// Play the animation once.
-    pub fn play_once(&mut self) {
-        self.frames_iter = Some(self.frames.clone().into_iter().into());
-        self.current_frame = None;
-    }
-
     /// Play the animation endlessly.
     pub fn play_cycle(&mut self) {
         self.frames_iter = Some(self.frames.clone().into_iter().cycle().into());
+        self.current_frame = None;
+    }
+
+    /// Play the animation once.
+    pub fn play_once(&mut self) {
+        self.frames_iter = Some(self.frames.clone().into_iter().into());
         self.current_frame = None;
     }
 
