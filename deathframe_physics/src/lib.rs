@@ -1,4 +1,4 @@
-#[cfg(feature = "serde")]
+#[cfg(feature = "serialize")]
 #[macro_use]
 extern crate serde;
 #[macro_use]

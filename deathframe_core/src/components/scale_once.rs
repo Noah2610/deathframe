@@ -4,7 +4,7 @@ use super::component_prelude::*;
 /// their sprites will be scaled to the entity's size once.
 /// After scaling, this component is removed from the entity.
 #[derive(Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct ScaleOnce;
 
 impl Component for ScaleOnce {

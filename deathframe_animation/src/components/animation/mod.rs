@@ -9,6 +9,7 @@ use climer::{Time, Timer};
 /// Each sprite has a _duration_, in milliseconds, for how long it will be rendered.
 #[derive(Component, Clone)]
 #[storage(DenseVecStorage)]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub struct Animation {
     frames:        Vec<AnimationFrame>,
     frames_iter:   Option<AnimationFramesIter>,

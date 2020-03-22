@@ -27,5 +27,6 @@ vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
-nightly = ["amethyst/nightly"]
-debug = []
+nightly   = ["amethyst/nightly"]
+debug     = []
+serialize = ["serde"]

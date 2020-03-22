@@ -1,5 +1,8 @@
 extern crate climer;
 extern crate core;
+#[cfg(feature = "serialize")]
+#[macro_use]
+extern crate serde;
 #[macro_use]
 extern crate derive_builder;
 extern crate specs;
