@@ -15,11 +15,16 @@ use std::hash::Hash;
 #[derive(Component, Default, Clone)]
 #[storage(DenseVecStorage)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "serialize",
+    serde(from = "HashMap<K, AnimationTypeWrapper<Vec<(usize, u64)>>>")
+)]
 pub struct AnimationsContainer<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
     animations:        HashMap<K, Animation>,
+    #[serde(skip)]
     current_animation: Option<K>,
 }
 
