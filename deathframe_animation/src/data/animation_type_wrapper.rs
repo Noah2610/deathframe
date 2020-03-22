@@ -14,6 +14,8 @@ where
     Once(A),
 }
 
+/// This `Into<Animation>` implementation will set
+/// the appropriate animation iter type (Cycle or Once).
 impl<A> Into<Animation> for AnimationTypeWrapper<A>
 where
     A: Into<Animation>,
