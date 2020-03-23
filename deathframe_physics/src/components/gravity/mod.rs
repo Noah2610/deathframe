@@ -6,7 +6,7 @@ use super::component_prelude::*;
 /// Entities with the `Gravity` component are affected by gravity.
 /// The gravity's strength is applied to the entity's velocity every frame
 /// through the `ApplyGravitySystem`.
-#[derive(Debug, Default, Component, Builder)]
+#[derive(Clone, Debug, Default, Component, Builder)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
