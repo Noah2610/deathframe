@@ -39,15 +39,24 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 (trans.x, trans.y)
             };
             let in_loading_distance = |target_pos: (f32, f32),
+                                       target_loadable: &Loadable,
                                        target_size_opt: Option<&Size>|
              -> bool {
                 let dist = {
                     let size = target_size_opt
                         .map(|s| (s.w, s.h))
                         .unwrap_or((0.0, 0.0));
+                    let padding = (
+                        target_loadable.padding.0.unwrap_or(0.0),
+                        target_loadable.padding.1.unwrap_or(0.0),
+                    );
                     (
-                        ((loader_pos.0 - target_pos.0).abs() - size.0 * 0.5),
-                        ((loader_pos.1 - target_pos.1).abs() - size.1 * 0.5),
+                        ((loader_pos.0 - target_pos.0).abs()
+                            - size.0 * 0.5
+                            - padding.0),
+                        ((loader_pos.1 - target_pos.1).abs()
+                            - size.1 * 0.5
+                            - padding.1),
                     )
                 };
 
@@ -59,7 +68,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 target_entity,
                 target_transform,
                 target_size_maybe,
-                _,
+                target_loadable,
                 target_loaded_maybe,
             ) in (
                 &entities,
@@ -76,8 +85,11 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 };
 
                 let is_loaded = target_loaded_maybe.is_some();
-                let is_in_loading_distance =
-                    in_loading_distance(target_pos, target_size_maybe);
+                let is_in_loading_distance = in_loading_distance(
+                    target_pos,
+                    target_loadable,
+                    target_size_maybe,
+                );
 
                 if is_loaded {
                     if is_in_loading_distance {

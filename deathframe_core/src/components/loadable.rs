@@ -2,10 +2,16 @@ use super::component_prelude::*;
 
 /// Entities which have `Loadable` may be loaded or unloaded
 /// (get or remove the `Loaded` component) later on.
-#[derive(Default)]
+#[derive(Default, Component)]
+#[storage(VecStorage)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
-pub struct Loadable;
+pub struct Loadable {
+    pub(crate) padding: (Option<f32>, Option<f32>),
+}
 
-impl Component for Loadable {
-    type Storage = NullStorage<Self>;
+impl Loadable {
+    pub fn with_padding(mut self, padding: (Option<f32>, Option<f32>)) -> Self {
+        self.padding = padding;
+        self
+    }
 }
