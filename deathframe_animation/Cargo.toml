@@ -30,4 +30,4 @@ optional = true
 
 [features]
 debug = []
-serialize = ["serde", "climer/serialize"]
+deserialize = ["serde", "climer/serialize"]

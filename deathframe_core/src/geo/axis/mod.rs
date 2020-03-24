@@ -10,7 +10,7 @@ use std::fmt;
 
 /// Just a plain `Axis` enum with `X` and `Y` variants.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum Axis {
     X,
     Y,

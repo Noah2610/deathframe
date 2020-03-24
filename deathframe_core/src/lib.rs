@@ -2,7 +2,7 @@ pub extern crate amethyst;
 #[macro_use]
 extern crate derive_builder;
 
-#[cfg(feature = "serialize")]
+#[cfg(feature = "deserialize")]
 #[macro_use]
 extern crate serde;
 

@@ -2,8 +2,8 @@
 /// and the _duration\_ms_ for how long this frame should be rendered.
 #[derive(Clone, Builder)]
 #[builder(pattern = "owned")]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serialize", serde(from = "(usize, u64)"))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "deserialize", serde(from = "(usize, u64)"))]
 pub struct AnimationFrame {
     pub(crate) sprite_id:   usize,
     pub(crate) duration_ms: u64,

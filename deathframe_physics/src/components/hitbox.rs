@@ -5,8 +5,8 @@ use super::component_prelude::*;
 /// So the `Rect` rects assume the entity's position is at `0, 0`.
 #[derive(Debug, Component, Default)]
 #[storage(DenseVecStorage)]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serialize", serde(from = "Vec<Rect>"))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "deserialize", serde(from = "Vec<Rect>"))]
 pub struct Hitbox {
     pub(crate) rects: Vec<Rect>,
 }

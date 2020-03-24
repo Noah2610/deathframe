@@ -14,9 +14,9 @@ use std::hash::Hash;
 /// `Animation` component with the active animation from this component.
 #[derive(Component, Default, Clone)]
 #[storage(DenseVecStorage)]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 #[cfg_attr(
-    feature = "serialize",
+    feature = "deserialize",
     serde(from = "HashMap<K, AnimationTypeWrapper<Vec<(usize, u64)>>>")
 )]
 pub struct AnimationsContainer<K>

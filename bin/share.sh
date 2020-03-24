@@ -58,4 +58,4 @@ _logdir="$( dirname "${LOGFILE}" )"
 [ -d "$_logdir" ] || mkdir -p "$_logdir"
 unset _logdir
 RUST_TOOLCHAIN="nightly-2020-02-06"
-[ -z "$RUST_FEATURES" ] && RUST_FEATURES="nightly,vulkan,debug,serialize"
+[ -z "$RUST_FEATURES" ] && RUST_FEATURES="nightly,vulkan,debug,deserialize"

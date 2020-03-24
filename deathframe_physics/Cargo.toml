@@ -26,4 +26,4 @@ optional = true
 
 [features]
 debug = []
-serialize = ["serde"]
+deserialize = ["serde"]

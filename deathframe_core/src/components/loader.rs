@@ -5,7 +5,7 @@ use super::component_prelude::*;
 /// from the `Loader` entity's transform.
 #[derive(Component)]
 #[storage(VecStorage)]
-#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Loader {
     pub(crate) loading_distance: (f32, f32),
 }

@@ -1,6 +1,6 @@
 extern crate climer;
 extern crate core;
-#[cfg(feature = "serialize")]
+#[cfg(feature = "deserialize")]
 #[macro_use]
 extern crate serde;
 #[macro_use]
