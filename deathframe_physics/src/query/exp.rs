@@ -1,6 +1,7 @@
 use crate::collision::data::prelude::*;
 use crate::collision::tag::CollisionTag;
 use std::cmp::PartialEq;
+use std::hash::Hash;
 
 pub mod prelude {
     pub use super::QueryExpression;
@@ -14,6 +15,7 @@ pub mod prelude_variants {
     pub use super::QueryValueState::*;
 }
 
+#[derive(PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum QueryExpression<C>
 where
@@ -26,6 +28,7 @@ where
     Or(Vec<QueryExpression<C>>),
 }
 
+#[derive(PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum QueryValueSide {
     Left,
@@ -47,6 +50,7 @@ impl Into<CollisionSide> for &QueryValueSide {
     }
 }
 
+#[derive(PartialEq, Eq, Clone, Hash)]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum QueryValueState {
     Enter,
