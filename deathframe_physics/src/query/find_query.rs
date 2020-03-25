@@ -13,7 +13,7 @@ where
     C: 'static + CollisionTag,
 {
     collider:   &'a Collider<C>,
-    expression: Option<QueryExpression<C>>,
+    expression: Option<&'a QueryExpression<C>>,
     filter_ids: Option<Vec<Index>>,
 }
 
@@ -22,7 +22,7 @@ where
     C: 'static + CollisionTag,
 {
     /// Use the given `QueryExpression` to match collisions when running the query.
-    pub fn exp(mut self, exp: QueryExpression<C>) -> Self {
+    pub fn exp(mut self, exp: &'a QueryExpression<C>) -> Self {
         self.expression = Some(exp);
         self
     }
@@ -50,7 +50,7 @@ where
         let exp = expression?;
 
         let find_predicate = |collision: &&CollisionData<C>| -> bool {
-            does_expression_match_collision(&exp, *collision)
+            does_expression_match_collision(exp, *collision)
         };
 
         let found_collision = if let Some(filter_ids) = filter_ids {
