@@ -14,6 +14,7 @@ pub mod prelude_variants {
     pub use super::QueryValueState::*;
 }
 
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum QueryExpression<C>
 where
     C: CollisionTag,
@@ -21,10 +22,11 @@ where
     IsSide(QueryValueSide),
     IsState(QueryValueState),
     IsTag(C),
-    And(Vec<Self>),
-    Or(Vec<Self>),
+    And(Vec<QueryExpression<C>>),
+    Or(Vec<QueryExpression<C>>),
 }
 
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum QueryValueSide {
     Left,
     Right,
@@ -45,6 +47,7 @@ impl Into<CollisionSide> for &QueryValueSide {
     }
 }
 
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum QueryValueState {
     Enter,
     Steady,
