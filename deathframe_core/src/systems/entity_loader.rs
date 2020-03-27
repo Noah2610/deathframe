@@ -33,9 +33,11 @@ impl<'a> System<'a> for EntityLoaderSystem {
         ): Self::SystemData,
     ) {
         let mut entity_loader = EntityComponentManager::default()
-            .with_priority(InsertionAction::Insert);
+            .with_priority(InsertionAction::Insert)
+            .with_cache(false);
         let mut entity_loader_hidden = EntityComponentManager::default()
-            .with_priority(InsertionAction::Remove);
+            .with_priority(InsertionAction::Remove)
+            .with_cache(false);
 
         for (loader, loader_transform) in (&loaders, &transforms).join() {
             let loader_pos = {
@@ -80,15 +82,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 target_transform,
                 target_size_maybe,
                 target_loadable,
-                target_loaded_maybe,
-            ) in (
-                &entities,
-                &transforms,
-                sizes.maybe(),
-                &loadables,
-                loadeds.maybe(),
-            )
-                .join()
+            ) in (&entities, &transforms, sizes.maybe(), &loadables).join()
             {
                 let target_pos = {
                     let trans = target_transform.translation();
@@ -107,18 +101,6 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 } else {
                     entity_loader.remove(target_entity);
                 }
-
-                // if is_loaded {
-                //     if in_loading_distance {
-                //         entity_loader.keep_loaded(target_entity);
-                //     } else {
-                //         entity_loader.unload(target_entity);
-                //     }
-                // } else {
-                //     if in_loading_distance {
-                //         entity_loader.load(target_entity);
-                //     }
-                // }
 
                 if in_render_distance {
                     entity_loader_hidden.remove(target_entity);
