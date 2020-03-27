@@ -24,6 +24,7 @@ pub(crate) mod helpers {
     use super::system_prelude::*;
     use specs::storage::MaskedStorage;
     use specs::Component;
+    use std::collections::HashMap;
     use std::ops::Deref;
 
     pub fn gen_collision_grid<C, W, DT>(
@@ -34,13 +35,13 @@ pub(crate) mod helpers {
         loadables: &ReadStorage<Loadable>,
         loadeds: &ReadStorage<Loaded>,
         padding_opt: Option<Point>,
-    ) -> CollisionGrid<C, ()>
+    ) -> CollisionGrid<Entity, C, ()>
     where
         C: CollisionTag,
         W: WithCollisionTag<C> + Component,
         DT: Deref<Target = MaskedStorage<Transform>>,
     {
-        let mut grid = CollisionGrid::<C, ()>::default();
+        let mut grid = CollisionGrid::<Entity, C, ()>::default();
 
         for (entity, transform, hitbox, collidable) in
             (entities, transforms, hitboxes, with_collision_tag_comps).join()
@@ -48,7 +49,7 @@ pub(crate) mod helpers {
             if is_entity_loaded(entity, loadables, loadeds) {
                 let collision_tag = collidable.collision_tag().clone();
 
-                grid.append(gen_collision_rects(
+                grid.extend(gen_collision_rects(
                     entity,
                     &transform,
                     &hitbox,
@@ -67,7 +68,7 @@ pub(crate) mod helpers {
         hitbox: &Hitbox,
         collision_tag: C,
         padding_opt: &Option<Point>,
-    ) -> Vec<CollisionRect<C, ()>>
+    ) -> HashMap<Entity, Vec<CollisionRect<C, ()>>>
     where
         C: CollisionTag,
     {
@@ -84,7 +85,7 @@ pub(crate) mod helpers {
         // Create the CollisionRect(s) for this entity.
         // Multiple CollisionRects may exist, because an entity
         // can have multiple Hitboxes (Hitbox parts).
-        hitbox
+        let rects = hitbox
             .rects
             .iter()
             .map(|hitbox_rect| {
@@ -94,6 +95,10 @@ pub(crate) mod helpers {
                 }
                 base_collision_rect.clone().rect(rect).build().unwrap()
             })
-            .collect()
+            .collect();
+
+        let mut hashmap = HashMap::new();
+        hashmap.insert(entity, rects);
+        hashmap
     }
 }

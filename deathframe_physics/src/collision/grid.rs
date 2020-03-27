@@ -1,35 +1,44 @@
-use specs::world::Index;
-
 use super::rect::CollisionRect;
 use crate::collision::tag::CollisionTag;
 use core::geo::prelude::*;
+use specs::world::Index;
+use std::collections::HashMap;
+use std::hash::Hash;
 
 /// A collection of `CollisionRect`, can perform collision detection.
 #[derive(Debug)]
-pub struct CollisionGrid<C, T>
+pub struct CollisionGrid<K, C, T>
 where
+    K: PartialEq + Eq + Hash,
     C: CollisionTag,
 {
-    pub rects: Vec<CollisionRect<C, T>>,
+    pub rects: HashMap<K, Vec<CollisionRect<C, T>>>,
 }
 
-impl<C, T> CollisionGrid<C, T>
+impl<K, C, T> CollisionGrid<K, C, T>
 where
+    K: PartialEq + Eq + Hash,
     C: CollisionTag,
 {
     /// Create a new `CollisionGrid` by passing in a vector of `CollisionRect`s.
-    pub fn new(rects: Vec<CollisionRect<C, T>>) -> Self {
+    pub fn new(rects: HashMap<K, Vec<CollisionRect<C, T>>>) -> Self {
         Self { rects }
     }
 
     /// Returns a new `CollisionGrid` with no `CollisionRect`s.
     pub fn empty() -> Self {
-        Self { rects: Vec::new() }
+        Self {
+            rects: Default::default(),
+        }
     }
 
     /// Adds a new `CollisionRect` to the grid.
-    pub fn push(&mut self, rect: CollisionRect<C, T>) {
-        self.rects.push(rect);
+    pub fn insert(&mut self, key: K, rect: CollisionRect<C, T>) {
+        self.rects.entry(key).or_default().push(rect);
+    }
+
+    pub fn append(&mut self, key: K, mut rects: Vec<CollisionRect<C, T>>) {
+        self.rects.entry(key).or_default().append(&mut rects);
     }
 
     /// Appends the given `Vec<CollisionRect>` to the grid.
@@ -38,8 +47,8 @@ where
     /// instead of copying `Vec::append`'s signature and only taking
     /// a mutable reference; I prefer it this way, as this can avoids problems,
     /// when you pass a mutable reference but try to use the Vec again afterwards (with no items).
-    pub fn append(&mut self, mut rects: Vec<CollisionRect<C, T>>) {
-        self.rects.append(&mut rects);
+    pub fn extend(&mut self, rects: HashMap<K, Vec<CollisionRect<C, T>>>) {
+        self.rects.extend(rects);
     }
 
     /// Clears all `CollisionRect`s from the `rects` field.
@@ -47,23 +56,25 @@ where
         self.rects.clear();
     }
 
-    /// Get a stored `CollisionRect` by its entity ID.
-    pub fn rect_by_id(&self, id: Index) -> Option<&CollisionRect<C, T>> {
-        self.rects.iter().find(|rect| {
-            if let Some(other_id) = rect.id {
-                id == other_id
-            } else {
-                false
-            }
-        })
+    pub fn get(&self, key: &K) -> Option<&Vec<CollisionRect<C, T>>> {
+        self.rects.get(key)
+    }
+
+    pub fn get_mut(
+        &mut self,
+        key: &K,
+    ) -> Option<&mut Vec<CollisionRect<C, T>>> {
+        self.rects.get_mut(key)
     }
 
     /// Returns `true` if the passed `CollisionRect` is colliding with any other
     /// `CollisionRect` stored in this `CollisionGrid`.
     pub fn collides_any(&self, target_rect: &CollisionRect<C, T>) -> bool {
-        self.rects
-            .iter()
-            .any(|rect| Self::do_rects_collide(&target_rect, rect))
+        self.rects.values().any(|rects| {
+            rects
+                .iter()
+                .any(|rect| Self::do_rects_collide(&target_rect, rect))
+        })
     }
 
     /// Returns a vector of all `CollisionRect`s, that are in collision
@@ -73,8 +84,13 @@ where
         target_rect: &CollisionRect<C, T>,
     ) -> Vec<&CollisionRect<C, T>> {
         self.rects
-            .iter()
-            .filter(|rect| Self::do_rects_collide(&target_rect, rect))
+            .values()
+            .map(|rects| {
+                rects
+                    .iter()
+                    .filter(|rect| Self::do_rects_collide(&target_rect, rect))
+            })
+            .flatten()
             .collect()
     }
 
@@ -83,13 +99,13 @@ where
     /// you pass in an entity ID to a `CollisionRect` which is stored inside this `CollisionGrid`.
     /// Note that, if you pass in an ID, which does not exist as a `CollisionRect` in this
     /// `CollisionGrid`, then you will simply receive an empty vector.
-    pub fn colliding_with_id(&self, id: Index) -> Vec<&CollisionRect<C, T>> {
-        if let Some(target_rect) = self.rect_by_id(id) {
-            self.colliding_with(target_rect)
-        } else {
-            Vec::new()
-        }
-    }
+    // pub fn colliding_with_id(&self, id: Index) -> Vec<&CollisionRect<C, T>> {
+    //     if let Some(target_rect) = self.rect_by_id(id) {
+    //         self.colliding_with(target_rect)
+    //     } else {
+    //         Vec::new()
+    //     }
+    // }
 
     /// Returns `true` if the two passed `CollisionRect`s are in collision;
     /// also checks, that their entity IDs are not the same,
@@ -155,11 +171,14 @@ where
     }
 }
 
-impl<C, T> Default for CollisionGrid<C, T>
+impl<K, C, T> Default for CollisionGrid<K, C, T>
 where
+    K: PartialEq + Eq + Hash,
     C: CollisionTag,
 {
     fn default() -> Self {
-        Self { rects: Vec::new() }
+        Self {
+            rects: Default::default(),
+        }
     }
 }
