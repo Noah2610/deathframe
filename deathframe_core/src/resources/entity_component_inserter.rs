@@ -14,17 +14,16 @@ impl Default for InsertionAction {
     }
 }
 
-// TODO: Rename
 // TODO: Documentation
 // TODO: Remove cache code. Seems to make stuff slower.
 #[derive(Default)]
-pub struct EntityComponentManager {
+pub struct EntityComponentInserter {
     prioritize_action: InsertionAction,
     actions:           HashMap<Entity, InsertionAction>,
     prev_actions:      Option<HashMap<Entity, InsertionAction>>,
 }
 
-impl EntityComponentManager {
+impl EntityComponentInserter {
     pub fn with_priority(mut self, prioritize_action: InsertionAction) -> Self {
         self.prioritize_action = prioritize_action;
         self
