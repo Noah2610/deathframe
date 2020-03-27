@@ -11,6 +11,15 @@ pub struct EntityLoaderSystem {
     entity_loader_hidden: EntityComponentInserter,
 }
 
+impl EntityLoaderSystem {
+    pub fn with_cache(mut self, use_cache: bool) -> Self {
+        self.entity_loader = self.entity_loader.with_cache(use_cache);
+        self.entity_loader_hidden =
+            self.entity_loader_hidden.with_cache(use_cache);
+        self
+    }
+}
+
 impl Default for EntityLoaderSystem {
     fn default() -> Self {
         Self {
