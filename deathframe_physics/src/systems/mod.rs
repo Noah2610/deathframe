@@ -46,41 +46,54 @@ pub(crate) mod helpers {
             (entities, transforms, hitboxes, with_collision_tag_comps).join()
         {
             if is_entity_loaded(entity, loadables, loadeds) {
-                let entity_id = entity.id();
-                let entity_pos: Point = {
-                    let trans = transform.translation();
-                    Point::new(trans.x, trans.y)
-                };
-                let entity_tag = collidable.collision_tag();
+                let collision_tag = collidable.collision_tag().clone();
 
-                let base_collision_rect = CollisionRect::<C, ()>::builder()
-                    .id(entity_id)
-                    .tag(entity_tag.clone());
-
-                grid.append(
-                    // Create the CollisionRect(s) for this entity.
-                    // Multiple CollisionRects may exist, because an entity
-                    // can have multiple Hitboxes (Hitbox parts).
-                    hitbox
-                        .rects
-                        .iter()
-                        .map(|hitbox_rect| {
-                            let mut rect =
-                                hitbox_rect.clone().with_offset(&entity_pos);
-                            if let Some(padding) = padding_opt {
-                                rect = rect.with_padding(&padding);
-                            }
-                            base_collision_rect
-                                .clone()
-                                .rect(rect)
-                                .build()
-                                .unwrap()
-                        })
-                        .collect(),
-                );
+                grid.append(gen_collision_rects(
+                    entity,
+                    &transform,
+                    &hitbox,
+                    collision_tag,
+                    &padding_opt,
+                ));
             }
         }
 
         grid
+    }
+
+    pub fn gen_collision_rects<C>(
+        entity: Entity,
+        transform: &Transform,
+        hitbox: &Hitbox,
+        collision_tag: C,
+        padding_opt: &Option<Point>,
+    ) -> Vec<CollisionRect<C, ()>>
+    where
+        C: CollisionTag,
+    {
+        let entity_id = entity.id();
+        let entity_pos: Point = {
+            let trans = transform.translation();
+            Point::new(trans.x, trans.y)
+        };
+
+        let base_collision_rect = CollisionRect::<C, ()>::builder()
+            .id(entity_id)
+            .tag(collision_tag);
+
+        // Create the CollisionRect(s) for this entity.
+        // Multiple CollisionRects may exist, because an entity
+        // can have multiple Hitboxes (Hitbox parts).
+        hitbox
+            .rects
+            .iter()
+            .map(|hitbox_rect| {
+                let mut rect = hitbox_rect.clone().with_offset(&entity_pos);
+                if let Some(padding) = padding_opt {
+                    rect = rect.with_padding(&padding);
+                }
+                base_collision_rect.clone().rect(rect).build().unwrap()
+            })
+            .collect()
     }
 }
