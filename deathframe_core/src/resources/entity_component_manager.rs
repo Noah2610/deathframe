@@ -14,6 +14,7 @@ impl Default for InsertionAction {
     }
 }
 
+// TODO: RENAME
 #[derive(Default)]
 pub struct EntityComponentManager {
     prioritize_action: InsertionAction,

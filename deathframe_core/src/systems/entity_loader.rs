@@ -1,5 +1,5 @@
 use super::system_prelude::*;
-use std::collections::HashSet;
+use crate::resources::entity_component_manager::InsertionAction;
 
 /// The `EntityLoaderSystem` handles the loading and unloading
 /// of entities. Entities with the `Loader` component load
@@ -7,9 +7,7 @@ use std::collections::HashSet;
 /// and `Loadable` entities are unloaded when _no_ `Loader` entities
 /// are in range.
 #[derive(Default)]
-pub struct EntityLoaderSystem {
-    loaded_entities: HashSet<Entity>,
-}
+pub struct EntityLoaderSystem;
 
 impl<'a> System<'a> for EntityLoaderSystem {
     type SystemData = (
@@ -34,8 +32,10 @@ impl<'a> System<'a> for EntityLoaderSystem {
             mut hiddens,
         ): Self::SystemData,
     ) {
-        let mut entity_loader = EntityLoader::default();
-        let mut entity_loader_hidden = EntityLoader::default();
+        let mut entity_loader = EntityComponentManager::default()
+            .with_priority(InsertionAction::Insert);
+        let mut entity_loader_hidden = EntityComponentManager::default()
+            .with_priority(InsertionAction::Remove);
 
         for (loader, loader_transform) in (&loaders, &transforms).join() {
             let loader_pos = {
@@ -95,29 +95,35 @@ impl<'a> System<'a> for EntityLoaderSystem {
                     (trans.x, trans.y)
                 };
 
-                let is_loaded = target_loaded_maybe.is_some();
+                // let is_loaded = target_loaded_maybe.is_some();
                 let (in_loading_distance, in_render_distance) = is_in_distance(
                     target_pos,
                     target_loadable,
                     target_size_maybe,
                 );
 
-                if is_loaded {
-                    if in_loading_distance {
-                        entity_loader.keep_loaded(target_entity);
-                    } else {
-                        entity_loader.unload(target_entity);
-                    }
+                if in_loading_distance {
+                    entity_loader.insert(target_entity);
                 } else {
-                    if in_loading_distance {
-                        entity_loader.load(target_entity);
-                    }
+                    entity_loader.remove(target_entity);
                 }
 
+                // if is_loaded {
+                //     if in_loading_distance {
+                //         entity_loader.keep_loaded(target_entity);
+                //     } else {
+                //         entity_loader.unload(target_entity);
+                //     }
+                // } else {
+                //     if in_loading_distance {
+                //         entity_loader.load(target_entity);
+                //     }
+                // }
+
                 if in_render_distance {
-                    entity_loader_hidden.unload(target_entity);
+                    entity_loader_hidden.remove(target_entity);
                 } else {
-                    entity_loader_hidden.load(target_entity);
+                    entity_loader_hidden.insert(target_entity);
                 }
             }
         }
