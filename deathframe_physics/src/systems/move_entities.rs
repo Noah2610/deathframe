@@ -98,7 +98,7 @@ where
         loadeds: &ReadStorage<Loaded>,
     ) {
         // Generate the collision grid.
-        let collision_grid = gen_collision_grid(
+        let mut collision_grid = gen_collision_grid(
             entities,
             &*transforms,
             hitboxes,
@@ -108,8 +108,8 @@ where
             None,
         );
 
-        for (entity, transform, velocity, solid, hitbox_opt) in
-            (entities, transforms, velocities, solids, hitboxes.maybe())
+        for (entity, transform, velocity, solid, hitbox) in
+            (entities, transforms, velocities, solids, hitboxes)
                 .join()
                 .filter(|(entity, _, _, _, _)| {
                     is_entity_loaded(*entity, &loadables, &loadeds)
@@ -118,11 +118,13 @@ where
             let entity_id = entity.id();
             let solid_tag = &solid.tag;
 
-            let is_position_in_collision = |position: &Point| -> bool {
-                let base_coll_rect = CollisionRect::builder()
-                    .id(entity_id)
-                    .tag(solid_tag.clone());
-                if let Some(hitbox) = hitbox_opt {
+            let is_position_in_collision =
+                |position: &Point,
+                 collision_grid: &CollisionGrid<Entity, C, ()>|
+                 -> bool {
+                    let base_coll_rect = CollisionRect::builder()
+                        .id(entity_id)
+                        .tag(solid_tag.clone());
                     // Check for collision with Hitbox
                     hitbox.rects.iter().any(|hitbox_rect| {
                         let coll_rect = base_coll_rect
@@ -132,9 +134,26 @@ where
                             .unwrap();
                         collision_grid.collides_any(&coll_rect)
                     })
-                } else {
-                    // If the entity has no hitbox, then they are never in collision
-                    false
+                };
+
+            let set_position = |transform: &mut Transform,
+                                position: Point,
+                                collision_grid: &mut CollisionGrid<
+                Entity,
+                C,
+                (),
+            >| {
+                transform.set_translation_x(position.x);
+                transform.set_translation_y(position.y);
+                if let Some(rects) = collision_grid.get_mut(&entity) {
+                    let new_rects = gen_collision_rects(
+                        &entity,
+                        &*transform,
+                        hitbox,
+                        solid_tag.clone(),
+                        &None,
+                    );
+                    *rects = new_rects;
                 }
             };
 
@@ -159,26 +178,34 @@ where
                 // Move one pixel at a time
                 'pixel_loop: for _ in 0 .. abs {
                     let new_position = next_position(&transform, sign);
-                    if is_position_in_collision(&new_position) {
+                    if is_position_in_collision(&new_position, &collision_grid)
+                    {
                         // New position would be in collision,
                         // kill the relevant velocity and break out of the loop.
                         velocity.clear(&axis);
                         break 'pixel_loop;
                     } else {
                         // New position is NOT in collision, apply position
-                        transform.set_translation_x(new_position.x);
-                        transform.set_translation_y(new_position.y);
+                        set_position(
+                            transform,
+                            new_position,
+                            &mut collision_grid,
+                        );
                     }
                 }
 
                 // Try to move by the floating point remainder
                 if rem != 0.0 {
                     let new_position = next_position(&transform, rem);
-                    if is_position_in_collision(&new_position) {
+                    if is_position_in_collision(&new_position, &collision_grid)
+                    {
                         velocity.clear(&axis);
                     } else {
-                        transform.set_translation_x(new_position.x);
-                        transform.set_translation_y(new_position.y);
+                        set_position(
+                            transform,
+                            new_position,
+                            &mut collision_grid,
+                        );
                     }
                 }
             });

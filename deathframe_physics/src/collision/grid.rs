@@ -2,7 +2,7 @@ use super::rect::CollisionRect;
 use crate::collision::tag::CollisionTag;
 use core::geo::prelude::*;
 use specs::world::Index;
-use std::collections::HashMap;
+use std::collections::hash_map::HashMap;
 use std::hash::Hash;
 
 /// A collection of `CollisionRect`, can perform collision detection.
@@ -32,9 +32,8 @@ where
         }
     }
 
-    /// Adds a new `CollisionRect` to the grid.
-    pub fn insert(&mut self, key: K, rect: CollisionRect<C, T>) {
-        self.rects.entry(key).or_default().push(rect);
+    pub fn insert(&mut self, key: K, rects: Vec<CollisionRect<C, T>>) {
+        self.rects.insert(key, rects);
     }
 
     pub fn append(&mut self, key: K, mut rects: Vec<CollisionRect<C, T>>) {
@@ -94,23 +93,9 @@ where
             .collect()
     }
 
-    /// Similar to the `colliding_with` method, but instead of passing
-    /// a `CollisionRect` (which may or may not exist in this `CollisionGrid`),
-    /// you pass in an entity ID to a `CollisionRect` which is stored inside this `CollisionGrid`.
-    /// Note that, if you pass in an ID, which does not exist as a `CollisionRect` in this
-    /// `CollisionGrid`, then you will simply receive an empty vector.
-    // pub fn colliding_with_id(&self, id: Index) -> Vec<&CollisionRect<C, T>> {
-    //     if let Some(target_rect) = self.rect_by_id(id) {
-    //         self.colliding_with(target_rect)
-    //     } else {
-    //         Vec::new()
-    //     }
-    // }
-
     /// Returns `true` if the two passed `CollisionRect`s are in collision;
     /// also checks, that their entity IDs are not the same,
     /// and that their tags allow them to collide with each other.
-    /// TODO: Maybe make this a standalone function, not associated with the `CollisionGrid` struct?
     pub fn do_rects_collide<U, V>(
         rect_one: &CollisionRect<C, U>,
         rect_two: &CollisionRect<C, V>,

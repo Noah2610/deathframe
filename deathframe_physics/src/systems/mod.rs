@@ -24,7 +24,6 @@ pub(crate) mod helpers {
     use super::system_prelude::*;
     use specs::storage::MaskedStorage;
     use specs::Component;
-    use std::collections::HashMap;
     use std::ops::Deref;
 
     pub fn gen_collision_grid<C, W, DT>(
@@ -49,13 +48,15 @@ pub(crate) mod helpers {
             if is_entity_loaded(entity, loadables, loadeds) {
                 let collision_tag = collidable.collision_tag().clone();
 
-                grid.extend(gen_collision_rects(
-                    entity,
+                let rects = gen_collision_rects(
+                    &entity,
                     &transform,
                     &hitbox,
                     collision_tag,
                     &padding_opt,
-                ));
+                );
+
+                grid.insert(entity, rects);
             }
         }
 
@@ -63,12 +64,12 @@ pub(crate) mod helpers {
     }
 
     pub fn gen_collision_rects<C>(
-        entity: Entity,
+        entity: &Entity,
         transform: &Transform,
         hitbox: &Hitbox,
         collision_tag: C,
         padding_opt: &Option<Point>,
-    ) -> HashMap<Entity, Vec<CollisionRect<C, ()>>>
+    ) -> Vec<CollisionRect<C, ()>>
     where
         C: CollisionTag,
     {
@@ -85,7 +86,7 @@ pub(crate) mod helpers {
         // Create the CollisionRect(s) for this entity.
         // Multiple CollisionRects may exist, because an entity
         // can have multiple Hitboxes (Hitbox parts).
-        let rects = hitbox
+        hitbox
             .rects
             .iter()
             .map(|hitbox_rect| {
@@ -95,10 +96,6 @@ pub(crate) mod helpers {
                 }
                 base_collision_rect.clone().rect(rect).build().unwrap()
             })
-            .collect();
-
-        let mut hashmap = HashMap::new();
-        hashmap.insert(entity, rects);
-        hashmap
+            .collect()
     }
 }
