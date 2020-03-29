@@ -1,10 +1,11 @@
-use std::collections::HashMap;
-use std::path::Path;
-
 use amethyst::assets::{AssetStorage, Loader};
 use amethyst::ecs::{World, WorldExt};
 use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
 use amethyst::renderer::{ImageFormat, SpriteSheetFormat, Texture};
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::hash::Hash;
+use std::path::Path;
 
 /// This is a resource wrapper for amethyst's `SpriteSheet`s.
 /// It can load and get `SpriteSheetHandle`s;
@@ -12,39 +13,40 @@ use amethyst::renderer::{ImageFormat, SpriteSheetFormat, Texture};
 /// _get_ them by passing their spritesheet's image file name (without extension) to an appropriate
 /// method.
 #[derive(Default)]
-pub struct SpriteSheetHandles {
-    spritesheet_handles: HashMap<String, SpriteSheetHandle>,
+pub struct SpriteSheetHandles<K>
+where
+    K: PartialEq + Eq + Hash + Debug,
+{
+    handles: HashMap<K, SpriteSheetHandle>,
 }
 
-impl SpriteSheetHandles {
+impl<K> SpriteSheetHandles<K>
+where
+    K: PartialEq + Eq + Hash + Debug,
+{
     /// Insert a new `SpriteSheetHandle` with an identifier name into this resource.
     /// You will not usually use this method, instead use a method such as `load`,
     /// which handles this for you.
-    pub fn insert<T>(&mut self, name: T, handle: SpriteSheetHandle)
-    where
-        T: ToString,
-    {
-        self.spritesheet_handles.insert(name.to_string(), handle);
+    pub fn insert(&mut self, key: K, handle: SpriteSheetHandle) {
+        self.handles.insert(key, handle);
     }
 
     /// Get the `SpriteSheetHandle` with the given identifier name.
     /// Returns `None` if there is no `SpriteSheetHandle` with this name,
     /// and returns `Some` with the `SpriteSheetHandle` if there is.
-    pub fn get<T>(&self, name: T) -> Option<SpriteSheetHandle>
-    where
-        T: ToString,
-    {
-        let name = name.to_string();
-        self.spritesheet_handles.get(&name).map(Clone::clone)
+    pub fn get(&self, key: &K) -> Option<SpriteSheetHandle> {
+        self.handles.get(key).cloned()
     }
 
     /// Load a new `SpriteSheet` and `SpriteSheetHandle` into this resource
     /// by passing the path to the spritesheet image file to this method (and the world).
-    pub fn load<P>(&mut self, path: P, world: &World)
+    pub fn load<P>(&mut self, name: P, world: &World)
     where
-        P: AsRef<Path>,
+        P: AsRef<Path> + Into<K> + Clone,
     {
-        let path = path.as_ref();
+        let key = name.clone().into();
+        let path = name.as_ref();
+
         if !path.is_file() {
             panic!(format!(
                 "Given image file path does not exist: '{:?}'",
@@ -52,12 +54,11 @@ impl SpriteSheetHandles {
             ));
         }
 
-        let path_ron_string = format!(
-            "{}/{}.ron",
-            path.parent().map(|p| p.to_str().unwrap()).unwrap_or(""),
-            path.file_stem().unwrap().to_str().unwrap()
-        );
-        let path_ron = Path::new(path_ron_string.as_str());
+        let path_ron = path
+            .parent()
+            .expect("Image path should have parent")
+            .join(path.file_stem().expect("Image path should have file stem"));
+
         if !path_ron.is_file() {
             panic!(format!(
                 "Given image file path does not have a .ron configuration \
@@ -88,7 +89,6 @@ impl SpriteSheetHandles {
             )
         };
 
-        let key = path.to_str().expect("Should convert path to str");
         self.insert(key, handle);
     }
 
@@ -96,18 +96,19 @@ impl SpriteSheetHandles {
     /// If it does not already exist, load it first, then return the newly loaded handle.
     pub fn get_or_load<P>(
         &mut self,
-        path: P,
+        name: P,
         world: &World,
     ) -> SpriteSheetHandle
     where
-        P: AsRef<Path>,
+        P: AsRef<Path> + Into<K> + Clone,
     {
-        let path = path.as_ref().to_str().expect("Should convert path to str");
-        if let Some(handle) = self.get(path) {
+        let key: K = name.clone().into();
+
+        if let Some(handle) = self.get(&key) {
             handle
         } else {
-            self.load(path, world);
-            self.get(path)
+            self.load(name, world);
+            self.get(&key)
                 .expect("SpriteSheet should be loaded at this point")
         }
     }
@@ -115,7 +116,7 @@ impl SpriteSheetHandles {
     /// Returns `true` if all `SpriteSheetHandle`s' textures have finished loading.
     pub fn has_finished_loading_all(&self, world: &World) -> bool {
         let asset = world.read_resource::<AssetStorage<SpriteSheet>>();
-        self.spritesheet_handles
+        self.handles
             .values()
             .all(|handle| asset.get(handle).is_some())
     }
