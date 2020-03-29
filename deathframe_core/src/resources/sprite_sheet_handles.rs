@@ -3,6 +3,7 @@ use amethyst::ecs::{World, WorldExt};
 use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
 use amethyst::renderer::{ImageFormat, SpriteSheetFormat, Texture};
 use std::collections::HashMap;
+use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::path::Path;
@@ -54,10 +55,15 @@ where
             ));
         }
 
-        let path_ron = path
-            .parent()
-            .expect("Image path should have parent")
-            .join(path.file_stem().expect("Image path should have file stem"));
+        let path_ron =
+            path.parent().expect("Image path should have parent").join({
+                let mut ron = path
+                    .file_stem()
+                    .expect("Image path should have file stem")
+                    .to_owned();
+                ron.push(".ron");
+                ron
+            });
 
         if !path_ron.is_file() {
             panic!(format!(
