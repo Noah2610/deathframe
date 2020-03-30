@@ -4,6 +4,7 @@
 mod collision_rect_tests {
     use crate::collision::prelude::*;
     use core::geo::prelude::*;
+    use std::collections::HashMap;
 
     /// Returns two Rects that intersect each other
     fn get_intersecting_rects() -> (Rect, Rect) {
@@ -66,7 +67,7 @@ mod collision_rect_tests {
     fn rects_do_intersect() {
         let (one, two) = get_intersecting_collision_rects();
         assert!(
-            CollisionGrid::<(), ()>::do_rects_collide(&one, &two),
+            collision_check::do_rects_collide(&one, &two),
             "CollisionRects should intersect"
         );
     }
@@ -74,7 +75,10 @@ mod collision_rect_tests {
     #[test]
     fn rects_collide_in_collision_rect() {
         let (one, two) = get_intersecting_collision_rects();
-        let grid = CollisionGrid::new(vec![one.clone(), two.clone()]);
+        let mut grid_map = HashMap::new();
+        grid_map.insert("One", vec![one.clone()]);
+        grid_map.insert("Two", vec![two.clone()]);
+        let grid = CollisionGrid::new(grid_map);
 
         assert!(
             grid.collides_any(&one),

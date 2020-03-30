@@ -3,10 +3,11 @@ use amethyst::ecs::{World, WorldExt};
 use amethyst::renderer::sprite::{SpriteSheet, SpriteSheetHandle};
 use amethyst::renderer::{ImageFormat, SpriteSheetFormat, Texture};
 use std::collections::HashMap;
-use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::path::Path;
+
+// TODO: Update documentation.
 
 /// This is a resource wrapper for amethyst's `SpriteSheet`s.
 /// It can load and get `SpriteSheetHandle`s;
