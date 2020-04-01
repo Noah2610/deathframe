@@ -27,10 +27,6 @@ where
     IsState(QueryValueState),
     /// Checks the given tag for equality with this collider's tag.
     IsTag(C),
-    /// Checks if this collider's tag collides with the given tag.
-    CollidesWith(C),
-    /// Checks if the given tag collides with this collider's tag.
-    OtherCollidesWithSelf(C),
     /// _All_ given expressions must be true.
     And(Vec<QueryExpression<C>>),
     /// _Any_ of the given expressions must be true.

@@ -33,13 +33,5 @@ where
         }
 
         QExp::IsTag(target_tag) => target_tag == &collision.tag,
-
-        QExp::CollidesWith(target_tag) => {
-            collision.tag.collides_with(target_tag)
-        }
-
-        QExp::OtherCollidesWithSelf(target_tag) => {
-            target_tag.collides_with(&collision.tag)
-        }
     }
 }

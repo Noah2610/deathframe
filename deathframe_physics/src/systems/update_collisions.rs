@@ -139,15 +139,15 @@ impl RectSides {
     }
 
     pub fn collides_with(&self, rect: &Rect) -> Option<CollisionSide> {
-        if collision_check::do_rects_intersect(rect, &self.inner) {
+        if collision_check::do_rects_intersect(&self.inner, rect) {
             Some(CollisionSide::Inner)
-        } else if collision_check::do_rects_intersect(rect, &self.top) {
+        } else if collision_check::do_rects_intersect(&self.top, rect) {
             Some(CollisionSide::Top)
-        } else if collision_check::do_rects_intersect(rect, &self.bottom) {
+        } else if collision_check::do_rects_intersect(&self.bottom, rect) {
             Some(CollisionSide::Bottom)
-        } else if collision_check::do_rects_intersect(rect, &self.left) {
+        } else if collision_check::do_rects_intersect(&self.left, rect) {
             Some(CollisionSide::Left)
-        } else if collision_check::do_rects_intersect(rect, &self.right) {
+        } else if collision_check::do_rects_intersect(&self.right, rect) {
             Some(CollisionSide::Right)
         } else {
             None
