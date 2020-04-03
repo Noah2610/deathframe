@@ -11,6 +11,7 @@ pub use side::CollisionSide;
 pub use state::CollisionState;
 
 use crate::collision::tag::CollisionTag;
+use specs::world::Index;
 
 pub struct CollisionData<C>
 where
@@ -18,6 +19,7 @@ where
 {
     pub state:                       CollisionState,
     pub tag:                         C,
+    pub id:                          Index,
     pub(crate) set_state_this_frame: bool,
 }
 

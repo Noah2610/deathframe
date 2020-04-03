@@ -62,6 +62,7 @@ where
             self.collisions.insert(entity_id, CollisionData {
                 state:                CollisionState::Enter(side),
                 tag:                  tag,
+                id:                   entity_id,
                 set_state_this_frame: true,
             });
         }
