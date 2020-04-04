@@ -13,12 +13,14 @@ use climer::{Time, Timer};
 #[cfg_attr(feature = "deserialize", serde(from = "Vec<(usize, u64)>"))]
 pub struct Animation {
     frames:        Vec<AnimationFrame>,
-    #[serde(skip)]
+    #[cfg_attr(feature = "deserialize", serde(skip))]
     frames_iter:   Option<AnimationFramesIter>,
-    #[serde(skip)]
+    #[cfg_attr(feature = "deserialize", serde(skip))]
     current_frame: Option<AnimationFrame>,
-    #[serde(skip)]
+    #[cfg_attr(feature = "deserialize", serde(skip))]
     timer:         Timer,
+    #[cfg_attr(feature = "deserialize", serde(skip))]
+    has_played:    bool,
 }
 
 impl Animation {
@@ -26,12 +28,14 @@ impl Animation {
     pub fn play_cycle(&mut self) {
         self.frames_iter = Some(self.frames.clone().into_iter().cycle().into());
         self.current_frame = None;
+        self.has_played = true;
     }
 
     /// Play the animation once.
     pub fn play_once(&mut self) {
         self.frames_iter = Some(self.frames.clone().into_iter().into());
         self.current_frame = None;
+        self.has_played = true;
     }
 
     /// Returns the sprite ID of the current frame of animation,
@@ -52,6 +56,10 @@ impl Animation {
                 self.setup_first_frame();
             }
         }
+    }
+
+    pub(crate) fn has_played_and_is_finished(&self) -> bool {
+        self.has_played && !self.is_playing()
     }
 
     fn is_playing(&self) -> bool {
@@ -108,6 +116,7 @@ where
             frames_iter:   Default::default(),
             current_frame: Default::default(),
             timer:         Default::default(),
+            has_played:    false,
         }
     }
 }

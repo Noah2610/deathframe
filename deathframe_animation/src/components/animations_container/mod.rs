@@ -78,22 +78,14 @@ where
     /// Pop off an animation from the top of the animation stack,
     /// letting lower ones continue playing.
     /// Returns the popped-off animation key.
-    /// Returns an Error if no animation with the given key exists,
-    /// or if attempted to pop off when no animation is in the stack.
+    /// Returns an Error if attempted to pop off when no animation is in the stack.
     /// Note, that it is possible to pop off _all_ animations from the stack,
     /// which may lead to unexpected behaviour.
-    pub fn pop(&mut self, key: K) -> Result<K, String> {
-        if self.animations.contains_key(&key) {
-            self.animation_stack.pop().ok_or(String::from(
-                "Attempted to pop off animation from animation stack with no \
-                 more animations",
-            ))
-        } else {
-            Err(String::from(format!(
-                "Animation with the key {:?} doesn't exist",
-                key
-            )))
-        }
+    pub fn pop(&mut self) -> Result<K, String> {
+        self.animation_stack.pop().ok_or(String::from(
+            "Attempted to pop off animation from animation stack with no more \
+             animations",
+        ))
     }
 
     /// Returns the _key_ of the currently active animation, if any.

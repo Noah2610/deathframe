@@ -18,7 +18,7 @@ where
 {
     type SystemData = (
         Entities<'a>,
-        ReadStorage<'a, AnimationsContainer<K>>,
+        WriteStorage<'a, AnimationsContainer<K>>,
         WriteStorage<'a, Animation>,
         ReadStorage<'a, Loadable>,
         ReadStorage<'a, Loaded>,
@@ -28,7 +28,7 @@ where
         &mut self,
         (
             entities,
-            animations_containers,
+            mut animations_containers,
             mut animations,
             loadables,
             loadeds,
@@ -37,12 +37,23 @@ where
         let mut entity_animations = HashMap::new();
 
         for (entity, animations_container) in
-            (&entities, &animations_containers)
-                .join()
-                .filter(|(entity, _)| {
-                    is_entity_loaded(*entity, &loadables, &loadeds)
-                })
+            (&entities, &mut animations_containers).join().filter(
+                |(entity, _)| is_entity_loaded(*entity, &loadables, &loadeds),
+            )
         {
+            if let Some(existing_animation) = animations.get(entity) {
+                if existing_animation.has_played_and_is_finished() {
+                    if let Err(e) = animations_container.pop() {
+                        eprintln!(
+                            "[WARNING]\n    First animation in \
+                             AnimationsContainer's animations stack\n    \
+                             should be an endlessly cycling animation\n    {}",
+                            e
+                        );
+                    }
+                }
+            }
+
             if let Some(current_key) = animations_container.current() {
                 entity_animations.insert(entity, current_key.clone());
                 // An animation should be playing
@@ -88,7 +99,8 @@ where
                 .expect("Couldn't insert Animation");
         } else {
             eprintln!(
-                "WARNING: AnimationsContainer doesn't have a current animation",
+                "[WARNING]\n    AnimationsContainer doesn't have a current \
+                 animation",
             );
         }
     }
