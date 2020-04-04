@@ -52,12 +52,18 @@ mod scale_sprites;
 
 mod helpers {
     use super::system_prelude::*;
+    use amethyst::ecs::storage::{MaskedStorage, Storage};
+    use std::ops::Deref;
 
-    pub fn is_entity_loaded(
+    pub fn is_entity_loaded<DA, DB>(
         entity: Entity,
-        loadables: &ReadStorage<Loadable>,
-        loadeds: &ReadStorage<Loaded>,
-    ) -> bool {
-        loadables.contains(entity) == loadeds.contains(entity)
+        loadable_store: &Storage<Loadable, DA>,
+        loaded_store: &Storage<Loaded, DB>,
+    ) -> bool
+    where
+        DA: Deref<Target = MaskedStorage<Loadable>>,
+        DB: Deref<Target = MaskedStorage<Loaded>>,
+    {
+        loadable_store.contains(entity) == loaded_store.contains(entity)
     }
 }
