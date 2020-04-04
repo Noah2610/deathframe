@@ -37,8 +37,11 @@ where
     /// Build the `AnimationsContainer`.
     pub fn build(self) -> Result<AnimationsContainer<K>, ()> {
         Ok(AnimationsContainer {
-            animations:        self.animations,
-            current_animation: self.current_animation,
+            animations:      self.animations,
+            animation_stack: self
+                .current_animation
+                .map(|current| vec![current])
+                .unwrap_or_else(Default::default),
         })
     }
 }

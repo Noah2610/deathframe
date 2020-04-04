@@ -23,9 +23,9 @@ pub struct AnimationsContainer<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
-    animations:        HashMap<K, Animation>,
+    animations:      HashMap<K, Animation>,
     #[cfg_attr(feature = "deserialize", serde(skip))]
-    current_animation: Option<K>,
+    animation_stack: Vec<K>,
 }
 
 impl<K> AnimationsContainer<K>
@@ -39,9 +39,16 @@ where
 
     /// Play the animation with the given _key_.
     /// Returns an Error if an animation with the given key doesn't exist.
+    /// Plays the animation at the lowest part of the animation stack,
+    /// so any other animations, pushed ontop of the stack need
+    /// to finish playing, before getting to this animation.
     pub fn play(&mut self, key: K) -> Result<(), String> {
         if self.animations.contains_key(&key) {
-            self.current_animation = Some(key);
+            if let Some(base_animation_key) = self.animation_stack.get_mut(0) {
+                *base_animation_key = key;
+            } else {
+                self.animation_stack.push(key);
+            }
             Ok(())
         } else {
             Err(String::from(format!(
@@ -53,7 +60,7 @@ where
 
     /// Returns the _key_ of the currently active animation, if any.
     pub fn current(&self) -> Option<&K> {
-        self.current_animation.as_ref()
+        self.animation_stack.last()
     }
 
     /// Returns a new `Animation` associated to the given _key_, if any.
@@ -74,11 +81,11 @@ where
 {
     fn from(animations: HashMap<K, A>) -> Self {
         Self {
-            animations:        animations
+            animations:      animations
                 .into_iter()
                 .map(|(k, a)| (k, a.into()))
                 .collect(),
-            current_animation: Default::default(),
+            animation_stack: Default::default(),
         }
     }
 }
