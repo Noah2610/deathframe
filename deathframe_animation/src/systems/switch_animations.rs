@@ -34,6 +34,8 @@ where
             loadeds,
         ): Self::SystemData,
     ) {
+        let mut entity_animations = HashMap::new();
+
         for (entity, animations_container) in
             (&entities, &animations_containers)
                 .join()
@@ -42,30 +44,31 @@ where
                 })
         {
             if let Some(current_key) = animations_container.current() {
+                entity_animations.insert(entity, current_key.clone());
                 // An animation should be playing
                 if let Some(saved_playing_key) =
-                    self.entity_animations.get(&entity).map(Clone::clone)
+                    self.entity_animations.get(&entity).cloned()
                 {
                     // Switch animation
                     if current_key != &saved_playing_key {
-                        self.play_animation(
+                        self.play_current_animation(
                             entity,
-                            current_key.clone(),
                             animations_container,
                             &mut animations,
                         );
                     }
                 } else {
                     // Insert initial animation
-                    self.play_animation(
+                    self.play_current_animation(
                         entity,
-                        current_key.clone(),
                         animations_container,
                         &mut animations,
                     );
                 }
             }
         }
+
+        self.entity_animations = entity_animations;
     }
 }
 
@@ -73,10 +76,9 @@ impl<K> SwitchAnimationsSystem<K>
 where
     K: Hash + Eq + Send + Sync + Debug + Clone,
 {
-    fn play_animation(
+    fn play_current_animation(
         &mut self,
         entity: Entity,
-        key: K,
         animations_container: &AnimationsContainer<K>,
         animations: &mut WriteStorage<Animation>,
     ) {
@@ -86,12 +88,9 @@ where
                 .expect("Couldn't insert Animation");
         } else {
             eprintln!(
-                "WARNING: Animation doesn't exist in container: {:?}",
-                &key
+                "WARNING: AnimationsContainer doesn't have a current animation",
             );
         }
-
-        self.entity_animations.insert(entity, key);
     }
 }
 
