@@ -24,7 +24,7 @@ where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
     animations:        HashMap<K, Animation>,
-    #[serde(skip)]
+    #[cfg_attr(feature = "deserialize", serde(skip))]
     current_animation: Option<K>,
 }
 
