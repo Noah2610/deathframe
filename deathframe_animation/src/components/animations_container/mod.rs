@@ -58,6 +58,44 @@ where
         }
     }
 
+    /// Push an animation on top of the animation stack,
+    /// making this animation play before others.
+    /// Animations lower in the stack will continue playing once
+    /// upper ones finish or are popped off.
+    /// Returns an Error if no animation with the given key exists.
+    pub fn push(&mut self, key: K) -> Result<(), String> {
+        if self.animations.contains_key(&key) {
+            self.animation_stack.push(key);
+            Ok(())
+        } else {
+            Err(String::from(format!(
+                "Animation with the key {:?} doesn't exist",
+                key
+            )))
+        }
+    }
+
+    /// Pop off an animation from the top of the animation stack,
+    /// letting lower ones continue playing.
+    /// Returns the popped-off animation key.
+    /// Returns an Error if no animation with the given key exists,
+    /// or if attempted to pop off when no animation is in the stack.
+    /// Note, that it is possible to pop off _all_ animations from the stack,
+    /// which may lead to unexpected behaviour.
+    pub fn pop(&mut self, key: K) -> Result<K, String> {
+        if self.animations.contains_key(&key) {
+            self.animation_stack.pop().ok_or(String::from(
+                "Attempted to pop off animation from animation stack with no \
+                 more animations",
+            ))
+        } else {
+            Err(String::from(format!(
+                "Animation with the key {:?} doesn't exist",
+                key
+            )))
+        }
+    }
+
     /// Returns the _key_ of the currently active animation, if any.
     pub fn current(&self) -> Option<&K> {
         self.animation_stack.last()
