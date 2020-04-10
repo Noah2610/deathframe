@@ -12,6 +12,7 @@ members = [
     "deathframe_core",
     "deathframe_physics",
     "deathframe_animation",
+    "deathframe_audio",
 ]
 
 [dependencies.core]
@@ -28,13 +29,18 @@ package = "deathframe_animation"
 path = "./deathframe_animation"
 optional = true
 
+[dependencies.audio]
+package = "deathframe_audio"
+path = "./deathframe_audio"
+optional = true
+
 [features]
-default = ["physics", "animation"]
+default = ["physics", "animation", "audio"]
 
 vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
 empty  = ["core/empty"]
 
-deserialize = ["core/deserialize", "physics/deserialize", "animation/deserialize"]
+deserialize = ["core/deserialize", "physics/deserialize", "animation/deserialize", "audio/deserialize"]
 nightly     = ["core/nightly"]
 debug       = ["core/debug", "physics/debug", "animation/debug"]

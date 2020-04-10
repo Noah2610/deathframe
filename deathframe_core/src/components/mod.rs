@@ -12,8 +12,6 @@ pub mod prelude {
     pub use super::loader::Loader;
     pub use super::scale_once::ScaleOnce;
     pub use super::size::Size;
-
-    pub use super::component_helpers::prelude::*;
 }
 
 pub mod component_prelude {
@@ -32,6 +30,7 @@ pub mod component_prelude {
         VecStorage,
     };
 
+    pub use super::component_helpers::prelude::*;
     pub use crate::geo::prelude::*;
 }
 

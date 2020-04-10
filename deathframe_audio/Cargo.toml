@@ -1,0 +1,22 @@
+[package]
+name = "deathframe_audio"
+version = "0.0.0"
+authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
+edition = "2018"
+description = "Deathframe crate for SFX and BGM"
+license = "MIT"
+
+[dependencies.core]
+package = "deathframe_core"
+path = "../deathframe_core"
+
+[dependencies.serde]
+version = "1.0.104"
+features = ["derive"]
+optional = true
+
+[features]
+default = []
+
+debug       = []
+deserialize = ["serde"]
