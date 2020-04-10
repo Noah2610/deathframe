@@ -30,8 +30,13 @@ pub mod component_prelude {
         VecStorage,
     };
 
+    pub use super::component_helpers::prelude::*;
     pub use crate::geo::prelude::*;
 }
+
+/// Helper traits, primarily targeted for components / data structures.
+/// Doesn't have to be used on components though, can be used for whatever.
+pub mod component_helpers;
 
 mod confined;
 mod follow;
