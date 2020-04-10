@@ -3,6 +3,8 @@
 pub mod prelude {
     #[cfg(feature = "animation")]
     pub use animation::systems::prelude::*;
+    #[cfg(feature = "audio")]
+    pub use audio::systems::prelude::*;
     pub use core::systems::prelude::*;
     #[cfg(feature = "physics")]
     pub use physics::systems::prelude::*;

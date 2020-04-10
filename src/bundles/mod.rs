@@ -7,3 +7,8 @@ pub use physics_bundle::PhysicsBundle;
 mod animation_bundle;
 #[cfg(feature = "animation")]
 pub use animation_bundle::AnimationBundle;
+
+#[cfg(feature = "audio")]
+mod audio_bundle;
+#[cfg(feature = "audio")]
+pub use audio_bundle::AudioBundle;

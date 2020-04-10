@@ -10,7 +10,6 @@ use std::marker::PhantomData;
 // TODO
 const DEFAULT_VOLUME: f32 = 1.0;
 
-#[derive(Default)]
 pub struct PlaySoundsSystem<K>
 where
     K: PartialEq + Eq + Hash,
@@ -93,5 +92,16 @@ fn play_sound<K>(
             "[WARNING]\n    Sound source for key {:?} is not registered",
             sound_key
         );
+    }
+}
+
+impl<K> Default for PlaySoundsSystem<K>
+where
+    K: PartialEq + Eq + Hash,
+{
+    fn default() -> Self {
+        Self {
+            _k: Default::default(),
+        }
     }
 }
