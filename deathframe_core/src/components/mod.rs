@@ -1,6 +1,7 @@
 //! A collection of components.
 
 pub mod prelude {
+    pub use super::component_helpers::prelude::*;
     pub use amethyst::core::transform::Transform;
     pub use amethyst::core::Hidden;
     pub use amethyst::renderer::Transparent;
