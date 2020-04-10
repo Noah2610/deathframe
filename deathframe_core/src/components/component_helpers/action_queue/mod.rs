@@ -17,3 +17,6 @@ pub trait ActionQueue {
         self.mut_actions().drain(..)
     }
 }
+
+#[cfg(test)]
+mod tests;
