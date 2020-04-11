@@ -27,14 +27,30 @@ impl<K> Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
-    /// Set the playback order for the songs.
     pub fn set_playback_order(&mut self, order: Vec<K>) {
         self.playback_order = order;
     }
 
-    /// Builder function for setting the playback order.
     pub fn with_playback_order(mut self, order: Vec<K>) -> Self {
         self.set_playback_order(order);
+        self
+    }
+
+    pub fn set_playback_state(&mut self, state: PlaybackState) {
+        self.playback_state = state;
+    }
+
+    pub fn with_playback_state(mut self, state: PlaybackState) -> Self {
+        self.set_playback_state(state);
+        self
+    }
+
+    pub fn set_playback_behavior(&mut self, state: PlaybackBehavior) {
+        self.playback_behavior = state;
+    }
+
+    pub fn with_playback_behavior(mut self, state: PlaybackBehavior) -> Self {
+        self.set_playback_behavior(state);
         self
     }
 

@@ -1,5 +1,6 @@
-use amethyst::audio::{AudioBundle as AmethystAudioBundle, DjSystem};
+use amethyst::audio::{AudioBundle as AmethystAudioBundle, DjSystemDesc};
 use amethyst::core::bundle::SystemBundle;
+use amethyst::core::SystemDesc;
 use amethyst::ecs::{DispatcherBuilder, World};
 use audio::resources::prelude::Songs;
 use audio::systems::prelude::*;
@@ -65,9 +66,8 @@ where
         AmethystAudioBundle::default().build(world, builder)?;
 
         builder.add(
-            DjSystem::new(|songs: &mut Option<Songs<KB>>| {
-                songs.as_mut().and_then(|songs| songs.next_song())
-            }),
+            DjSystemDesc::new(|songs: &mut Songs<KB>| songs.next_song())
+                .build(world),
             "dj_system",
             self.deps,
         );
