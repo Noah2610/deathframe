@@ -7,14 +7,27 @@ use std::fmt::Debug;
 use std::hash::Hash;
 use std::marker::PhantomData;
 
-// TODO
-const DEFAULT_VOLUME: f32 = 1.0;
-
+/// Plays queued sounds from `SoundPlayer` components.
+/// `SoundAction::Play` sounds are played with the _default volume_,
+/// which can be set with the `with_default_volume` builder function.
+/// See the `Default` implementation for the default.
 pub struct PlaySoundsSystem<K>
 where
     K: PartialEq + Eq + Hash,
 {
-    _k: PhantomData<K>,
+    default_volume: f32,
+    _k:             PhantomData<K>,
+}
+
+impl<K> PlaySoundsSystem<K>
+where
+    K: PartialEq + Eq + Hash,
+{
+    /// Sets the _default volume_ for sounds played with `SoundAction::Play`.
+    pub fn with_default_volume(mut self, default_volume: f32) -> Self {
+        self.default_volume = default_volume;
+        self
+    }
 }
 
 impl<'a, K> System<'a> for PlaySoundsSystem<K>
@@ -39,7 +52,7 @@ where
             audio_output,
         ): Self::SystemData,
     ) {
-        for (entity, sound_player) in
+        for (_entity, sound_player) in
             (&entities, &mut sound_player_store).join()
         {
             for action in sound_player.drain_actions() {
@@ -50,7 +63,7 @@ where
                             &asset_storage,
                             &audio_output,
                             &sound_key,
-                            DEFAULT_VOLUME,
+                            self.default_volume,
                         );
                     }
                     SoundAction::PlayWithVolume(sound_key, volume) => {
@@ -101,7 +114,8 @@ where
 {
     fn default() -> Self {
         Self {
-            _k: Default::default(),
+            default_volume: 1.0,
+            _k:             Default::default(),
         }
     }
 }
