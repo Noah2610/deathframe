@@ -28,7 +28,7 @@ where
     /// Returns an Error, if no matching audio format was found
     /// for the file extension.
     /// Valid extensions: ".wav", ".mp3", ".ogg", ".flac"
-    fn load_sound<P>(
+    fn load_audio<P>(
         &mut self,
         key: K,
         path: P,

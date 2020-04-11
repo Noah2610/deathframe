@@ -14,6 +14,9 @@ use std::marker::PhantomData;
 ///   which will use `resources::prelude::Songs` BGM manager,
 ///   if it has been inserted into the world.
 /// - `PlaySoundsSystem` (named `"play_sounds_system"`)
+///
+/// Both generics are used for both the `Sounds` and the `Songs` audio keys.
+/// `KA` for `Sounds`, `KB` for `Songs`.
 pub struct AudioBundle<'a, KA, KB>
 where
     KA: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
