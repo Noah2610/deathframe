@@ -7,14 +7,16 @@ use std::fmt::Debug;
 use std::hash::Hash;
 use std::marker::PhantomData;
 
-/// The `AudioBundle` registers the following systems:
+/// The `AudioBundle` registers amehtyst's `amethyst_audio::AudioBundle`
+/// and the following systems:
 /// - `PlaySoundsSystem` (named `"play_sounds_system"`)
 pub struct AudioBundle<'a, AK>
 where
     AK: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
 {
-    deps: &'a [&'a str],
-    _ak:  PhantomData<AK>,
+    sounds_default_volume: Option<f32>,
+    deps:                  &'a [&'a str],
+    _ak:                   PhantomData<AK>,
 }
 
 impl<'a, AK> AudioBundle<'a, AK>
@@ -31,6 +33,13 @@ where
         self.deps = deps;
         self
     }
+
+    /// Set the _default volume_ for the `PlaySoundsSystem`.
+    /// Check the system's documentation for more info.
+    pub fn with_sounds_default_volume(mut self, default_volume: f32) -> Self {
+        self.sounds_default_volume = Some(default_volume);
+        self
+    }
 }
 
 impl<'a, 'b, 'c, AK> SystemBundle<'a, 'b> for AudioBundle<'c, AK>
@@ -43,11 +52,13 @@ where
         builder: &mut DispatcherBuilder<'a, 'b>,
     ) -> Result<(), amethyst::Error> {
         AmethystAudioBundle::default().build(world, builder)?;
-        builder.add(
-            PlaySoundsSystem::<AK>::default(),
-            "play_sounds_system",
-            self.deps,
-        );
+
+        let mut play_sounds_system = PlaySoundsSystem::<AK>::default();
+        if let Some(sounds_default_volume) = self.sounds_default_volume {
+            play_sounds_system =
+                play_sounds_system.with_default_volume(sounds_default_volume);
+        }
+        builder.add(play_sounds_system, "play_sounds_system", self.deps);
         Ok(())
     }
 }
@@ -58,8 +69,9 @@ where
 {
     fn default() -> Self {
         Self {
-            deps: Default::default(),
-            _ak:  Default::default(),
+            sounds_default_volume: None,
+            deps:                  Default::default(),
+            _ak:                   Default::default(),
         }
     }
 }
