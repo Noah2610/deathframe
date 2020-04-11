@@ -1,26 +1,31 @@
 use super::audio_manager::AudioManager;
+use super::playback_behavior::PlaybackBehavior;
+use super::playback_state::PlaybackState;
 use amethyst::audio::SourceHandle;
 use core::amethyst;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::iter::Cycle;
+use std::vec::IntoIter;
 
 /// BGM song manager.
-pub struct Songs<'a, K>
+/// Set the _playback order_ with one of the functions below,
+/// otherwise no songs will play, even if you loaded them.
+pub struct Songs<K>
 where
-    K: PartialEq + Eq + Hash,
+    K: PartialEq + Eq + Hash + Clone,
 {
-    songs:          HashMap<K, SourceHandle>,
+    songs:             HashMap<K, SourceHandle>,
     /// The order in which to play songs.
-    playback_order: Vec<K>,
-
-    /// Pops-off and plays songs from the _end_ of the `Vec`,
-    /// adds new songs to the queue by inserting them to the _start_ of the `Vec`.
-    queue: Vec<&'a K>,
+    playback_order:    Vec<K>,
+    playback_state:    PlaybackState,
+    playback_behavior: PlaybackBehavior,
+    autoplay_queue:    Option<Cycle<IntoIter<K>>>,
 }
 
-impl<'a, K> Songs<'a, K>
+impl<K> Songs<K>
 where
-    K: PartialEq + Eq + Hash,
+    K: PartialEq + Eq + Hash + Clone,
 {
     /// Set the playback order for the songs.
     pub fn set_playback_order(&mut self, order: Vec<K>) {
@@ -34,16 +39,40 @@ where
     }
 
     /// Returns the next song to play, for `amethyst_audio::DjSystem`.
+    /// What is returned depends on the `PlaybackState` and `PlaybackBehavior`.
     pub fn next_song(&mut self) -> Option<SourceHandle> {
-        self.queue
-            .pop()
-            .and_then(|key| self.get_source_handle(key).cloned())
+        match &self.playback_state {
+            PlaybackState::Stopped => None,
+            PlaybackState::Playing => self.next_song_for_behavior(),
+            PlaybackState::Paused => None,
+            PlaybackState::Finished => None,
+        }
+    }
+
+    /// Returns the next song to play, depending on the `PlaybackBehavior`.
+    /// Disregards the current `PlaybackState`.
+    fn next_song_for_behavior(&mut self) -> Option<SourceHandle> {
+        match &self.playback_behavior {
+            PlaybackBehavior::Autoplay => {
+                if self.autoplay_queue.is_none() {
+                    self.autoplay_queue =
+                        Some(self.playback_order.clone().into_iter().cycle());
+                }
+                if let Some(key) =
+                    self.autoplay_queue.as_mut().and_then(Iterator::next)
+                {
+                    self.get_source_handle(&key).cloned()
+                } else {
+                    None
+                }
+            }
+        }
     }
 }
 
-impl<'a, K> AudioManager<K> for Songs<'a, K>
+impl<K> AudioManager<K> for Songs<K>
 where
-    K: PartialEq + Eq + Hash,
+    K: PartialEq + Eq + Hash + Clone,
 {
     fn get_source_handle(&self, key: &K) -> Option<&SourceHandle> {
         self.songs.get(key)
@@ -54,15 +83,17 @@ where
     }
 }
 
-impl<'a, K> Default for Songs<'a, K>
+impl<K> Default for Songs<K>
 where
-    K: PartialEq + Eq + Hash,
+    K: PartialEq + Eq + Hash + Clone,
 {
     fn default() -> Self {
         Self {
-            songs:          HashMap::new(),
-            playback_order: Vec::new(),
-            queue:          Vec::new(),
+            songs:             HashMap::new(),
+            playback_order:    Vec::new(),
+            playback_state:    PlaybackState::default(),
+            playback_behavior: PlaybackBehavior::default(),
+            autoplay_queue:    None,
         }
     }
 }

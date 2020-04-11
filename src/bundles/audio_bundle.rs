@@ -1,10 +1,5 @@
-use amethyst::audio::{
-    AudioBundle as AmethystAudioBundle,
-    DjSystem,
-    DjSystemDesc,
-};
+use amethyst::audio::{AudioBundle as AmethystAudioBundle, DjSystem};
 use amethyst::core::bundle::SystemBundle;
-use amethyst::ecs::WriteStorage;
 use amethyst::ecs::{DispatcherBuilder, World};
 use audio::resources::prelude::Songs;
 use audio::systems::prelude::*;
@@ -21,8 +16,8 @@ use std::marker::PhantomData;
 /// - `PlaySoundsSystem` (named `"play_sounds_system"`)
 pub struct AudioBundle<'a, KA, KB>
 where
-    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
-    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
 {
     sounds_default_volume: Option<f32>,
     deps:                  &'a [&'a str],
@@ -32,8 +27,8 @@ where
 
 impl<'a, KA, KB> AudioBundle<'a, KA, KB>
 where
-    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
-    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
 {
     /// Create new `AudioBundle` with no dependencies.
     pub fn new() -> Self {
@@ -56,8 +51,8 @@ where
 
 impl<'a, 'b, 'c, KA, KB> SystemBundle<'a, 'b> for AudioBundle<'c, KA, KB>
 where
-    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
-    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
 {
     fn build(
         self,
@@ -86,8 +81,8 @@ where
 
 impl<'a, KA, KB> Default for AudioBundle<'a, KA, KB>
 where
-    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
-    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Clone + Send + Sync + Debug,
 {
     fn default() -> Self {
         Self {
