@@ -5,24 +5,29 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 /// BGM song manager.
-pub struct Songs<K>
+pub struct Songs<'a, K>
 where
     K: PartialEq + Eq + Hash,
 {
     songs: HashMap<K, SourceHandle>,
+    /// Pops-off and plays songs from the _end_ of the `Vec`,
+    /// adds new songs to the queue by inserting them to the _start_ of the `Vec`.
+    queue: Vec<&'a K>,
 }
 
-impl<K> Songs<K>
+impl<'a, K> Songs<'a, K>
 where
     K: PartialEq + Eq + Hash,
 {
     /// Returns the next song to play, for `amethyst_audio::DjSystem`.
     pub fn next_song(&mut self) -> Option<SourceHandle> {
-        unimplemented!()
+        self.queue
+            .pop()
+            .and_then(|key| self.get_source_handle(key).cloned())
     }
 }
 
-impl<K> AudioManager<K> for Songs<K>
+impl<'a, K> AudioManager<K> for Songs<'a, K>
 where
     K: PartialEq + Eq + Hash,
 {
@@ -35,13 +40,14 @@ where
     }
 }
 
-impl<K> Default for Songs<K>
+impl<'a, K> Default for Songs<'a, K>
 where
     K: PartialEq + Eq + Hash,
 {
     fn default() -> Self {
         Self {
             songs: HashMap::new(),
+            queue: Vec::new(),
         }
     }
 }
