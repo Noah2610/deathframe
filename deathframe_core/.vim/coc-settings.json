@@ -1,3 +1,0 @@
-{
-  "rust.features": ["debug", "deserialize", "vulkan", "nightly"]
-}

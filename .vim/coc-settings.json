@@ -1,3 +1,11 @@
 {
-  "rust.features": ["vulkan", "nightly", "debug", "deserialize", "physics", "animation"]
+  "rust.features": [
+      "vulkan",
+      "nightly",
+      "debug",
+      "deserialize",
+      "physics",
+      "animation",
+      "audio"
+  ]
 }
