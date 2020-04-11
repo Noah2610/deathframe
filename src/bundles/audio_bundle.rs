@@ -1,27 +1,39 @@
-use amethyst::audio::AudioBundle as AmethystAudioBundle;
+use amethyst::audio::{
+    AudioBundle as AmethystAudioBundle,
+    DjSystem,
+    DjSystemDesc,
+};
 use amethyst::core::bundle::SystemBundle;
+use amethyst::ecs::WriteStorage;
 use amethyst::ecs::{DispatcherBuilder, World};
+use audio::resources::prelude::Songs;
 use audio::systems::prelude::*;
 use core::amethyst;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::marker::PhantomData;
 
-/// The `AudioBundle` registers amehtyst's `amethyst_audio::AudioBundle`
+/// The `AudioBundle` registers amethyst's `amethyst_audio::AudioBundle`
 /// and the following systems:
+/// - `amethyst_audio::DjSystem` (named `"dj_system"`)
+///   which will use `resources::prelude::Songs` BGM manager,
+///   if it has been inserted into the world.
 /// - `PlaySoundsSystem` (named `"play_sounds_system"`)
-pub struct AudioBundle<'a, AK>
+pub struct AudioBundle<'a, KA, KB>
 where
-    AK: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
 {
     sounds_default_volume: Option<f32>,
     deps:                  &'a [&'a str],
-    _ak:                   PhantomData<AK>,
+    _ka:                   PhantomData<KA>,
+    _kb:                   PhantomData<KB>,
 }
 
-impl<'a, AK> AudioBundle<'a, AK>
+impl<'a, KA, KB> AudioBundle<'a, KA, KB>
 where
-    AK: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
 {
     /// Create new `AudioBundle` with no dependencies.
     pub fn new() -> Self {
@@ -42,9 +54,10 @@ where
     }
 }
 
-impl<'a, 'b, 'c, AK> SystemBundle<'a, 'b> for AudioBundle<'c, AK>
+impl<'a, 'b, 'c, KA, KB> SystemBundle<'a, 'b> for AudioBundle<'c, KA, KB>
 where
-    AK: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
 {
     fn build(
         self,
@@ -53,7 +66,15 @@ where
     ) -> Result<(), amethyst::Error> {
         AmethystAudioBundle::default().build(world, builder)?;
 
-        let mut play_sounds_system = PlaySoundsSystem::<AK>::default();
+        builder.add(
+            DjSystem::new(|songs: &mut Option<Songs<KB>>| {
+                songs.as_mut().and_then(|songs| songs.next_song())
+            }),
+            "dj_system",
+            self.deps,
+        );
+
+        let mut play_sounds_system = PlaySoundsSystem::<KA>::default();
         if let Some(sounds_default_volume) = self.sounds_default_volume {
             play_sounds_system =
                 play_sounds_system.with_default_volume(sounds_default_volume);
@@ -63,15 +84,17 @@ where
     }
 }
 
-impl<'a, AK> Default for AudioBundle<'a, AK>
+impl<'a, KA, KB> Default for AudioBundle<'a, KA, KB>
 where
-    AK: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KA: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
+    KB: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
 {
     fn default() -> Self {
         Self {
             sounds_default_volume: None,
             deps:                  Default::default(),
-            _ak:                   Default::default(),
+            _ka:                   Default::default(),
+            _kb:                   Default::default(),
         }
     }
 }

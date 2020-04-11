@@ -12,6 +12,16 @@ where
     songs: HashMap<K, SourceHandle>,
 }
 
+impl<K> Songs<K>
+where
+    K: PartialEq + Eq + Hash,
+{
+    /// Returns the next song to play, for `amethyst_audio::DjSystem`.
+    pub fn next_song(&mut self) -> Option<SourceHandle> {
+        unimplemented!()
+    }
+}
+
 impl<K> AudioManager<K> for Songs<K>
 where
     K: PartialEq + Eq + Hash,
