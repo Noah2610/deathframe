@@ -1,3 +1,4 @@
+use amethyst::audio::AudioBundle as AmethystAudioBundle;
 use amethyst::core::bundle::SystemBundle;
 use amethyst::ecs::{DispatcherBuilder, World};
 use audio::systems::prelude::*;
@@ -38,9 +39,10 @@ where
 {
     fn build(
         self,
-        _world: &mut World,
+        world: &mut World,
         builder: &mut DispatcherBuilder<'a, 'b>,
     ) -> Result<(), amethyst::Error> {
+        AmethystAudioBundle::default().build(world, builder)?;
         builder.add(
             PlaySoundsSystem::<AK>::default(),
             "play_sounds_system",
