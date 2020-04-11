@@ -16,12 +16,12 @@ impl<K> AudioManager<K> for Sounds<K>
 where
     K: PartialEq + Eq + Hash,
 {
-    fn get_source_handles(&self) -> &HashMap<K, SourceHandle> {
-        &self.sounds
+    fn get_source_handle(&self, key: &K) -> Option<&SourceHandle> {
+        self.sounds.get(key)
     }
 
-    fn mut_source_handles(&mut self) -> &mut HashMap<K, SourceHandle> {
-        &mut self.sounds
+    fn insert_source_handle(&mut self, key: K, source_handle: SourceHandle) {
+        self.sounds.insert(key, source_handle);
     }
 }
 

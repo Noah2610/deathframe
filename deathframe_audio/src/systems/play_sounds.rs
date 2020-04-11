@@ -90,7 +90,7 @@ fn play_sound<K>(
 ) where
     K: PartialEq + Eq + Hash + Debug,
 {
-    if let Some(sound_source) = sounds.get_handle(sound_key) {
+    if let Some(sound_source) = sounds.get_source_handle(sound_key) {
         if let Some(sound) = asset_storage.get(sound_source) {
             audio_output.play_once(sound, volume);
         } else {

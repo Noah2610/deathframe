@@ -1,17 +1,8 @@
-use amethyst::assets::{AssetStorage, Loader};
-use amethyst::audio::{
-    FlacFormat,
-    Mp3Format,
-    OggFormat,
-    Source,
-    SourceHandle,
-    WavFormat,
-};
+use super::audio_manager::AudioManager;
+use amethyst::audio::SourceHandle;
 use core::amethyst;
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use std::hash::Hash;
-use std::path::Path;
 
 /// BGM song manager.
 pub struct Songs<K>
@@ -21,12 +12,26 @@ where
     songs: HashMap<K, SourceHandle>,
 }
 
-impl<K> Songs<K>
+impl<K> AudioManager<K> for Songs<K>
 where
     K: PartialEq + Eq + Hash,
 {
-    /// Get the `SourceHandle` for the given key `K`.
-    pub(crate) fn get_handle(&self, key: &K) -> Option<&SourceHandle> {
+    fn get_source_handle(&self, key: &K) -> Option<&SourceHandle> {
         self.songs.get(key)
+    }
+
+    fn insert_source_handle(&mut self, key: K, source_handle: SourceHandle) {
+        self.songs.insert(key, source_handle);
+    }
+}
+
+impl<K> Default for Songs<K>
+where
+    K: PartialEq + Eq + Hash,
+{
+    fn default() -> Self {
+        Self {
+            songs: HashMap::new(),
+        }
     }
 }

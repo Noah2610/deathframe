@@ -8,7 +8,6 @@ use amethyst::audio::{
     WavFormat,
 };
 use core::amethyst;
-use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::hash::Hash;
 use std::path::Path;
@@ -18,13 +17,11 @@ pub trait AudioManager<K>
 where
     K: PartialEq + Eq + Hash,
 {
-    /// Has to return a reference to the `HashMap`,
-    /// containing loaded `SourceHandle`s.
-    fn get_source_handles(&self) -> &HashMap<K, SourceHandle>;
+    /// Returns a reference to the `SourceHandle` for the given key.
+    fn get_source_handle(&self, key: &K) -> Option<&SourceHandle>;
 
-    /// Has to return a mutable reference to the `HashMap`,
-    /// containing loaded `SourceHandle`s.
-    fn mut_source_handles(&mut self) -> &mut HashMap<K, SourceHandle>;
+    /// Should insert the given `SourceHandle` with the given key.
+    fn insert_source_handle(&mut self, key: K, source_handle: SourceHandle);
 
     /// Load sound file from for key `K` from the given path.
     /// The file format is derived from the filename's extension.
@@ -54,7 +51,7 @@ where
         )?;
         let filepath =
             path.to_str().ok_or("Couldn't convert path to string")?;
-        self.mut_source_handles().insert(key, match audio_format {
+        self.insert_source_handle(key, match audio_format {
             AudioFormat::Flac(format) => {
                 loader.load(filepath, format, (), asset_storage)
             }
@@ -69,14 +66,6 @@ where
             }
         });
         Ok(())
-    }
-
-    /// Get the `SourceHandle` for the given key `K`.
-    fn get_handle<'a, 'b>(&'a self, key: &'b K) -> Option<&'a SourceHandle>
-    where
-        'b: 'a,
-    {
-        self.get_source_handles().get(key)
     }
 }
 
