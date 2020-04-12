@@ -11,16 +11,20 @@ use std::vec::IntoIter;
 /// BGM song manager.
 /// Set the _playback order_ with one of the functions below,
 /// otherwise no songs will play, even if you loaded them.
+#[derive(Builder)]
+#[builder(pattern = "owned", default)]
 pub struct Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
+    #[builder(setter(skip))]
     songs:             HashMap<K, SourceHandle>,
     volume:            f32,
     /// The order in which to play songs.
     playback_order:    Vec<K>,
     playback_state:    PlaybackState,
     playback_behavior: PlaybackBehavior,
+    #[builder(setter(skip))]
     autoplay_queue:    Option<Cycle<IntoIter<K>>>,
 }
 
@@ -28,6 +32,17 @@ impl<K> Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
+    pub fn builder() -> SongsBuilder<K> {
+        SongsBuilder {
+            songs:             Default::default(),
+            volume:            Default::default(),
+            playback_order:    Default::default(),
+            playback_state:    Default::default(),
+            playback_behavior: Default::default(),
+            autoplay_queue:    Default::default(),
+        }
+    }
+
     pub fn get_volume(&self) -> f32 {
         self.volume
     }
@@ -36,36 +51,16 @@ where
         self.volume = volume;
     }
 
-    pub fn with_volume(mut self, volume: f32) -> Self {
-        self.set_volume(volume);
-        self
-    }
-
     pub fn set_playback_order(&mut self, order: Vec<K>) {
         self.playback_order = order;
-    }
-
-    pub fn with_playback_order(mut self, order: Vec<K>) -> Self {
-        self.set_playback_order(order);
-        self
     }
 
     pub fn set_playback_state(&mut self, state: PlaybackState) {
         self.playback_state = state;
     }
 
-    pub fn with_playback_state(mut self, state: PlaybackState) -> Self {
-        self.set_playback_state(state);
-        self
-    }
-
     pub fn set_playback_behavior(&mut self, state: PlaybackBehavior) {
         self.playback_behavior = state;
-    }
-
-    pub fn with_playback_behavior(mut self, state: PlaybackBehavior) -> Self {
-        self.set_playback_behavior(state);
-        self
     }
 
     /// Returns the next song to play, for `amethyst_audio::DjSystem`.
