@@ -16,6 +16,7 @@ where
     K: PartialEq + Eq + Hash + Clone,
 {
     songs:             HashMap<K, SourceHandle>,
+    volume:            f32,
     /// The order in which to play songs.
     playback_order:    Vec<K>,
     playback_state:    PlaybackState,
@@ -27,6 +28,19 @@ impl<K> Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
+    pub fn get_volume(&self) -> f32 {
+        self.volume
+    }
+
+    pub fn set_volume(&mut self, volume: f32) {
+        self.volume = volume;
+    }
+
+    pub fn with_volume(mut self, volume: f32) -> Self {
+        self.set_volume(volume);
+        self
+    }
+
     pub fn set_playback_order(&mut self, order: Vec<K>) {
         self.playback_order = order;
     }
@@ -106,6 +120,7 @@ where
     fn default() -> Self {
         Self {
             songs:             HashMap::new(),
+            volume:            1.0,
             playback_order:    Vec::new(),
             playback_state:    PlaybackState::default(),
             playback_behavior: PlaybackBehavior::default(),

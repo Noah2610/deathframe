@@ -15,6 +15,7 @@ use std::marker::PhantomData;
 ///   which will use `resources::prelude::Songs` BGM manager,
 ///   if it has been inserted into the world.
 /// - `PlaySoundsSystem` (named `"play_sounds_system"`)
+/// - `UpdateSongVolumeSystem` (named `"update_song_volume_system"`)
 ///
 /// Both generics are used for both the `Sounds` and the `Songs` audio keys.
 /// `KA` for `Sounds`, `KB` for `Songs`.
@@ -78,6 +79,13 @@ where
                 play_sounds_system.with_default_volume(sounds_default_volume);
         }
         builder.add(play_sounds_system, "play_sounds_system", self.deps);
+
+        builder.add(
+            UpdateSongVolumeSystem::<KB>::default(),
+            "update_song_volume_system",
+            self.deps,
+        );
+
         Ok(())
     }
 }
