@@ -19,7 +19,7 @@
 //!     ui_data: UiData,
 //! }
 //!
-//! impl<MyGameData, MyStateEvent> Menu<MyGameData, MyStateEvent> for ExampleState {
+//! impl Menu<MyGameData, MyStateEvent> for ExampleState {
 //!     fn event_triggered(
 //!         &mut self,
 //!         data: &mut StateData<MyGameData>,
