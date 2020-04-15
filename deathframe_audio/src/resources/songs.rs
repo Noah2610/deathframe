@@ -34,6 +34,17 @@ where
             Some(PlaybackState::Playing(PlaybackBehavior::Repeat(key)));
     }
 
+    /// Plays the given ordered songs,
+    /// looping back to the first song when the final song finishes.
+    pub fn autoplay<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = K, IntoIter = std::vec::IntoIter<K>>,
+    {
+        self.playback_state = Some(PlaybackState::Playing(
+            PlaybackBehavior::Autoplay(iter.into_iter().cycle()),
+        ));
+    }
+
     /// Pauses the playing song. Can only pause, if the `PlaybackState` is `Playing`.
     /// Returns an error if the state is not `Playing`.
     pub fn pause(&mut self) -> Result<(), String> {
