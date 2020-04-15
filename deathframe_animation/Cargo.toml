@@ -15,12 +15,6 @@ version = "0.6.0"
 default-features = false
 features = ["serialize"]
 
-[dependencies.specs]
-version = "0.15.1"
-
-[dependencies.specs-derive]
-version = "0.4.0"
-
 [dependencies.derive_builder]
 version = "0.9.0"
 
