@@ -7,18 +7,12 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 /// BGM song manager.
-/// Set the _playback order_ with one of the functions below,
-/// otherwise no songs will play, even if you loaded them.
-#[derive(Builder)]
-#[builder(pattern = "owned", default)]
 pub struct Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
-    #[builder(setter(skip))]
     songs:          HashMap<K, SourceHandle>,
     volume:         f32,
-    #[builder(setter(skip))]
     playback_state: Option<PlaybackState<K>>,
 }
 
@@ -26,14 +20,6 @@ impl<K> Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
-    pub fn builder() -> SongsBuilder<K> {
-        SongsBuilder {
-            songs:          Default::default(),
-            volume:         Default::default(),
-            playback_state: Default::default(),
-        }
-    }
-
     pub fn get_volume(&self) -> f32 {
         self.volume
     }
