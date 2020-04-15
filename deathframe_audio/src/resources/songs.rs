@@ -5,8 +5,6 @@ use amethyst::audio::SourceHandle;
 use core::amethyst;
 use std::collections::HashMap;
 use std::hash::Hash;
-use std::iter::Cycle;
-use std::vec::IntoIter;
 
 /// BGM song manager.
 /// Set the _playback order_ with one of the functions below,
@@ -18,14 +16,10 @@ where
     K: PartialEq + Eq + Hash + Clone,
 {
     #[builder(setter(skip))]
-    songs:             HashMap<K, SourceHandle>,
-    volume:            f32,
-    /// The order in which to play songs.
-    playback_order:    Vec<K>,
-    playback_state:    PlaybackState,
-    playback_behavior: PlaybackBehavior,
+    songs:          HashMap<K, SourceHandle>,
+    volume:         f32,
     #[builder(setter(skip))]
-    autoplay_queue:    Option<Cycle<IntoIter<K>>>,
+    playback_state: Option<PlaybackState<K>>,
 }
 
 impl<K> Songs<K>
@@ -34,12 +28,9 @@ where
 {
     pub fn builder() -> SongsBuilder<K> {
         SongsBuilder {
-            songs:             Default::default(),
-            volume:            Default::default(),
-            playback_order:    Default::default(),
-            playback_state:    Default::default(),
-            playback_behavior: Default::default(),
-            autoplay_queue:    Default::default(),
+            songs:          Default::default(),
+            volume:         Default::default(),
+            playback_state: Default::default(),
         }
     }
 
@@ -51,47 +42,77 @@ where
         self.volume = volume;
     }
 
-    pub fn set_playback_order(&mut self, order: Vec<K>) {
-        self.playback_order = order;
+    /// Plays the given song key on repeat.
+    pub fn play(&mut self, key: K) {
+        self.playback_state =
+            Some(PlaybackState::Playing(PlaybackBehavior::Repeat(key)));
     }
 
-    pub fn set_playback_state(&mut self, state: PlaybackState) {
-        self.playback_state = state;
+    /// Pauses the playing song. Can only pause, if the `PlaybackState` is `Playing`.
+    /// Returns an error if the state is not `Playing`.
+    pub fn pause(&mut self) -> Result<(), String> {
+        if let Some(PlaybackState::Playing(behavior)) =
+            self.playback_state.take()
+        {
+            self.playback_state = Some(PlaybackState::Paused(behavior));
+            Ok(())
+        } else {
+            Err(
+                "Cannot pause `Songs` when it is not `PlaybackState::Playing`"
+                    .into(),
+            )
+        }
     }
 
-    pub fn set_playback_behavior(&mut self, state: PlaybackBehavior) {
-        self.playback_behavior = state;
+    /// Resumes playing from the `Paused` `PlaybackState`.
+    /// Returns an error if the state is not `Paused`.
+    pub fn resume(&mut self) -> Result<(), String> {
+        if let Some(PlaybackState::Paused(behavior)) =
+            self.playback_state.take()
+        {
+            self.playback_state = Some(PlaybackState::Playing(behavior));
+            Ok(())
+        } else {
+            Err("Cannot play `Songs` when it is not `PlaybackState::Paused`"
+                .into())
+        }
+    }
+
+    /// Stops playing. Clears the `PlaybackBehavior`, so we'll need to
+    /// start playing again with the `play` function.
+    pub fn stop(&mut self) {
+        self.playback_state = Some(PlaybackState::Stopped);
     }
 
     /// Returns the next song to play, for `amethyst_audio::DjSystem`.
     /// What is returned depends on the `PlaybackState` and `PlaybackBehavior`.
     pub fn next_song(&mut self) -> Option<SourceHandle> {
-        match &self.playback_state {
-            PlaybackState::Stopped => None,
-            PlaybackState::Playing => self.next_song_for_behavior(),
-            PlaybackState::Paused => None,
-            PlaybackState::Finished => None,
+        if let Some(playback_state) = self.playback_state.as_mut() {
+            (match playback_state {
+                PlaybackState::Stopped => None,
+                PlaybackState::Playing(behavior) => {
+                    next_song_for_behavior(behavior)
+                }
+                PlaybackState::Paused(_behavior) => None,
+                PlaybackState::Finished => None,
+            })
+            .and_then(|key| self.get_source_handle(&key).cloned())
+        } else {
+            None
         }
     }
+}
 
-    /// Returns the next song to play, depending on the `PlaybackBehavior`.
-    /// Disregards the current `PlaybackState`.
-    fn next_song_for_behavior(&mut self) -> Option<SourceHandle> {
-        match &self.playback_behavior {
-            PlaybackBehavior::Autoplay => {
-                if self.autoplay_queue.is_none() {
-                    self.autoplay_queue =
-                        Some(self.playback_order.clone().into_iter().cycle());
-                }
-                if let Some(key) =
-                    self.autoplay_queue.as_mut().and_then(Iterator::next)
-                {
-                    self.get_source_handle(&key).cloned()
-                } else {
-                    None
-                }
-            }
-        }
+/// Returns the next song to play, depending on the `PlaybackBehavior`.
+fn next_song_for_behavior<K>(
+    playback_behavior: &mut PlaybackBehavior<K>,
+) -> Option<K>
+where
+    K: PartialEq + Eq + Hash + Clone,
+{
+    match playback_behavior {
+        PlaybackBehavior::Autoplay(iter) => iter.next(),
+        PlaybackBehavior::Repeat(key) => Some(key.clone()),
     }
 }
 
@@ -114,12 +135,9 @@ where
 {
     fn default() -> Self {
         Self {
-            songs:             HashMap::new(),
-            volume:            1.0,
-            playback_order:    Vec::new(),
-            playback_state:    PlaybackState::default(),
-            playback_behavior: PlaybackBehavior::default(),
-            autoplay_queue:    None,
+            songs:          HashMap::new(),
+            volume:         1.0,
+            playback_state: Some(PlaybackState::default()),
         }
     }
 }
