@@ -1,7 +1,6 @@
 use std::hash::Hash;
 
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub enum SoundAction<K>
 where
     K: PartialEq + Eq + Hash,

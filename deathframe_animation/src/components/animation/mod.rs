@@ -7,19 +7,14 @@ use climer::{Time, Timer};
 /// Animates an entity with `SpriteRender` frame-by-frame.
 /// Iterates through different sprites __in the same spritesheet__.
 /// Each sprite has a _duration_, in milliseconds, for how long it will be rendered.
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Deserialize)]
 #[storage(DenseVecStorage)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(feature = "deserialize", serde(from = "Vec<(usize, u64)>"))]
+#[serde(from = "Vec<(usize, u64)>")]
 pub struct Animation {
     frames:        Vec<AnimationFrame>,
-    #[cfg_attr(feature = "deserialize", serde(skip))]
     frames_iter:   Option<AnimationFramesIter>,
-    #[cfg_attr(feature = "deserialize", serde(skip))]
     current_frame: Option<AnimationFrame>,
-    #[cfg_attr(feature = "deserialize", serde(skip))]
     timer:         Timer,
-    #[cfg_attr(feature = "deserialize", serde(skip))]
     has_played:    bool,
 }
 

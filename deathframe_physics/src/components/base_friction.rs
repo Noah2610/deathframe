@@ -2,15 +2,14 @@ use super::component_prelude::*;
 
 /// Friction that is applied constantly.
 /// You can disable it with the `set_enabled` function.
-#[derive(Component, Builder, Clone, Debug)]
+#[derive(Component, Builder, Clone, Debug, Deserialize)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct BaseFriction {
     pub(crate) friction_x: Option<f32>,
     pub(crate) friction_y: Option<f32>,
     #[builder(setter(skip))]
-    #[cfg_attr(feature = "deserialize", serde(default = "default_enabled"))]
+    #[serde(default = "default_enabled")]
     pub(crate) enabled:    (bool, bool),
 }
 

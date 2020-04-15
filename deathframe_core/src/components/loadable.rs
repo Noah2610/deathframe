@@ -2,9 +2,8 @@ use super::component_prelude::*;
 
 /// Entities which have `Loadable` may be loaded or unloaded
 /// (get or remove the `Loaded` component) later on.
-#[derive(Default, Component)]
+#[derive(Default, Component, Deserialize)]
 #[storage(VecStorage)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Loadable {
     pub(crate) padding: (Option<f32>, Option<f32>),
 }

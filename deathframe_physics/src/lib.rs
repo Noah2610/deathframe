@@ -1,7 +1,6 @@
 extern crate core;
 #[macro_use]
 extern crate derive_builder;
-#[cfg(feature = "deserialize")]
 #[macro_use]
 extern crate serde;
 extern crate specs;

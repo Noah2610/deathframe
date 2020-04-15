@@ -41,6 +41,5 @@ vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
 empty  = ["core/empty"]
 
-deserialize = ["core/deserialize", "physics/deserialize", "animation/deserialize", "audio/deserialize"]
 nightly     = ["core/nightly"]
 debug       = ["core/debug", "physics/debug", "animation/debug"]

@@ -3,7 +3,6 @@
       "vulkan",
       "nightly",
       "debug",
-      "deserialize",
       "physics",
       "animation",
       "audio"

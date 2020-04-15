@@ -2,8 +2,7 @@ use crate::components::prelude::Animation;
 
 /// Wraps an `Animation`, specifying its `AnimationFramesIter` variant
 /// when turning this enum into an `Animation`.
-#[derive(Clone)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[derive(Clone, Deserialize)]
 pub enum AnimationTypeWrapper<A>
 where
     A: Into<Animation>,

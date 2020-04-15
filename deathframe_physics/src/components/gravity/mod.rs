@@ -6,10 +6,9 @@ use super::component_prelude::*;
 /// Entities with the `Gravity` component are affected by gravity.
 /// The gravity's strength is applied to the entity's velocity every frame
 /// through the `ApplyGravitySystem`.
-#[derive(Clone, Debug, Default, Component, Builder)]
+#[derive(Clone, Debug, Default, Component, Builder, Deserialize)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Gravity {
     pub x: Option<f32>,
     pub y: Option<f32>,

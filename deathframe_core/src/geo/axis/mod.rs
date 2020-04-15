@@ -9,8 +9,7 @@ mod by_axis;
 use std::fmt;
 
 /// Just a plain `Axis` enum with `X` and `Y` variants.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
 pub enum Axis {
     X,
     Y,

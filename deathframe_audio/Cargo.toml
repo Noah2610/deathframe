@@ -13,10 +13,7 @@ path = "../deathframe_core"
 [dependencies.serde]
 version = "1.0.104"
 features = ["derive"]
-optional = true
 
 [features]
 default = []
-
-debug       = []
-deserialize = ["serde"]
+debug = []

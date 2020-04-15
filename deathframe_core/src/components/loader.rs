@@ -3,9 +3,8 @@ use super::component_prelude::*;
 /// `Loader` entities can load `Loadable` entities,
 /// whose transforms are within a loading distance
 /// from the `Loader` entity's transform.
-#[derive(Component)]
+#[derive(Component, Deserialize)]
 #[storage(VecStorage)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Loader {
     pub(crate) loading_distance: (f32, f32),
 }

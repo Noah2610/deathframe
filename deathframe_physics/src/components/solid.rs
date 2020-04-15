@@ -1,8 +1,7 @@
 use super::component_prelude::*;
 
-#[derive(Component)]
+#[derive(Component, Deserialize)]
 #[storage(VecStorage)]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Solid<C>
 where
     C: 'static + CollisionTag,

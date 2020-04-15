@@ -22,8 +22,6 @@ version = "0.9.0"
 [dependencies.serde]
 version = "1.0.104"
 features = ["derive"]
-optional = true
 
 [features]
 debug = []
-deserialize = ["serde"]
