@@ -26,4 +26,4 @@ vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
-debug   = []
+debug = []
