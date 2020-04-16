@@ -8,15 +8,11 @@ use amethyst::input::BindingTypes;
 #[derive(Default)]
 pub struct InputManagerSystem<B>(PhantomData<B>)
 where
-    B: BindingTypes + Eq + Default + Hash,
-    B::Action: Default,
-    B::Axis: Default;
+    B: BindingTypes + Eq + Default + Hash;
 
 impl<'a, B> System<'a> for InputManagerSystem<B>
 where
     B: BindingTypes + Eq + Default + Hash,
-    B::Action: Default,
-    B::Axis: Default,
 {
     type SystemData = (Read<'a, InputHandler<B>>, Write<'a, InputManager<B>>);
 

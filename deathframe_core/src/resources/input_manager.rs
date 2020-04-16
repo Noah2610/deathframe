@@ -21,13 +21,24 @@ impl Default for ActionState {
 
 /// Manages input actions.
 /// Stores data about which actions are _down_, _up_, or being _pressed_.
-#[derive(Default)]
 pub struct InputManager<B>
 where
     B: BindingTypes + Eq + Hash,
 {
     actions: HashMap<B::Action, ActionState>,
     axes:    HashMap<B::Axis, AxisValue>,
+}
+
+impl<B> Default for InputManager<B>
+where
+    B: BindingTypes + Eq + Hash,
+{
+    fn default() -> Self {
+        Self {
+            actions: HashMap::new(),
+            axes:    HashMap::new(),
+        }
+    }
 }
 
 impl<B> InputManager<B>
