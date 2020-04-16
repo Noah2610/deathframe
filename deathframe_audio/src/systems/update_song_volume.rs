@@ -16,23 +16,20 @@ impl<'a, K> System<'a> for UpdateSongVolumeSystem<K>
 where
     K: 'static + PartialEq + Eq + Hash + Clone + Send + Sync,
 {
-    type SystemData =
-        (Option<Read<'a, Songs<K>>>, Option<Write<'a, AudioSink>>);
+    type SystemData = (Read<'a, Songs<K>>, Option<Write<'a, AudioSink>>);
 
-    fn run(&mut self, (songs_opt, audio_sink_opt): Self::SystemData) {
-        if let Some(songs) = songs_opt {
-            let target_volume = songs.get_volume();
-            if self
-                .prev_volume
-                .map(|prev| prev != target_volume)
-                .unwrap_or(true)
-            {
-                self.prev_volume = Some(target_volume);
-                if let Some(mut audio_sink) = audio_sink_opt {
-                    audio_sink.set_volume(target_volume);
-                } else {
-                    eprintln!("[WARNING]\n    No audio sink");
-                }
+    fn run(&mut self, (songs, audio_sink_opt): Self::SystemData) {
+        let target_volume = songs.get_volume();
+        if self
+            .prev_volume
+            .map(|prev| prev != target_volume)
+            .unwrap_or(true)
+        {
+            self.prev_volume = Some(target_volume);
+            if let Some(mut audio_sink) = audio_sink_opt {
+                audio_sink.set_volume(target_volume);
+            } else {
+                eprintln!("[WARNING]\n    No audio sink");
             }
         }
     }

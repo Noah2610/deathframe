@@ -16,28 +16,26 @@ where
     K: 'static + PartialEq + Eq + Hash + Clone + Send + Sync,
 {
     type SystemData = (
-        Option<Write<'a, Songs<K>>>,
+        Write<'a, Songs<K>>,
         Option<Write<'a, AudioSink>>,
         Option<Read<'a, Output>>,
     );
 
     fn run(
         &mut self,
-        (mut songs_opt, audio_sink_opt, output_opt): Self::SystemData,
+        (mut songs, audio_sink_opt, output_opt): Self::SystemData,
     ) {
-        if let Some(songs) = songs_opt.as_mut() {
-            if let Some(audio_sink_action) = songs.audio_sink_action.take() {
-                if let (Some(mut audio_sink), Some(output)) =
-                    (audio_sink_opt, output_opt)
-                {
-                    match audio_sink_action {
-                        AudioSinkAction::Stop => {
-                            audio_sink.stop();
-                            *audio_sink = AudioSink::new(&output);
-                        }
-                        AudioSinkAction::Pause => audio_sink.pause(),
-                        AudioSinkAction::Resume => audio_sink.play(),
+        if let Some(audio_sink_action) = songs.audio_sink_action.take() {
+            if let (Some(mut audio_sink), Some(output)) =
+                (audio_sink_opt, output_opt)
+            {
+                match audio_sink_action {
+                    AudioSinkAction::Stop => {
+                        audio_sink.stop();
+                        *audio_sink = AudioSink::new(&output);
                     }
+                    AudioSinkAction::Pause => audio_sink.pause(),
+                    AudioSinkAction::Resume => audio_sink.play(),
                 }
             }
         }

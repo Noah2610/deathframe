@@ -37,7 +37,7 @@ where
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, SoundPlayer<K>>,
-        ReadExpect<'a, Sounds<K>>,
+        Read<'a, Sounds<K>>,
         Read<'a, AssetStorage<Source>>,
         Read<'a, AudioOutput>,
     );
