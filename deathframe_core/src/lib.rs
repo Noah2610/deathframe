@@ -10,8 +10,5 @@ pub mod systems;
 pub mod custom_game_data;
 pub mod geo;
 pub mod menu;
+pub mod resource_helper;
 pub mod resources;
-
-mod resource_helper;
-
-pub use resource_helper::resource;
