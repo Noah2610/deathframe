@@ -5,6 +5,7 @@ pub mod prelude {
     pub use super::entity_loader::EntityLoaderSystem;
     pub use super::follow::FollowSystem;
     pub use super::input_manager::InputManagerSystem;
+    pub use super::print_fps::PrintFpsSystem;
     pub use super::scale_sprites::ScaleSpritesSystem;
 }
 
@@ -48,6 +49,7 @@ mod confine_entities;
 mod entity_loader;
 mod follow;
 mod input_manager;
+mod print_fps;
 mod scale_sprites;
 
 mod helpers {
