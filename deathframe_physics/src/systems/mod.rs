@@ -22,8 +22,8 @@ mod update_collisions;
 
 pub(crate) mod helpers {
     use super::system_prelude::*;
-    use specs::storage::MaskedStorage;
-    use specs::Component;
+    use core::amethyst::ecs::storage::MaskedStorage;
+    use core::amethyst::ecs::Component;
     use std::ops::Deref;
 
     pub fn gen_collision_grid<C, W, DT>(
@@ -37,7 +37,7 @@ pub(crate) mod helpers {
     ) -> CollisionGrid<Entity, C, ()>
     where
         C: CollisionTag,
-        W: WithCollisionTag<C> + Component,
+        W: Component + WithCollisionTag<C>,
         DT: Deref<Target = MaskedStorage<Transform>>,
     {
         let mut grid = CollisionGrid::<Entity, C, ()>::default();

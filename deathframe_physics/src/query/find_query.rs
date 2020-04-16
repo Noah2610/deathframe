@@ -3,7 +3,7 @@ pub mod prelude {
 }
 
 use super::query_prelude::*;
-use specs::world::Index;
+use core::amethyst::ecs::world::Index;
 
 /// The `FindQuery` runs a given `QueryExpression` on all
 /// collisions, and returns the first match.

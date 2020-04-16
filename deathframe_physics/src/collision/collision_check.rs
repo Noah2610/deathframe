@@ -2,8 +2,8 @@
 
 use super::prelude::*;
 use super::tag::CollisionTag;
+use core::amethyst::ecs::world::Index;
 use core::geo::prelude::*;
-use specs::world::Index;
 
 /// Returns `true` if the two passed `CollisionRect`s are in collision;
 /// also checks, that their entity IDs are not the same,

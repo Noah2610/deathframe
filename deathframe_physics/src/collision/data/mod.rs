@@ -11,7 +11,7 @@ pub use side::CollisionSide;
 pub use state::CollisionState;
 
 use crate::collision::tag::CollisionTag;
-use specs::world::Index;
+use core::amethyst::ecs::world::Index;
 
 pub struct CollisionData<C>
 where

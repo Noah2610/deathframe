@@ -1,7 +1,7 @@
 use super::component_prelude::*;
 use crate::collision::data::prelude::*;
 use crate::query::Query;
-use specs::world::Index;
+use core::amethyst::ecs::world::Index;
 use std::collections::HashMap;
 
 #[derive(Component)]

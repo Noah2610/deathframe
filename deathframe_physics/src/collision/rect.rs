@@ -1,6 +1,5 @@
-use specs::world::Index;
-
 use crate::collision::tag::CollisionTag;
+use amethyst::ecs::world::Index;
 use core::amethyst;
 use core::geo::prelude::*;
 

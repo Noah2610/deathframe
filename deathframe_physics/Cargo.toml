@@ -10,12 +10,6 @@ license = "MIT"
 package = "deathframe_core"
 path = "../deathframe_core"
 
-[dependencies.specs]
-version = "0.15.1"
-
-[dependencies.specs-derive]
-version = "0.4.0"
-
 [dependencies.derive_builder]
 version = "0.9.0"
 
