@@ -1,5 +1,6 @@
 use super::system_prelude::*;
 
+/// Updates entities' `Health`, via `HealthAction`s from their `HealthActionQueue`.
 #[derive(Default)]
 pub struct UpdateHealthSystem;
 
