@@ -7,3 +7,10 @@ use super::component_prelude::*;
 pub struct DealsDamage {
     pub damage: HitPoints,
 }
+
+impl DealsDamage {
+    /// Returns a new `DealsDamage` with the given `damage`.
+    pub fn new(damage: HitPoints) -> Self {
+        Self { damage }
+    }
+}
