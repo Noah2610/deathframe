@@ -1,6 +1,6 @@
 [package]
 name = "deathframe_animation"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 edition = "2018"
 description = "Deathframe crate for frame-by-frame sprite animations"
@@ -8,6 +8,7 @@ license = "MIT"
 
 [dependencies.core]
 package = "deathframe_core"
+version = "0.1.0"
 path = "../deathframe_core"
 
 [dependencies.climer]

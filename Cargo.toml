@@ -1,11 +1,12 @@
 [package]
 name = "deathframe"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 edition = "2018"
-description = "My game development framework for the amethyst game engine"
+description = "Game development framework for the amethyst game engine"
 license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
+categories = ["game-development"]
 
 [workspace]
 members = [
@@ -17,21 +18,25 @@ members = [
 
 [dependencies.core]
 package = "deathframe_core"
-path = "./deathframe_core"
+version = "0.1.0"
+path = "deathframe_core"
 
 [dependencies.physics]
 package = "deathframe_physics"
-path = "./deathframe_physics"
+version = "0.1.0"
+path = "deathframe_physics"
 optional = true
 
 [dependencies.animation]
 package = "deathframe_animation"
-path = "./deathframe_animation"
+version = "0.1.0"
+path = "deathframe_animation"
 optional = true
 
 [dependencies.audio]
 package = "deathframe_audio"
-path = "./deathframe_audio"
+version = "0.1.0"
+path = "deathframe_audio"
 optional = true
 
 [features]

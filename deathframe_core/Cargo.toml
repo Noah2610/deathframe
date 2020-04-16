@@ -1,9 +1,9 @@
 [package]
 name = "deathframe_core"
-version = "0.5.1"
+version = "0.1.0"
 authors = ["Noah Rosenzweig <rosenzweig.noah@gmail.com>"]
 edition = "2018"
-description = "My game development framework for the amethyst game engine"
+description = "Deathframe core crate"
 license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
