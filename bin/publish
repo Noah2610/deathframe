@@ -1,0 +1,52 @@
+#!/bin/bash
+# Publishes all crates.
+# Version must be bumped manually.
+
+# shellcheck source=./share.sh
+_dir="$( dirname "$0" )"
+source "${_dir}/share.sh"
+unset _dir
+
+check "cargo"
+check "jq"
+
+ROOT_CRATE_NAME="deathframe"
+
+CLRCODE="$( clr "${CLR_CODE[@]}" )"
+CLRRS="$( clrrs )"
+
+function main {
+    cd "$ROOT" || exit 1
+
+    local args=( "$@" )
+    local crates_with_versions=()
+    local crate_with_version=
+    local crate=
+    local version=
+    local crate_display=
+
+    mapfile -t crates_with_versions < <(
+        cargo metadata --no-deps --format-version 1 \
+            | jq -rM '.workspace_members[] | split(" ") | .[0:2] | join(" ")'
+    )
+
+    for crate_with_version in "${crates_with_versions[@]}"; do
+        crate="$( echo "${crate_with_version}" | cut -d" " -f1 )"
+        version="$( echo "${crate_with_version}" | cut -d" " -f2 )"
+        crate_display="${CLRCODE}${crate} v${version}${CLRRS}"
+
+        msg "Publishing crate ${crate_display}"
+
+        [ "$crate" != "$ROOT_CRATE_NAME" ] \
+            && { pushd "$crate" &> /dev/null \
+            || err "Directory for crate doesn't exist: ${crate}"; }
+
+        try_run \
+            cargo publish "${args[@]}"
+
+        [ "$crate" != "$ROOT_CRATE_NAME" ] \
+            && { popd  &> /dev/null || exit 1; }
+    done
+}
+
+main "$@"
