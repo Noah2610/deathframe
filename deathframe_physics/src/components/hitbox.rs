@@ -3,7 +3,7 @@ use super::component_prelude::*;
 /// A `Hitbox` has one or more `Rect` rects,
 /// which are collision boxes, relative to this entity's `Transform`.
 /// So the `Rect` rects assume the entity's position is at `0, 0`.
-#[derive(Debug, Component, Default, Deserialize)]
+#[derive(Debug, Component, Default, Deserialize, Clone)]
 #[storage(DenseVecStorage)]
 #[serde(from = "Vec<Rect>")]
 pub struct Hitbox {
