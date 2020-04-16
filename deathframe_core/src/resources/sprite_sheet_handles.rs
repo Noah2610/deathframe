@@ -7,13 +7,8 @@ use std::fmt::Debug;
 use std::hash::Hash;
 use std::path::Path;
 
-// TODO: Update documentation.
-
 /// This is a resource wrapper for amethyst's `SpriteSheet`s.
 /// It can load and get `SpriteSheetHandle`s;
-/// _load_ them by passing a spritesheet's image file path to an appropriate method and
-/// _get_ them by passing their spritesheet's image file name (without extension) to an appropriate
-/// method.
 #[derive(Default)]
 pub struct SpriteSheetHandles<K>
 where
