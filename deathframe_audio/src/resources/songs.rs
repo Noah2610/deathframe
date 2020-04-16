@@ -1,6 +1,7 @@
 use super::audio_manager::AudioManager;
 use super::playback_behavior::PlaybackBehavior;
 use super::playback_state::PlaybackState;
+use super::AudioSinkAction;
 use amethyst::audio::SourceHandle;
 use core::amethyst;
 use std::collections::HashMap;
@@ -11,9 +12,10 @@ pub struct Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
-    songs:                     HashMap<K, SourceHandle>,
-    volume:                    f32,
-    pub(crate) playback_state: Option<PlaybackState<K>>,
+    songs:                        HashMap<K, SourceHandle>,
+    volume:                       f32,
+    playback_state:               Option<PlaybackState<K>>,
+    pub(crate) audio_sink_action: Option<AudioSinkAction>,
 }
 
 impl<K> Songs<K>
@@ -30,6 +32,7 @@ where
 
     /// Plays the given song key on repeat.
     pub fn play(&mut self, key: K) {
+        self.audio_sink_action = Some(AudioSinkAction::Stop);
         self.set_playback_state(PlaybackState::Playing(
             PlaybackBehavior::Repeat(key),
         ));
@@ -41,6 +44,7 @@ where
     where
         I: IntoIterator<Item = K, IntoIter = std::vec::IntoIter<K>>,
     {
+        self.audio_sink_action = Some(AudioSinkAction::Stop);
         self.set_playback_state(PlaybackState::Playing(
             PlaybackBehavior::Autoplay(iter.into_iter().cycle()),
         ));
@@ -49,36 +53,45 @@ where
     /// Pauses the playing song. Can only pause, if the `PlaybackState` is `Playing`.
     /// Returns an error if the state is not `Playing`.
     pub fn pause(&mut self) -> Result<(), String> {
-        if let Some(PlaybackState::Playing(behavior)) =
-            self.playback_state.take()
-        {
-            self.set_playback_state(PlaybackState::Paused(behavior));
-            Ok(())
+        if let Some(state) = self.playback_state.take() {
+            if let PlaybackState::Playing(behavior) = state {
+                self.audio_sink_action = Some(AudioSinkAction::Pause);
+                self.set_playback_state(PlaybackState::Paused(behavior));
+                Ok(())
+            } else {
+                self.playback_state = Some(state);
+                Err("Cannot pause `Songs` when it is not \
+                     `PlaybackState::Playing`"
+                    .into())
+            }
         } else {
-            Err(
-                "Cannot pause `Songs` when it is not `PlaybackState::Playing`"
-                    .into(),
-            )
+            unreachable!("`Songs`' `PlaybackState` should never be `None`")
         }
     }
 
     /// Resumes playing from the `Paused` `PlaybackState`.
     /// Returns an error if the state is not `Paused`.
     pub fn resume(&mut self) -> Result<(), String> {
-        if let Some(PlaybackState::Paused(behavior)) =
-            self.playback_state.take()
-        {
-            self.set_playback_state(PlaybackState::Playing(behavior));
-            Ok(())
+        if let Some(state) = self.playback_state.take() {
+            if let PlaybackState::Paused(behavior) = state {
+                self.audio_sink_action = Some(AudioSinkAction::Resume);
+                self.set_playback_state(PlaybackState::Playing(behavior));
+                Ok(())
+            } else {
+                self.playback_state = Some(state);
+                Err("Cannot resume `Songs` when it is not \
+                     `PlaybackState::Paused`"
+                    .into())
+            }
         } else {
-            Err("Cannot play `Songs` when it is not `PlaybackState::Paused`"
-                .into())
+            unreachable!("`Songs`' `PlaybackState` should never be `None`")
         }
     }
 
     /// Stops playing. Clears the `PlaybackBehavior`, so we'll need to
     /// start playing again with the `play` function.
     pub fn stop(&mut self) {
+        self.audio_sink_action = Some(AudioSinkAction::Stop);
         self.set_playback_state(PlaybackState::Stopped);
     }
 
@@ -146,9 +159,10 @@ where
 {
     fn default() -> Self {
         Self {
-            songs:          HashMap::new(),
-            volume:         1.0,
-            playback_state: Some(PlaybackState::default()),
+            songs:             HashMap::new(),
+            volume:            1.0,
+            playback_state:    Some(PlaybackState::default()),
+            audio_sink_action: None,
         }
     }
 }

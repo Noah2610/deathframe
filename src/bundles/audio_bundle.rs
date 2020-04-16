@@ -67,13 +67,6 @@ where
     ) -> Result<(), amethyst::Error> {
         AmethystAudioBundle::default().build(world, builder)?;
 
-        builder.add(
-            DjSystemDesc::new(|songs: &mut Songs<KB>| songs.next_song())
-                .build(world),
-            "dj_system",
-            self.deps,
-        );
-
         let mut play_sounds_system = PlaySoundsSystem::<KA>::default();
         if let Some(sounds_default_volume) = self.sounds_default_volume {
             play_sounds_system =
@@ -91,6 +84,13 @@ where
             UpdateSongPlaybackSystem::<KB>::default(),
             "update_song_playback_system",
             self.deps,
+        );
+
+        builder.add(
+            DjSystemDesc::new(|songs: &mut Songs<KB>| songs.next_song())
+                .build(world),
+            "dj_system",
+            &[self.deps, &["update_song_playback_system"]].concat(),
         );
 
         Ok(())
