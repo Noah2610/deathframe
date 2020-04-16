@@ -33,6 +33,7 @@ pub mod component_prelude {
     };
 
     pub use super::component_helpers::prelude::*;
+    pub use super::health::HitPoints;
     pub use crate::geo::prelude::*;
 }
 

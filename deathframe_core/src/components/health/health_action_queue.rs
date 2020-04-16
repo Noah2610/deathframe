@@ -1,6 +1,5 @@
 use super::component_prelude::*;
 use super::health_action::HealthAction;
-use super::HitPoints;
 
 /// Can manipulate the entity's `Health` component via `HealthAction`s.
 /// Through this component, the entity can _lose_ and _gain_ health.
