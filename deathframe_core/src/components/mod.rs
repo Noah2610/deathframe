@@ -8,6 +8,7 @@ pub mod prelude {
     pub use super::component_helpers::prelude::*;
     pub use super::confined::Confined;
     pub use super::follow::Follow;
+    pub use super::health::prelude::*;
     pub use super::loadable::Loadable;
     pub use super::loaded::Loaded;
     pub use super::loader::Loader;
@@ -41,6 +42,7 @@ pub mod component_helpers;
 
 mod confined;
 mod follow;
+mod health;
 mod loadable;
 mod loaded;
 mod loader;
