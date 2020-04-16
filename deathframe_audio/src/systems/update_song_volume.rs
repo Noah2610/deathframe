@@ -1,5 +1,4 @@
 use super::system_prelude::*;
-use core::amethyst::audio::AudioSink;
 use std::hash::Hash;
 use std::marker::PhantomData;
 

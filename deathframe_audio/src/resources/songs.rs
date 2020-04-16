@@ -11,9 +11,9 @@ pub struct Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
-    songs:          HashMap<K, SourceHandle>,
-    volume:         f32,
-    playback_state: Option<PlaybackState<K>>,
+    songs:                     HashMap<K, SourceHandle>,
+    volume:                    f32,
+    pub(crate) playback_state: Option<PlaybackState<K>>,
 }
 
 impl<K> Songs<K>
@@ -30,8 +30,9 @@ where
 
     /// Plays the given song key on repeat.
     pub fn play(&mut self, key: K) {
-        self.playback_state =
-            Some(PlaybackState::Playing(PlaybackBehavior::Repeat(key)));
+        self.set_playback_state(PlaybackState::Playing(
+            PlaybackBehavior::Repeat(key),
+        ));
     }
 
     /// Plays the given ordered songs,
@@ -40,7 +41,7 @@ where
     where
         I: IntoIterator<Item = K, IntoIter = std::vec::IntoIter<K>>,
     {
-        self.playback_state = Some(PlaybackState::Playing(
+        self.set_playback_state(PlaybackState::Playing(
             PlaybackBehavior::Autoplay(iter.into_iter().cycle()),
         ));
     }
@@ -51,7 +52,7 @@ where
         if let Some(PlaybackState::Playing(behavior)) =
             self.playback_state.take()
         {
-            self.playback_state = Some(PlaybackState::Paused(behavior));
+            self.set_playback_state(PlaybackState::Paused(behavior));
             Ok(())
         } else {
             Err(
@@ -67,7 +68,7 @@ where
         if let Some(PlaybackState::Paused(behavior)) =
             self.playback_state.take()
         {
-            self.playback_state = Some(PlaybackState::Playing(behavior));
+            self.set_playback_state(PlaybackState::Playing(behavior));
             Ok(())
         } else {
             Err("Cannot play `Songs` when it is not `PlaybackState::Paused`"
@@ -78,7 +79,20 @@ where
     /// Stops playing. Clears the `PlaybackBehavior`, so we'll need to
     /// start playing again with the `play` function.
     pub fn stop(&mut self) {
-        self.playback_state = Some(PlaybackState::Stopped);
+        self.set_playback_state(PlaybackState::Stopped);
+    }
+
+    /// Returns `true` if the `PlaybackState` is `Playing`.
+    pub fn is_playing(&self) -> bool {
+        if let Some(PlaybackState::Playing(_)) = &self.playback_state {
+            true
+        } else {
+            false
+        }
+    }
+
+    fn set_playback_state(&mut self, new_state: PlaybackState<K>) {
+        self.playback_state = Some(new_state);
     }
 
     /// Returns the next song to play, for `amethyst_audio::DjSystem`.
