@@ -12,7 +12,6 @@ mod playback_state;
 mod songs;
 mod sounds;
 
-// TODO
 pub(crate) enum AudioSinkAction {
     Stop,
     Pause,
