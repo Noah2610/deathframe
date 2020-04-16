@@ -10,6 +10,7 @@ use std::marker::PhantomData;
 /// - `UpdateCollisionsSystem` (named `"update_collisions_system"`)
 /// - `ApplyBaseFrictionSystem` (named `"apply_base_friction_system"`)
 /// - `ApplyGravitySystem` (named `"apply_gravity_system"`)
+/// - `HandleTakingDamageSystem` (named `"handle_taking_damage_system"`)
 pub struct PhysicsBundle<'a, CU, CM>
 where
     CU: 'static + CollisionTag,
@@ -70,6 +71,11 @@ where
             UpdateCollisionsSystem::<CU>::default(),
             "update_collisions_system",
             &[self.deps, &["move_entities_system"]].concat(),
+        );
+        builder.add(
+            HandleTakingDamageSystem::<CU>::default(),
+            "handle_taking_damage_system",
+            &[self.deps, &["update_collisions_system"]].concat(),
         );
         Ok(())
     }

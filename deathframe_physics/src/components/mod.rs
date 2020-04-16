@@ -2,6 +2,7 @@ pub mod prelude {
     pub use super::base_friction::BaseFriction;
     pub use super::collidable::Collidable;
     pub use super::collider::Collider;
+    pub use super::damage::prelude::*;
     pub use super::gravity::Gravity;
     pub use super::hitbox::Hitbox;
     pub use super::solid::Solid;
@@ -17,6 +18,7 @@ mod component_prelude {
 mod base_friction;
 mod collidable;
 mod collider;
+mod damage;
 mod gravity;
 mod hitbox;
 mod solid;

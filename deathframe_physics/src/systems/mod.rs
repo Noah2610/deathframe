@@ -1,6 +1,7 @@
 pub mod prelude {
     pub use super::apply_base_friction::ApplyBaseFrictionSystem;
     pub use super::apply_gravity::ApplyGravitySystem;
+    pub use super::handle_taking_damage::HandleTakingDamageSystem;
     pub use super::move_entities::MoveEntitiesSystem;
     pub use super::update_collisions::UpdateCollisionsSystem;
 }
@@ -17,6 +18,7 @@ mod system_prelude {
 
 mod apply_base_friction;
 mod apply_gravity;
+mod handle_taking_damage;
 mod move_entities;
 mod update_collisions;
 
