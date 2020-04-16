@@ -9,6 +9,7 @@ pub extern crate physics;
 pub mod bundles;
 pub mod components;
 pub mod resources;
+pub mod states;
 pub mod systems;
 
 pub use core::amethyst;
