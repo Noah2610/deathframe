@@ -18,6 +18,12 @@ impl Rect {
         RectBuilder::default()
     }
 
+    /// Returns the center position of this rect.
+    pub fn center(&self) -> Point {
+        let length = (self.right - self.left, self.top - self.bottom);
+        Point::new(self.left + length.0, self.bottom + length.1)
+    }
+
     /// Offsets all sides by the given `Point`.
     pub fn with_offset(mut self, point: &Point) -> Self {
         self.top += point.y;

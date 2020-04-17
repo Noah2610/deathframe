@@ -118,6 +118,7 @@ struct RectSides {
 
 impl RectSides {
     pub fn new(rect: &Rect) -> Self {
+        let rect_center = rect.center();
         let base_rect = Rect::builder()
             .top(rect.top - PADDING.1)
             .bottom(rect.bottom + PADDING.1)
@@ -125,10 +126,29 @@ impl RectSides {
             .right(rect.right - PADDING.0);
 
         let inner = base_rect.clone().build().unwrap();
-        let top = base_rect.clone().top(rect.top).build().unwrap();
-        let bottom = base_rect.clone().bottom(rect.bottom).build().unwrap();
-        let left = base_rect.clone().left(rect.left).build().unwrap();
-        let right = base_rect.clone().right(rect.right).build().unwrap();
+        let top = base_rect
+            .clone()
+            .top(rect.top)
+            .bottom(rect_center.y)
+            .build()
+            .unwrap();
+        let bottom = base_rect
+            .clone()
+            .bottom(rect.bottom)
+            .top(rect_center.y)
+            .build()
+            .unwrap();
+        let left = base_rect
+            .clone()
+            .left(rect.left)
+            .right(rect_center.x)
+            .build()
+            .unwrap();
+        let right = base_rect
+            .right(rect.right)
+            .left(rect_center.x)
+            .build()
+            .unwrap();
 
         Self {
             outer: rect.clone(),
