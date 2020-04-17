@@ -108,11 +108,12 @@ where
 }
 
 struct RectSides {
-    pub inner:  Rect,
-    pub top:    Rect,
-    pub bottom: Rect,
-    pub left:   Rect,
-    pub right:  Rect,
+    outer:  Rect,
+    inner:  Rect,
+    top:    Rect,
+    bottom: Rect,
+    left:   Rect,
+    right:  Rect,
 }
 
 impl RectSides {
@@ -130,6 +131,7 @@ impl RectSides {
         let right = base_rect.clone().right(rect.right).build().unwrap();
 
         Self {
+            outer: rect.clone(),
             inner,
             top,
             bottom,
@@ -139,6 +141,10 @@ impl RectSides {
     }
 
     pub fn collides_with(&self, rect: &Rect) -> Option<CollisionSide> {
+        if !collision_check::do_rects_intersect(&self.outer, rect) {
+            return None;
+        }
+
         if collision_check::do_rects_intersect(&self.inner, rect) {
             Some(CollisionSide::Inner)
         } else if collision_check::do_rects_intersect(&self.top, rect) {
