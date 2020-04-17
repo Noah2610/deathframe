@@ -8,6 +8,7 @@ pub mod prelude {
     pub use super::print_fps::PrintFpsSystem;
     pub use super::scale_sprites::ScaleSpritesSystem;
     pub use super::update_health::UpdateHealthSystem;
+    pub use super::update_lifecycle::UpdateLifecycleSystem;
 }
 
 pub mod system_prelude {
@@ -53,6 +54,7 @@ mod input_manager;
 mod print_fps;
 mod scale_sprites;
 mod update_health;
+mod update_lifecycle;
 
 mod helpers {
     use super::system_prelude::*;
