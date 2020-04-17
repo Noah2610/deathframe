@@ -1,17 +1,19 @@
 pub mod prelude {
+    pub use super::side::{
+        CollisionInnerSideX,
+        CollisionInnerSideY,
+        CollisionSide,
+    };
+    pub use super::state::CollisionState;
     pub use super::CollisionData;
-    pub use super::CollisionSide;
-    pub use super::CollisionState;
 }
 
 mod side;
 mod state;
 
-pub use side::CollisionSide;
-pub use state::CollisionState;
-
 use crate::collision::tag::CollisionTag;
 use core::amethyst::ecs::world::Index;
+use prelude::*;
 
 pub struct CollisionData<C>
 where

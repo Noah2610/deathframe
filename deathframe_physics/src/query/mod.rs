@@ -10,7 +10,7 @@ pub mod prelude {
 }
 
 mod query_prelude {
-    pub(super) use super::exp::QueryExpression;
+    pub(super) use super::exp::prelude::QueryExpression;
     pub(super) use super::query_helpers::*;
     pub(super) use super::Query;
     pub(super) use crate::collision::prelude::*;

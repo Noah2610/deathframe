@@ -161,28 +161,40 @@ impl RectSides {
     }
 
     pub fn collides_with(&self, rect: &Rect) -> Option<CollisionSide> {
+        use std::convert::TryFrom;
+
         if !collision_check::do_rects_intersect(&self.outer, rect) {
             return None;
         }
 
-        let colliding_side =
-            if collision_check::do_rects_intersect(&self.top, rect) {
-                Some(CollisionSide::Top)
-            } else if collision_check::do_rects_intersect(&self.bottom, rect) {
-                Some(CollisionSide::Bottom)
-            } else if collision_check::do_rects_intersect(&self.left, rect) {
+        let colliding_sides = (
+            if collision_check::do_rects_intersect(&self.left, rect) {
                 Some(CollisionSide::Left)
             } else if collision_check::do_rects_intersect(&self.right, rect) {
                 Some(CollisionSide::Right)
             } else {
                 None
-            };
+            },
+            if collision_check::do_rects_intersect(&self.top, rect) {
+                Some(CollisionSide::Top)
+            } else if collision_check::do_rects_intersect(&self.bottom, rect) {
+                Some(CollisionSide::Bottom)
+            } else {
+                None
+            },
+        );
 
         if collision_check::do_rects_intersect(&self.inner, rect) {
-            let inner_side = colliding_side.map(|s| Box::new(s));
-            Some(CollisionSide::Inner(inner_side))
+            Some(CollisionSide::Inner {
+                x: colliding_sides
+                    .0
+                    .and_then(|side| CollisionInnerSideX::try_from(side).ok()),
+                y: colliding_sides
+                    .1
+                    .and_then(|side| CollisionInnerSideY::try_from(side).ok()),
+            })
         } else {
-            colliding_side
+            colliding_sides.0.or(colliding_sides.1)
         }
     }
 }
