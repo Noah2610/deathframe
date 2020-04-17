@@ -44,34 +44,28 @@ where
             use CollisionState::*;
 
             // Set state of colliding entity to ...
-            data.state = match data.state {
-                // `Enter` if it was `Leave` previously
+            data.state = match &data.state {
+                // `Enter` if it was `Leave` previously.
                 CollisionState::Leave => Enter(side),
-                // `Steady` if it was `Enter`, `EnterSteady`, or `Steady`
-                // with the same side previously
-                Enter(prev_side) | EnterSide(prev_side) | Steady(prev_side)
-                    if side == prev_side =>
-                {
-                    Steady(side)
-                }
-                // `EnterSide` with new side, if it was `Enter` or `Steady` with
-                // a _different_ side previously
-                Enter(prev_side) | Steady(prev_side) if side != prev_side => {
-                    EnterSide(side)
-                }
 
-                Enter(_) | EnterSide(_) | Steady(_) => unreachable!(
-                    "All Collider CollisionState sides should be thoroughly \
-                     checked before this"
-                ),
+                // Collision existed previously and is still exists.
+                // Change to `Steady` if the side didn't change,
+                // or to `EnterSide` if the side changed.
+                Enter(prev_side) | EnterSide(prev_side) | Steady(prev_side) => {
+                    if &side == prev_side {
+                        Steady(side)
+                    } else {
+                        EnterSide(side)
+                    }
+                }
             };
-            data.set_state_this_frame = true;
+            data.did_update_collision = true;
         } else {
             self.collisions.insert(entity_id, CollisionData {
                 state:                CollisionState::Enter(side),
                 tag:                  tag,
                 id:                   entity_id,
-                set_state_this_frame: true,
+                did_update_collision: true,
             });
         }
     }
@@ -81,11 +75,13 @@ where
     pub(crate) fn update(&mut self) {
         let mut to_remove = Vec::new();
         for (&id, collision) in self.collisions.iter_mut() {
-            if collision.set_state_this_frame {
-                // Entity collision data was modified this frame, stage for possible deletion next frame
-                collision.set_state_this_frame = false;
+            if collision.did_update_collision {
+                // Entity collision data was modified this frame,
+                // stage for possible deletion next frame
+                collision.did_update_collision = false;
             } else {
-                // Entity collision data was NOT modified this frame, set State to `Leave` or remove
+                // Entity collision data was NOT modified this frame,
+                // set State to `Leave` or remove
                 collision.unset();
                 if collision.should_remove() {
                     to_remove.push(id);

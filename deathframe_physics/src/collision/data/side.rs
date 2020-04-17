@@ -1,8 +1,8 @@
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum CollisionSide {
     Left,
     Right,
     Top,
     Bottom,
-    Inner,
+    Inner(Option<Box<Self>>),
 }

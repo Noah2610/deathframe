@@ -165,18 +165,24 @@ impl RectSides {
             return None;
         }
 
+        let colliding_side =
+            if collision_check::do_rects_intersect(&self.top, rect) {
+                Some(CollisionSide::Top)
+            } else if collision_check::do_rects_intersect(&self.bottom, rect) {
+                Some(CollisionSide::Bottom)
+            } else if collision_check::do_rects_intersect(&self.left, rect) {
+                Some(CollisionSide::Left)
+            } else if collision_check::do_rects_intersect(&self.right, rect) {
+                Some(CollisionSide::Right)
+            } else {
+                None
+            };
+
         if collision_check::do_rects_intersect(&self.inner, rect) {
-            Some(CollisionSide::Inner)
-        } else if collision_check::do_rects_intersect(&self.top, rect) {
-            Some(CollisionSide::Top)
-        } else if collision_check::do_rects_intersect(&self.bottom, rect) {
-            Some(CollisionSide::Bottom)
-        } else if collision_check::do_rects_intersect(&self.left, rect) {
-            Some(CollisionSide::Left)
-        } else if collision_check::do_rects_intersect(&self.right, rect) {
-            Some(CollisionSide::Right)
+            let inner_side = colliding_side.map(|s| Box::new(s));
+            Some(CollisionSide::Inner(inner_side))
         } else {
-            None
+            colliding_side
         }
     }
 }

@@ -19,8 +19,7 @@ where
             .into_iter()
             .any(|e| does_expression_match_collision(e, collision)),
 
-        QExp::IsSide(target_side_qval) => {
-            let target_side: CollisionSide = target_side_qval.into();
+        QExp::IsSide(target_side) => {
             if let Some(side) = collision.side() {
                 target_side == side
             } else {
@@ -29,7 +28,7 @@ where
         }
 
         QExp::IsState(target_state_qval) => {
-            target_state_qval == collision.state
+            target_state_qval == &collision.state
         }
 
         QExp::IsTag(target_tag) => target_tag == &collision.tag,
