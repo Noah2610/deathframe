@@ -51,11 +51,11 @@ where
     /// Maybe returns the `CollisionSide` of this collision,
     /// depending on which `CollisionState` it is.
     pub(crate) fn side(&self) -> Option<CollisionSide> {
+        use CollisionState::*;
+
         match &self.state {
-            CollisionState::Enter(side) | CollisionState::Steady(side) => {
-                Some(side.clone())
-            }
-            CollisionState::Leave => None,
+            Enter(side) | EnterSide(side) | Steady(side) => Some(side.clone()),
+            Leave => None,
         }
     }
 }

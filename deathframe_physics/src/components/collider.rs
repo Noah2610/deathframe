@@ -41,21 +41,29 @@ where
         tag: C,
     ) {
         if let Some(data) = self.collisions.get_mut(&entity_id) {
+            use CollisionState::*;
+
             // Set state of colliding entity to ...
             data.state = match data.state {
                 // `Enter` if it was `Leave` previously
-                CollisionState::Leave => CollisionState::Enter(side),
-                // `Steady` if it was `Enter` or `Steady` with the same side previously
-                CollisionState::Enter(prev_side)
-                | CollisionState::Steady(prev_side)
+                CollisionState::Leave => Enter(side),
+                // `Steady` if it was `Enter`, `EnterSteady`, or `Steady`
+                // with the same side previously
+                Enter(prev_side) | EnterSide(prev_side) | Steady(prev_side)
                     if side == prev_side =>
                 {
-                    CollisionState::Steady(side)
+                    Steady(side)
                 }
-                // `Enter` with new side, if it was `Enter` or `Steady` with a _different_ side previously
-                CollisionState::Enter(_) | CollisionState::Steady(_) => {
-                    CollisionState::Enter(side)
+                // `EnterSide` with new side, if it was `Enter` or `Steady` with
+                // a _different_ side previously
+                Enter(prev_side) | Steady(prev_side) if side != prev_side => {
+                    EnterSide(side)
                 }
+
+                Enter(_) | EnterSide(_) | Steady(_) => unreachable!(
+                    "All Collider CollisionState sides should be thoroughly \
+                     checked before this"
+                ),
             };
             data.set_state_this_frame = true;
         } else {
