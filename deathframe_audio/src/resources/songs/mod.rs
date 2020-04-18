@@ -47,6 +47,13 @@ where
         Ok(())
     }
 
+    /// Stops all `Song`s from playing.
+    pub fn stop_all(&mut self) {
+        for song in self.songs.values_mut() {
+            song.stop();
+        }
+    }
+
     // TODO
     // /// Returns the next song to play, for `amethyst_audio::DjSystem`.
     // /// What is returned depends on the `PlaybackState` and `PlaybackBehavior`.
