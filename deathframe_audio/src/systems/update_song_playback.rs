@@ -15,27 +15,18 @@ impl<'a, K> System<'a> for UpdateSongPlaybackSystem<K>
 where
     K: 'static + PartialEq + Eq + Hash + Clone + Send + Sync,
 {
-    type SystemData = (
-        Write<'a, Songs<K>>,
-        Option<Write<'a, AudioSink>>,
-        Option<Read<'a, Output>>,
-    );
+    type SystemData = (Write<'a, Songs<K>>, Read<'a, Output>);
 
-    fn run(
-        &mut self,
-        (mut songs, audio_sink_opt, output_opt): Self::SystemData,
-    ) {
-        if let Some(audio_sink_action) = songs.audio_sink_action.take() {
-            if let (Some(mut audio_sink), Some(output)) =
-                (audio_sink_opt, output_opt)
-            {
+    fn run(&mut self, (mut songs, output): Self::SystemData) {
+        for song in songs.songs.values_mut() {
+            if let Some(audio_sink_action) = song.audio_sink_action.take() {
                 match audio_sink_action {
                     AudioSinkAction::Stop => {
-                        audio_sink.stop();
-                        *audio_sink = AudioSink::new(&output);
+                        song.audio_sink.stop();
+                        song.audio_sink = AudioSink::new(&output);
                     }
-                    AudioSinkAction::Pause => audio_sink.pause(),
-                    AudioSinkAction::Resume => audio_sink.play(),
+                    AudioSinkAction::Pause => song.audio_sink.pause(),
+                    AudioSinkAction::Resume => song.audio_sink.play(),
                 }
             }
         }

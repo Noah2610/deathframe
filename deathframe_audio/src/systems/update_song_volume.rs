@@ -1,4 +1,5 @@
 use super::system_prelude::*;
+use std::collections::HashMap;
 use std::hash::Hash;
 use std::marker::PhantomData;
 
@@ -8,28 +9,27 @@ pub struct UpdateSongVolumeSystem<K>
 where
     K: PartialEq + Eq + Hash + Clone + Send + Sync,
 {
-    prev_volume: Option<f32>,
-    _k:          PhantomData<K>,
+    prev_volumes: HashMap<K, f32>,
+    _k:           PhantomData<K>,
 }
 
 impl<'a, K> System<'a> for UpdateSongVolumeSystem<K>
 where
     K: 'static + PartialEq + Eq + Hash + Clone + Send + Sync,
 {
-    type SystemData = (Read<'a, Songs<K>>, Option<Write<'a, AudioSink>>);
+    type SystemData = Write<'a, Songs<K>>;
 
-    fn run(&mut self, (songs, audio_sink_opt): Self::SystemData) {
-        let target_volume = songs.get_volume();
-        if self
-            .prev_volume
-            .map(|prev| prev != target_volume)
-            .unwrap_or(true)
-        {
-            self.prev_volume = Some(target_volume);
-            if let Some(mut audio_sink) = audio_sink_opt {
-                audio_sink.set_volume(target_volume);
-            } else {
-                eprintln!("[WARNING]\n    No audio sink");
+    fn run(&mut self, mut songs: Self::SystemData) {
+        for (key, song) in songs.songs.iter_mut() {
+            let target_volume = song.get_volume();
+            if self
+                .prev_volumes
+                .get(key)
+                .map(|prev| prev != &target_volume)
+                .unwrap_or(true)
+            {
+                self.prev_volumes.insert(key.clone(), target_volume);
+                song.audio_sink.set_volume(target_volume);
             }
         }
     }
@@ -41,8 +41,8 @@ where
 {
     fn default() -> Self {
         Self {
-            prev_volume: Default::default(),
-            _k:          Default::default(),
+            prev_volumes: Default::default(),
+            _k:           Default::default(),
         }
     }
 }

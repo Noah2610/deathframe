@@ -1,21 +1,12 @@
-use super::playback_behavior::PlaybackBehavior;
-use std::hash::Hash;
-
 /// The playback state for a song.
-pub enum PlaybackState<K>
-where
-    K: PartialEq + Eq + Hash,
-{
+pub enum PlaybackState {
     Stopped,
-    Playing(PlaybackBehavior<K>),
-    Paused(PlaybackBehavior<K>),
+    Playing,
+    Paused,
     Finished,
 }
 
-impl<K> Default for PlaybackState<K>
-where
-    K: PartialEq + Eq + Hash,
-{
+impl Default for PlaybackState {
     fn default() -> Self {
         PlaybackState::Stopped
     }

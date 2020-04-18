@@ -86,12 +86,12 @@ where
             self.deps,
         );
 
-        builder.add(
-            DjSystemDesc::new(|songs: &mut Songs<KB>| songs.next_song())
-                .build(world),
-            "dj_system",
-            &[self.deps, &["update_song_playback_system"]].concat(),
-        );
+        // builder.add(
+        //     DjSystemDesc::new(|songs: &mut Songs<KB>| songs.next_song())
+        //         .build(world),
+        //     "dj_system",
+        //     &[self.deps, &["update_song_playback_system"]].concat(),
+        // );
 
         Ok(())
     }
