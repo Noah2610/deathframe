@@ -13,8 +13,9 @@ pub struct AnimationBundle<'a, AK>
 where
     AK: 'static + Hash + Eq + Send + Sync + Debug + Clone,
 {
-    deps: &'a [&'a str],
-    _ak:  PhantomData<AK>,
+    name_suffix: Option<String>,
+    deps:        &'a [&'a str],
+    _ak:         PhantomData<AK>,
 }
 
 impl<'a, AK> AnimationBundle<'a, AK>
@@ -24,6 +25,15 @@ where
     /// Create new `AnimationBundle` with no dependencies.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Suffix all systems' names with the the given string.
+    pub fn with_name_suffix<S>(mut self, name_suffix: S) -> Self
+    where
+        S: ToString,
+    {
+        self.name_suffix = Some(name_suffix.to_string());
+        self
     }
 
     /// Set system dependencies for all registered systems.
@@ -44,12 +54,24 @@ where
     ) -> Result<(), amethyst::Error> {
         builder.add(
             SwitchAnimationsSystem::<AK>::default(),
-            "switch_animations_system",
+            &format!(
+                "switch_animations_system{}",
+                self.name_suffix
+                    .as_ref()
+                    .map(String::as_str)
+                    .unwrap_or_default()
+            ),
             self.deps,
         );
         builder.add(
             PlayAnimationsSystem::default(),
-            "play_animations_system",
+            &format!(
+                "play_animations_system{}",
+                self.name_suffix
+                    .as_ref()
+                    .map(String::as_str)
+                    .unwrap_or_default()
+            ),
             &[self.deps, &["switch_animations_system"]].concat(),
         );
         Ok(())
@@ -62,8 +84,9 @@ where
 {
     fn default() -> Self {
         Self {
-            deps: Default::default(),
-            _ak:  Default::default(),
+            name_suffix: Default::default(),
+            deps:        Default::default(),
+            _ak:         Default::default(),
         }
     }
 }
