@@ -34,6 +34,28 @@ where
         self.songs.get_mut(key)
     }
 
+    /// Plays the song for the given key, if it exists.
+    pub fn play(&mut self, key: &K) {
+        self.get_mut(key).map(Song::play);
+    }
+
+    /// Pauses the song for the given key, if it exists and is playing.
+    /// Returns an error if the state is not `Playing`.
+    pub fn pause(&mut self, key: &K) -> Result<(), String> {
+        self.get_mut(key).map(Song::pause).unwrap_or(Ok(()))
+    }
+
+    /// Resumes the song for the given key, if it exists and is paused.
+    /// Returns an error if the state is not `Paused`.
+    pub fn resume(&mut self, key: &K) -> Result<(), String> {
+        self.get_mut(key).map(Song::resume).unwrap_or(Ok(()))
+    }
+
+    /// Stops the song for the given key, if it exists.
+    pub fn stop(&mut self, key: &K) {
+        self.get_mut(key).map(Song::stop);
+    }
+
     /// Load song file for the given key, from the given path.
     /// The file format is derived from the filename's extension.
     /// Returns an Error, if no matching audio format was found
