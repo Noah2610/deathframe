@@ -24,6 +24,16 @@ impl<K> Songs<K>
 where
     K: PartialEq + Eq + Hash + Clone,
 {
+    /// Returns a reference to the `Song` for the given key.
+    pub fn get(&self, key: &K) -> Option<&Song> {
+        self.songs.get(key)
+    }
+
+    /// Returns a mutable reference to the `Song` for the given key.
+    pub fn get_mut(&mut self, key: &K) -> Option<&mut Song> {
+        self.songs.get_mut(key)
+    }
+
     /// Load song file for the given key, from the given path.
     /// The file format is derived from the filename's extension.
     /// Returns an Error, if no matching audio format was found
