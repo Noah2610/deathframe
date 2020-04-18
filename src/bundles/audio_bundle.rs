@@ -1,8 +1,7 @@
-use amethyst::audio::{AudioBundle as AmethystAudioBundle, DjSystemDesc};
+use amethyst::audio::output::init_output;
+use amethyst::audio::AudioBundle as AmethystAudioBundle;
 use amethyst::core::bundle::SystemBundle;
-use amethyst::core::SystemDesc;
 use amethyst::ecs::{DispatcherBuilder, World};
-use audio::resources::prelude::Songs;
 use audio::systems::prelude::*;
 use core::amethyst;
 use std::fmt::Debug;
@@ -65,6 +64,8 @@ where
         world: &mut World,
         builder: &mut DispatcherBuilder<'a, 'b>,
     ) -> Result<(), amethyst::Error> {
+        init_output(world);
+
         AmethystAudioBundle::default().build(world, builder)?;
 
         let mut play_sounds_system = PlaySoundsSystem::<KA>::default();
@@ -85,13 +86,6 @@ where
             "update_song_playback_system",
             self.deps,
         );
-
-        // builder.add(
-        //     DjSystemDesc::new(|songs: &mut Songs<KB>| songs.next_song())
-        //         .build(world),
-        //     "dj_system",
-        //     &[self.deps, &["update_song_playback_system"]].concat(),
-        // );
 
         Ok(())
     }

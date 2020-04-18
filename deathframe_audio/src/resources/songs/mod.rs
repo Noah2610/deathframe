@@ -31,7 +31,7 @@ where
     /// Valid extensions: ".wav", ".mp3", ".ogg", ".flac"
     /// Panics if the default audio `Output` doesn't exist
     /// (`amethyst::audio::output::Output`).
-    fn load_audio<P>(
+    pub fn load_audio<P>(
         &mut self,
         key: K,
         path: P,
