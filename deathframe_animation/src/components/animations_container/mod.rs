@@ -56,12 +56,20 @@ where
 
     /// Push an animation on top of the animation stack,
     /// making this animation play before others.
+    /// Will only push animation if the final animation on the stack
+    /// isn't already the same animation.
     /// Animations lower in the stack will continue playing once
     /// upper ones finish or are popped off.
     /// Returns an Error if no animation with the given key exists.
     pub fn push(&mut self, key: K) -> Result<(), String> {
         if self.animations.contains_key(&key) {
-            self.animation_stack.push(key);
+            if self
+                .current()
+                .map(|current| current != &key)
+                .unwrap_or(true)
+            {
+                self.animation_stack.push(key);
+            }
             Ok(())
         } else {
             Err(String::from(format!(
