@@ -111,6 +111,12 @@ where
     pub fn has_animation(&self, key: &K) -> bool {
         self.animations.contains_key(key)
     }
+
+    /// Truncate the `animation_stack` to the given length.
+    /// Note, that this should probably never truncate to `0`.
+    pub fn truncate_animation_stack(&mut self, truncate_to: usize) {
+        self.animation_stack.truncate(truncate_to);
+    }
 }
 
 impl<K, A> From<HashMap<K, A>> for AnimationsContainer<K>
