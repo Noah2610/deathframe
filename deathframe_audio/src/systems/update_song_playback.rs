@@ -31,7 +31,7 @@ where
         for song in songs.songs.values_mut() {
             if let Some(audio_sink_action) = song.audio_sink_action.take() {
                 match audio_sink_action {
-                    AudioSinkAction::Stop => {
+                    AudioSinkAction::Play => {
                         if let Some(source) =
                             source_asset_store.get(&song.source)
                         {
@@ -54,7 +54,14 @@ where
                             );
                         }
                     }
+
+                    AudioSinkAction::Stop => {
+                        song.audio_sink.stop();
+                        song.audio_sink = AudioSink::new(&output);
+                    }
+
                     AudioSinkAction::Pause => song.audio_sink.pause(),
+
                     AudioSinkAction::Resume => song.audio_sink.play(),
                 }
             }

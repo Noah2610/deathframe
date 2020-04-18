@@ -64,9 +64,9 @@ where
         world: &mut World,
         builder: &mut DispatcherBuilder<'a, 'b>,
     ) -> Result<(), amethyst::Error> {
-        init_output(world);
-
         AmethystAudioBundle::default().build(world, builder)?;
+
+        init_output(world);
 
         let mut play_sounds_system = PlaySoundsSystem::<KA>::default();
         if let Some(sounds_default_volume) = self.sounds_default_volume {

@@ -11,6 +11,7 @@ mod sounds;
 mod helpers;
 
 pub(crate) enum AudioSinkAction {
+    Play,
     Stop,
     Pause,
     Resume,

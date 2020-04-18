@@ -36,7 +36,7 @@ impl Song {
 
     /// Plays the song.
     pub fn play(&mut self) {
-        self.audio_sink_action = Some(AudioSinkAction::Stop);
+        self.audio_sink_action = Some(AudioSinkAction::Play);
         self.playback_state = PlaybackState::Playing;
     }
 
