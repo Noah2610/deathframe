@@ -8,9 +8,9 @@ const DEFAULT_VOLUME: f32 = 1.0;
 /// A `Song`, wraps it's `SourceHandle` and `AudioSink`.
 pub struct Song {
     pub(crate) source:            SourceHandle,
-    playback_state:               PlaybackState,
+    pub(crate) playback_state:    PlaybackState,
     volume:                       f32,
-    does_loop:                    bool,
+    pub(crate) should_loop:       bool,
     pub(crate) audio_sink:        AudioSink,
     pub(crate) audio_sink_action: Option<AudioSinkAction>,
 }
@@ -22,14 +22,14 @@ impl Song {
             source,
             playback_state: Default::default(),
             volume: DEFAULT_VOLUME,
-            does_loop: false,
+            should_loop: false,
             audio_sink,
             audio_sink_action: Default::default(),
         }
     }
 
-    pub fn with_loop(mut self, does_loop: bool) -> Self {
-        self.does_loop = does_loop;
+    pub fn with_loop(mut self, should_loop: bool) -> Self {
+        self.should_loop = should_loop;
         self
     }
 

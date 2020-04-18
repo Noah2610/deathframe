@@ -10,12 +10,10 @@ use std::marker::PhantomData;
 
 /// The `AudioBundle` registers amethyst's `amethyst_audio::AudioBundle`
 /// and the following systems:
-/// - `amethyst_audio::DjSystem` (named `"dj_system"`)
-///   which will use `resources::prelude::Songs` BGM manager,
-///   if it has been inserted into the world.
 /// - `PlaySoundsSystem` (named `"play_sounds_system"`)
 /// - `UpdateSongVolumeSystem` (named `"update_song_volume_system"`)
 /// - `UpdateSongPlaybackSystem` (named `"update_song_playback_system"`)
+/// - `UpdateSongStateSystem` (named `"update_song_state_system"`)
 ///
 /// Both generics are used for both the `Sounds` and the `Songs` audio keys.
 /// `KA` for `Sounds`, `KB` for `Songs`.
@@ -85,6 +83,12 @@ where
             UpdateSongPlaybackSystem::<KB>::default(),
             "update_song_playback_system",
             self.deps,
+        );
+
+        builder.add(
+            UpdateSongStateSystem::<KB>::default(),
+            "update_song_state_system",
+            &[self.deps, &["update_song_playback_system"]].concat(),
         );
 
         Ok(())
