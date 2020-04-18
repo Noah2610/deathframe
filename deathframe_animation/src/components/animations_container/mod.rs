@@ -12,7 +12,7 @@ use std::hash::Hash;
 /// It knows which `Animation` is currently active / playing.
 /// The `SwitchAnimationsSystem` will switch out the entity's
 /// `Animation` component with the active animation from this component.
-#[derive(Component, Default, Clone, Deserialize)]
+#[derive(Component, Clone, Deserialize)]
 #[storage(DenseVecStorage)]
 #[serde(from = "HashMap<K, AnimationTypeWrapper<Vec<(usize, u64)>>>")]
 pub struct AnimationsContainer<K>
@@ -112,6 +112,18 @@ where
                 .map(|(k, a)| (k, a.into()))
                 .collect(),
             animation_stack: Default::default(),
+        }
+    }
+}
+
+impl<K> Default for AnimationsContainer<K>
+where
+    K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
+{
+    fn default() -> Self {
+        Self {
+            animations:      HashMap::new(),
+            animation_stack: Vec::new(),
         }
     }
 }
