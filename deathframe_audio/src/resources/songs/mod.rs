@@ -87,40 +87,7 @@ where
             song.stop();
         }
     }
-
-    // TODO
-    // /// Returns the next song to play, for `amethyst_audio::DjSystem`.
-    // /// What is returned depends on the `PlaybackState` and `PlaybackBehavior`.
-    // pub fn next_song(&mut self) -> Option<SourceHandle> {
-    //     if let Some(playback_state) = self.playback_state.as_mut() {
-    //         (match playback_state {
-    //             PlaybackState::Stopped => None,
-    //             PlaybackState::Playing(behavior) => {
-    //                 next_song_for_behavior(behavior)
-    //             }
-    //             PlaybackState::Paused(_behavior) => None,
-    //             PlaybackState::Finished => None,
-    //         })
-    //         .and_then(|key| self.get_source_handle(&key).cloned())
-    //     } else {
-    //         None
-    //     }
-    // }
 }
-
-// TODO
-/// Returns the next song to play, depending on the `PlaybackBehavior`.
-// fn next_song_for_behavior<K>(
-//     playback_behavior: &mut PlaybackBehavior<K>,
-// ) -> Option<K>
-// where
-//     K: PartialEq + Eq + Hash + Clone,
-// {
-//     match playback_behavior {
-//         PlaybackBehavior::Autoplay(iter) => iter.next(),
-//         PlaybackBehavior::Repeat(key) => Some(key.clone()),
-//     }
-// }
 
 impl<K> Default for Songs<K>
 where
