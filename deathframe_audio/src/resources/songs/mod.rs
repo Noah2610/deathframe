@@ -67,6 +67,7 @@ where
         &mut self,
         key: K,
         path: P,
+        does_loop: bool,
         world: &World,
     ) -> Result<(), String>
     where
@@ -75,7 +76,8 @@ where
         let source_handle =
             load_audio(path, &world.read_resource(), &world.read_resource())?;
         let audio_sink: AudioSink = AudioSink::new(&world.read_resource());
-        self.songs.insert(key, Song::new(source_handle, audio_sink));
+        let song = Song::new(source_handle, audio_sink).with_loop(does_loop);
+        self.songs.insert(key, song);
         Ok(())
     }
 
