@@ -59,7 +59,7 @@ where
 
             let collisions = collider
                 .query::<FilterQuery<C>>()
-                .filter_ids(damage_dealing_ids.clone())
+                .filter_ids(&damage_dealing_ids)
                 .exp(&query_exp)
                 .run();
 

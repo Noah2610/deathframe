@@ -14,7 +14,7 @@ where
 {
     collider:   &'a Collider<C>,
     expression: Option<&'a QueryExpression<C>>,
-    filter_ids: Option<Vec<Index>>,
+    filter_ids: Option<&'a Vec<Index>>,
 }
 
 impl<'a, C> FilterQuery<'a, C>
@@ -28,7 +28,7 @@ where
     }
 
     /// If given, only match collisions for entities that have one of the given IDs.
-    pub fn filter_ids(mut self, ids: Vec<Index>) -> Self {
+    pub fn filter_ids(mut self, ids: &'a Vec<Index>) -> Self {
         self.filter_ids = Some(ids);
         self
     }
