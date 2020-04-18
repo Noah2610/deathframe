@@ -7,7 +7,7 @@ const DEFAULT_VOLUME: f32 = 1.0;
 
 /// A `Song`, wraps it's `SourceHandle` and `AudioSink`.
 pub struct Song {
-    source:                       SourceHandle,
+    pub(crate) source:            SourceHandle,
     playback_state:               PlaybackState,
     volume:                       f32,
     pub(crate) audio_sink:        AudioSink,
