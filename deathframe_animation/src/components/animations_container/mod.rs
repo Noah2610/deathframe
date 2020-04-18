@@ -98,6 +98,11 @@ where
     pub fn current_animation(&self) -> Option<Animation> {
         self.current().and_then(|key| self.animation(key))
     }
+
+    /// Returns `true` if an animation for the given _key_ exists.
+    pub fn has_animation(&self, key: &K) -> bool {
+        self.animations.contains_key(key)
+    }
 }
 
 impl<K, A> From<HashMap<K, A>> for AnimationsContainer<K>
