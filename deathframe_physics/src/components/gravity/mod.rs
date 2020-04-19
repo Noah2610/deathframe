@@ -10,8 +10,10 @@ use super::component_prelude::*;
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
 pub struct Gravity {
-    pub x: Option<f32>,
-    pub y: Option<f32>,
+    pub x:              Option<f32>,
+    pub y:              Option<f32>,
+    #[serde(skip, default = "enabled_default")]
+    pub(crate) enabled: (bool, bool),
 }
 
 impl Gravity {
@@ -35,13 +37,23 @@ impl Gravity {
             Axis::Y => self.y,
         }
     }
+
+    /// Set enabled state for the given `Axis`.
+    pub fn set_enabled(&mut self, axis: &Axis, enabled: bool) {
+        *(&mut self.enabled).by_axis(axis) = enabled;
+    }
 }
 
 impl From<(Option<f32>, Option<f32>)> for Gravity {
     fn from(gravs: (Option<f32>, Option<f32>)) -> Self {
         Self {
-            x: gravs.0,
-            y: gravs.1,
+            x:       gravs.0,
+            y:       gravs.1,
+            enabled: enabled_default(),
         }
     }
+}
+
+fn enabled_default() -> (bool, bool) {
+    (true, true)
 }

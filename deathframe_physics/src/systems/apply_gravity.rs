@@ -26,9 +26,11 @@ impl<'a> System<'a> for ApplyGravitySystem {
             })
         {
             Axis::for_each(|axis| {
-                if let Some(grav) = gravity.get(&axis) {
-                    if grav != 0.0 {
-                        velocity.increase(&axis, grav * dt);
+                if gravity.enabled.by_axis(&axis) {
+                    if let Some(grav) = gravity.get(&axis) {
+                        if grav != 0.0 {
+                            velocity.increase(&axis, grav * dt);
+                        }
                     }
                 }
             });
