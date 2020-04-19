@@ -8,6 +8,8 @@ use std::hash::Hash;
 use std::marker::PhantomData;
 
 /// Plays queued sounds from `SoundPlayer` components.
+/// If a resource of component type `SoundPlayer` exists,
+/// then it will also be used to play sounds.
 /// `SoundAction::Play` sounds are played with the _default volume_,
 /// which can be set with the `with_default_volume` builder function.
 /// See the `Default` implementation for the default.
@@ -35,7 +37,7 @@ where
     K: 'static + PartialEq + Eq + Hash + Send + Sync + Debug,
 {
     type SystemData = (
-        Entities<'a>,
+        Option<Write<'a, SoundPlayer<K>>>,
         WriteStorage<'a, SoundPlayer<K>>,
         Read<'a, Sounds<K>>,
         Read<'a, AssetStorage<Source>>,
@@ -45,38 +47,45 @@ where
     fn run(
         &mut self,
         (
-            entities,
+            sound_player_res,
             mut sound_player_store,
             sounds,
             asset_storage,
             audio_output,
         ): Self::SystemData,
     ) {
-        for (_entity, sound_player) in
-            (&entities, &mut sound_player_store).join()
-        {
-            for action in sound_player.drain_actions() {
-                match action {
-                    SoundAction::Play(sound_key) => {
-                        play_sound(
-                            &sounds,
-                            &asset_storage,
-                            &audio_output,
-                            &sound_key,
-                            self.default_volume,
-                        );
-                    }
-                    SoundAction::PlayWithVolume(sound_key, volume) => {
-                        play_sound(
-                            &sounds,
-                            &asset_storage,
-                            &audio_output,
-                            &sound_key,
-                            volume,
-                        );
+        let handle_sound_player_actions =
+            |sound_player: &mut SoundPlayer<K>| {
+                for action in sound_player.drain_actions() {
+                    match action {
+                        SoundAction::Play(sound_key) => {
+                            play_sound(
+                                &sounds,
+                                &asset_storage,
+                                &audio_output,
+                                &sound_key,
+                                self.default_volume,
+                            );
+                        }
+                        SoundAction::PlayWithVolume(sound_key, volume) => {
+                            play_sound(
+                                &sounds,
+                                &asset_storage,
+                                &audio_output,
+                                &sound_key,
+                                volume,
+                            );
+                        }
                     }
                 }
-            }
+            };
+
+        if let Some(mut sound_player) = sound_player_res {
+            handle_sound_player_actions(&mut sound_player);
+        }
+
+        for sound_player in (&mut sound_player_store).join() {
+            handle_sound_player_actions(sound_player);
         }
     }
 }
