@@ -53,7 +53,7 @@ impl Animation {
         }
     }
 
-    pub(crate) fn has_played_and_is_finished(&self) -> bool {
+    pub fn has_played_and_is_finished(&self) -> bool {
         self.has_played && !self.is_playing()
     }
 
