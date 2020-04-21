@@ -9,7 +9,7 @@ const DEFAULT_VOLUME: f32 = 1.0;
 pub struct Song {
     pub(crate) source:            SourceHandle,
     pub(crate) playback_state:    PlaybackState,
-    volume:                       f32,
+    pub(crate) volume:            f32,
     pub(crate) should_loop:       bool,
     pub(crate) audio_sink:        AudioSink,
     pub(crate) audio_sink_action: Option<AudioSinkAction>,

@@ -37,6 +37,7 @@ where
                         {
                             song.audio_sink.stop();
                             song.audio_sink = AudioSink::new(&output);
+                            song.audio_sink.set_volume(song.volume);
                             if let Err(e) = song.audio_sink.append(source) {
                                 eprintln!(
                                     "[WARNING]\n[deathframe::audio::systems::\
