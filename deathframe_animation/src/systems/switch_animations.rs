@@ -36,45 +36,53 @@ where
     ) {
         let mut entity_animations = HashMap::new();
 
-        for (entity, animations_container) in
-            (&entities, &mut animations_containers).join().filter(
-                |(entity, _)| is_entity_loaded(*entity, &loadables, &loadeds),
-            )
+        for (entity, animations_container, loadable_opt, loaded_opt) in (
+            &entities,
+            &mut animations_containers,
+            loadables.maybe(),
+            loadeds.maybe(),
+        )
+            .join()
         {
-            if let Some(existing_animation) = animations.get(entity) {
-                if existing_animation.has_played_and_is_finished() {
-                    if let Err(e) = animations_container.pop() {
-                        eprintln!(
-                            "[WARNING]\n    First animation in \
-                             AnimationsContainer's animations stack\n    \
-                             should be an endlessly cycling animation\n    {}",
-                            e
-                        );
+            if let (Some(_), Some(_)) | (None, None) =
+                (loadable_opt, loaded_opt)
+            {
+                if let Some(existing_animation) = animations.get(entity) {
+                    if existing_animation.has_played_and_is_finished() {
+                        if let Err(e) = animations_container.pop() {
+                            eprintln!(
+                                "[WARNING]\n    First animation in \
+                                 AnimationsContainer's animations stack\n    \
+                                 should be an endlessly cycling animation\n    \
+                                 {}",
+                                e
+                            );
+                        }
                     }
                 }
-            }
 
-            if let Some(current_key) = animations_container.current() {
-                entity_animations.insert(entity, current_key.clone());
-                // An animation should be playing
-                if let Some(saved_playing_key) =
-                    self.entity_animations.get(&entity).cloned()
-                {
-                    // Switch animation
-                    if current_key != &saved_playing_key {
+                if let Some(current_key) = animations_container.current() {
+                    entity_animations.insert(entity, current_key.clone());
+                    // An animation should be playing
+                    if let Some(saved_playing_key) =
+                        self.entity_animations.get(&entity).cloned()
+                    {
+                        // Switch animation
+                        if current_key != &saved_playing_key {
+                            self.play_current_animation(
+                                entity,
+                                animations_container,
+                                &mut animations,
+                            );
+                        }
+                    } else {
+                        // Insert initial animation
                         self.play_current_animation(
                             entity,
                             animations_container,
                             &mut animations,
                         );
                     }
-                } else {
-                    // Insert initial animation
-                    self.play_current_animation(
-                        entity,
-                        animations_container,
-                        &mut animations,
-                    );
                 }
             }
         }

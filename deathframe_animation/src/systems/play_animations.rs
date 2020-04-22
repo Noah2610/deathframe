@@ -23,17 +23,23 @@ impl<'a> System<'a> for PlayAnimationsSystem {
             loadeds,
         ): Self::SystemData,
     ) {
-        for (_, animation, sprite_render) in
-            (&entities, &mut animations, &mut sprite_renders)
-                .join()
-                .filter(|(entity, _, _)| {
-                    is_entity_loaded(*entity, &loadables, &loadeds)
-                })
+        for (_, animation, sprite_render, loadable_opt, loaded_opt) in (
+            &entities,
+            &mut animations,
+            &mut sprite_renders,
+            loadables.maybe(),
+            loadeds.maybe(),
+        )
+            .join()
         {
-            animation.update();
-            if let Some(sprite_id) = animation.current_sprite_id() {
-                if sprite_id != sprite_render.sprite_number {
-                    sprite_render.sprite_number = sprite_id;
+            if let (Some(_), Some(_)) | (None, None) =
+                (loadable_opt, loaded_opt)
+            {
+                animation.update();
+                if let Some(sprite_id) = animation.current_sprite_id() {
+                    if sprite_id != sprite_render.sprite_number {
+                        sprite_render.sprite_number = sprite_id;
+                    }
                 }
             }
         }

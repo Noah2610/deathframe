@@ -59,10 +59,19 @@ where
         );
 
         // Loop through all Colliders, and check for collision in the CollisionGrid.
-        for (entity, collider, hitbox, transform) in
-            (&entities, &mut colliders, &hitboxes, &transforms).join()
+        for (entity, collider, hitbox, transform, loadable_opt, loaded_opt) in (
+            &entities,
+            &mut colliders,
+            &hitboxes,
+            &transforms,
+            loadables.maybe(),
+            loadeds.maybe(),
+        )
+            .join()
         {
-            if is_entity_loaded(entity, &loadables, &loadeds) {
+            if let (Some(_), Some(_)) | (None, None) =
+                (loadable_opt, loaded_opt)
+            {
                 let entity_id = entity.id();
                 let entity_pos: Point = {
                     let trans = transform.translation();

@@ -19,21 +19,28 @@ impl<'a> System<'a> for ApplyGravitySystem {
     ) {
         let dt = time.delta_seconds() as f32;
 
-        for (_, gravity, velocity) in (&entities, &gravities, &mut velocities)
+        for (_, gravity, velocity, loadable_opt, loaded_opt) in (
+            &entities,
+            &gravities,
+            &mut velocities,
+            loadables.maybe(),
+            loadeds.maybe(),
+        )
             .join()
-            .filter(|(entity, _, _)| {
-                is_entity_loaded(*entity, &loadables, &loadeds)
-            })
         {
-            Axis::for_each(|axis| {
-                if gravity.enabled.by_axis(&axis) {
-                    if let Some(grav) = gravity.get(&axis) {
-                        if grav != 0.0 {
-                            velocity.increase(&axis, grav * dt);
+            if let (Some(_), Some(_)) | (None, None) =
+                (loadable_opt, loaded_opt)
+            {
+                Axis::for_each(|axis| {
+                    if gravity.enabled.by_axis(&axis) {
+                        if let Some(grav) = gravity.get(&axis) {
+                            if grav != 0.0 {
+                                velocity.increase(&axis, grav * dt);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
     }
 }
