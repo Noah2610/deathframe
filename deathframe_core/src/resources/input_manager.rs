@@ -1,12 +1,13 @@
-use std::collections::HashMap;
-use std::hash::Hash;
+pub use ActionState as InputActionState;
 
 use amethyst::input::{BindingTypes, InputHandler};
+use std::collections::HashMap;
+use std::hash::Hash;
 
 type AxisValue = f32;
 
 #[derive(Clone, Copy, PartialEq)]
-enum ActionState {
+pub enum ActionState {
     Down,
     Up,
     Pressed,
@@ -83,6 +84,23 @@ where
         F: Fn(&(&B::Axis, &AxisValue)) -> bool,
     {
         self.axes.iter().find(find_func).map(|(_, value)| *value)
+    }
+
+    // TODO: REFACTOR + DOCS
+    pub fn actions_for_each<F>(&self, target_state: ActionState, fun: F)
+    where
+        F: FnMut(&B::Action),
+    {
+        self.actions
+            .iter()
+            .filter_map(|(action, state)| {
+                if state == &target_state {
+                    Some(action)
+                } else {
+                    None
+                }
+            })
+            .for_each(fun);
     }
 
     fn is_action_in_state(
