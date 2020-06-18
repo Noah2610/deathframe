@@ -32,22 +32,32 @@ where
     }
 
     // Call this from the active state with the state's (dispatcher's) name every frame.
+    /// Update the given dispatcher, then update the _core_ dispatcher.
     pub fn update(
+        &mut self,
+        world: &World,
+        dispatcher_name: D,
+    ) -> amethyst::Result<()> {
+        self.update_only(world, dispatcher_name)?;
+        self.update_core(world);
+        Ok(())
+    }
+
+    /// Update the given dispatcher, but _don't_ update the _core_ dispatcher.
+    pub fn update_only(
         &mut self,
         world: &World,
         dispatcher_name: D,
     ) -> amethyst::Result<()> {
         if let Some(dispatcher) = self.dispatchers.get_mut(&dispatcher_name) {
             dispatcher.dispatch(&world);
+            Ok(())
         } else {
-            return Err(dispatcher_not_found(dispatcher_name));
+            Err(dispatcher_not_found(dispatcher_name))
         }
-
-        self.update_core(world);
-
-        Ok(())
     }
 
+    /// Upddate the _core_ dispatcher.
     pub fn update_core(&mut self, world: &World) {
         self.core_dispatcher
             .as_mut()
