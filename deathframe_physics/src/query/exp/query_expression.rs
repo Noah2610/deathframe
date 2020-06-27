@@ -16,4 +16,6 @@ where
     And(Vec<QueryExpression<C>>),
     /// _Any_ of the given expressions must be true.
     Or(Vec<QueryExpression<C>>),
+    /// Negates the result of the given expression.
+    Not(Box<QueryExpression<C>>),
 }

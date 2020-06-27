@@ -19,6 +19,8 @@ where
             .into_iter()
             .any(|e| does_expression_match_collision(e, collision)),
 
+        QExp::Not(exp) => !does_expression_match_collision(exp, collision),
+
         QExp::IsSide(target_side) => {
             if let Some(side) = collision.side() {
                 target_side == side
