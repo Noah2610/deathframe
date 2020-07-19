@@ -4,7 +4,7 @@ mod tests;
 use super::component_prelude::*;
 use core::geo::Axis;
 
-#[derive(Component, Default, Builder, Debug, Deserialize)]
+#[derive(Component, Default, Builder, Debug, Clone, Deserialize)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned")]
 pub struct Velocity {
