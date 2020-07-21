@@ -27,8 +27,10 @@ impl<'a> System<'a> for FollowSystem {
                 if let Some(follower_transform) =
                     transforms.get_mut(follower_entity)
                 {
-                    follower_transform.set_translation_x(followed_pos.0);
-                    follower_transform.set_translation_y(followed_pos.1);
+                    follower_transform
+                        .set_translation_x(followed_pos.0 + follower.offset.0);
+                    follower_transform
+                        .set_translation_y(followed_pos.1 + follower.offset.1);
                 }
             }
         }

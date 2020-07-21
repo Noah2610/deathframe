@@ -8,6 +8,7 @@ use std::cmp;
 pub struct Follow {
     pub(crate) to_follow: Entity,
     pub(crate) priority:  i32,
+    pub(crate) offset:    (f32, f32),
 }
 
 impl Follow {
@@ -16,6 +17,7 @@ impl Follow {
         Self {
             to_follow,
             priority: 0,
+            offset: (0.0, 0.0),
         }
     }
 
@@ -25,6 +27,13 @@ impl Follow {
     /// Default priority is `0`.
     pub fn with_priority(mut self, priority: i32) -> Self {
         self.priority = priority;
+        self
+    }
+
+    /// Set a positional offset for this follower.
+    /// So this entity follows the followed entity with an offset.
+    pub fn with_offset(mut self, offset: (f32, f32)) -> Self {
+        self.offset = offset;
         self
     }
 }
