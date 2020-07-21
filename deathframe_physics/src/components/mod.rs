@@ -24,7 +24,7 @@ mod hitbox;
 mod solid;
 mod velocity;
 
-pub(crate) mod helpers {
+pub mod helpers {
     use crate::collision::tag::CollisionTag;
 
     pub trait WithCollisionTag<C>
