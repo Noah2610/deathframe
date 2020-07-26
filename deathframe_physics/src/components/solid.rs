@@ -6,7 +6,7 @@ pub struct Solid<C>
 where
     C: 'static + CollisionTag,
 {
-    pub(crate) tag: C,
+    pub tag: C,
 }
 
 impl<C> Solid<C>
