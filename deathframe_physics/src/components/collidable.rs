@@ -6,7 +6,7 @@ pub struct Collidable<T>
 where
     T: 'static + CollisionTag,
 {
-    pub(crate) tag: T,
+    pub tag: T,
 }
 
 impl<T> Collidable<T>
