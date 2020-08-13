@@ -52,23 +52,23 @@ where
 }
 
 /// Returns `true` if the two passed `Rect`s intersect with each other.
-    #[rustfmt::skip]
-    pub fn do_rects_intersect(rect_one: &Rect, rect_two: &Rect) -> bool {
+#[rustfmt::skip]
+pub fn do_rects_intersect(rect_one: &Rect, rect_two: &Rect) -> bool {
+    (
         (
-            (
-                   rect_one.left >= rect_two.left
-                && rect_one.left <  rect_two.right
-            ) || (
-                   rect_one.left  <= rect_two.left
-                && rect_one.right >  rect_two.left
-            )
-        ) && (
-            (
-                   rect_one.top <= rect_two.top
-                && rect_one.top >  rect_two.bottom
-            ) || (
-                   rect_one.top    >= rect_two.top
-                && rect_one.bottom <  rect_two.top
-            )
+               rect_one.left >= rect_two.left
+            && rect_one.left <  rect_two.right
+        ) || (
+               rect_one.left  <= rect_two.left
+            && rect_one.right >  rect_two.left
         )
-    }
+    ) && (
+        (
+               rect_one.top <= rect_two.top
+            && rect_one.top >  rect_two.bottom
+        ) || (
+               rect_one.top    >= rect_two.top
+            && rect_one.bottom <  rect_two.top
+        )
+    )
+}
