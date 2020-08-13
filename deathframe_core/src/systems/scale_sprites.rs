@@ -93,8 +93,8 @@ impl<'s> System<'s> for ScaleSpritesSystem {
 
             if let Some(scale) = scale_opt {
                 let trans_scale = transform.scale_mut();
-                trans_scale.x = scale[0];
-                trans_scale.y = scale[1];
+                trans_scale.x = scale[0] * trans_scale.x;
+                trans_scale.y = scale[1] * trans_scale.y;
                 to_remove.push(entity);
             }
         }
