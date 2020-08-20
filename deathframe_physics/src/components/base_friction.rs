@@ -6,7 +6,9 @@ use super::component_prelude::*;
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
 pub struct BaseFriction {
+    #[serde(alias = "x")]
     pub(crate) friction_x: Option<f32>,
+    #[serde(alias = "y")]
     pub(crate) friction_y: Option<f32>,
     #[builder(setter(skip))]
     #[serde(default = "default_enabled")]
