@@ -49,14 +49,18 @@ where
             {
                 if let Some(existing_animation) = animations.get(entity) {
                     if existing_animation.has_played_and_is_finished() {
-                        if let Err(e) = animations_container.pop() {
-                            eprintln!(
+                        match animations_container.pop() {
+                            Ok(anim) => {
+                                animations_container.last_finished_animation =
+                                    Some(anim)
+                            }
+                            Err(e) => eprintln!(
                                 "[WARNING]\n    First animation in \
                                  AnimationsContainer's animations stack\n    \
                                  should be an endlessly cycling animation\n    \
                                  {}",
                                 e
-                            );
+                            ),
                         }
                     }
                 }
@@ -83,6 +87,10 @@ where
                             &mut animations,
                         );
                     }
+                } else {
+                    // Remove Animation component if there is no more animation to play
+                    let _ = animations.remove(entity);
+                    let _ = entity_animations.remove(&entity);
                 }
             }
         }

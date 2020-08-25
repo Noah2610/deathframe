@@ -19,9 +19,13 @@ pub struct AnimationsContainer<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
-    animations:      HashMap<K, Animation>,
+    animations:                         HashMap<K, Animation>,
     #[serde(skip)]
-    animation_stack: Vec<K>,
+    animation_stack:                    Vec<K>,
+    /// The last animation that was finished and popped off
+    /// the `animation_stack`. Can only be a `Once` animation.
+    #[serde(skip)]
+    pub(crate) last_finished_animation: Option<K>,
 }
 
 impl<K> AnimationsContainer<K>
@@ -81,7 +85,7 @@ where
 
     /// Pop off an animation from the top of the animation stack,
     /// letting lower ones continue playing.
-    /// Returns the popped-off animation key.
+    /// Returns the popped off animation key.
     /// Returns an Error if attempted to pop off when no animation is in the stack.
     /// Note, that it is possible to pop off _all_ animations from the stack,
     /// which may lead to unexpected behaviour.
@@ -117,6 +121,12 @@ where
     pub fn truncate_animation_stack(&mut self, truncate_to: usize) {
         self.animation_stack.truncate(truncate_to);
     }
+
+    /// Returns the last animation that was finished and popped off
+    /// the `animation_stack`. Can only be a `Once` animation.
+    pub fn last_finished_animation(&self) -> Option<&K> {
+        self.last_finished_animation.as_ref()
+    }
 }
 
 impl<K, A> From<HashMap<K, A>> for AnimationsContainer<K>
@@ -126,11 +136,12 @@ where
 {
     fn from(animations: HashMap<K, A>) -> Self {
         Self {
-            animations:      animations
+            animations:              animations
                 .into_iter()
                 .map(|(k, a)| (k, a.into()))
                 .collect(),
-            animation_stack: Default::default(),
+            animation_stack:         Default::default(),
+            last_finished_animation: None,
         }
     }
 }
@@ -141,8 +152,9 @@ where
 {
     fn default() -> Self {
         Self {
-            animations:      HashMap::new(),
-            animation_stack: Vec::new(),
+            animations:              HashMap::new(),
+            animation_stack:         Vec::new(),
+            last_finished_animation: None,
         }
     }
 }
