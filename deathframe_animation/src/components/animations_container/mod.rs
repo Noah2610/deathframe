@@ -19,13 +19,11 @@ pub struct AnimationsContainer<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
-    animations:                         HashMap<K, Animation>,
+    animations:              HashMap<K, Animation>,
     #[serde(skip)]
-    animation_stack:                    Vec<K>,
-    /// The last animation that was finished and popped off
-    /// the `animation_stack`. Can only be a `Once` animation.
+    animation_stack:         Vec<K>,
     #[serde(skip)]
-    pub(crate) last_finished_animation: Option<K>,
+    last_finished_animation: Option<K>,
 }
 
 impl<K> AnimationsContainer<K>
@@ -42,6 +40,8 @@ where
     /// Plays the animation at the lowest part of the animation stack,
     /// so any other animations, pushed ontop of the stack need
     /// to finish playing, before getting to this animation.
+    ///
+    /// Sets the `last_finished_animation` to `None`.
     pub fn play(&mut self, key: K) -> Result<(), String> {
         if self.animations.contains_key(&key) {
             if let Some(base_animation_key) = self.animation_stack.get_mut(0) {
@@ -49,6 +49,7 @@ where
             } else {
                 self.animation_stack.push(key);
             }
+            self.last_finished_animation = None;
             Ok(())
         } else {
             Err(String::from(format!(
@@ -65,6 +66,8 @@ where
     /// Animations lower in the stack will continue playing once
     /// upper ones finish or are popped off.
     /// Returns an Error if no animation with the given key exists.
+    ///
+    /// Sets the `last_finished_animation` to `None`.
     pub fn push(&mut self, key: K) -> Result<(), String> {
         if self.animations.contains_key(&key) {
             if self
@@ -74,6 +77,7 @@ where
             {
                 self.animation_stack.push(key);
             }
+            self.last_finished_animation = None;
             Ok(())
         } else {
             Err(String::from(format!(
@@ -89,11 +93,19 @@ where
     /// Returns an Error if attempted to pop off when no animation is in the stack.
     /// Note, that it is possible to pop off _all_ animations from the stack,
     /// which may lead to unexpected behaviour.
+    ///
+    /// Also sets the `last_finished_animation`.
     pub fn pop(&mut self) -> Result<K, String> {
-        self.animation_stack.pop().ok_or(String::from(
-            "Attempted to pop off animation from animation stack with no more \
-             animations",
-        ))
+        self.animation_stack
+            .pop()
+            .map(|anim| {
+                self.last_finished_animation = Some(anim.clone());
+                anim
+            })
+            .ok_or(String::from(
+                "Attempted to pop off animation from animation stack with no \
+                 more animations",
+            ))
     }
 
     /// Returns the _key_ of the currently active animation, if any.
@@ -124,6 +136,8 @@ where
 
     /// Returns the last animation that was finished and popped off
     /// the `animation_stack`. Can only be a `Once` animation.
+    /// The `last_finished_animation` is set to `None` when another
+    /// animation starts playing.
     pub fn last_finished_animation(&self) -> Option<&K> {
         self.last_finished_animation.as_ref()
     }
