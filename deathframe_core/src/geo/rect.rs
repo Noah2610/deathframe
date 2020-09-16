@@ -5,6 +5,7 @@ use crate::geo::Point;
 /// It has positions bounding sides (top, bottom, left, right).
 #[derive(Clone, PartialEq, Default, Builder, Debug, Deserialize)]
 #[builder(pattern = "owned", derive(Clone))]
+#[serde(deny_unknown_fields)]
 pub struct Rect {
     pub top:    f32,
     pub bottom: f32,

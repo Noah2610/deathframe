@@ -5,6 +5,7 @@ use super::component_prelude::*;
 #[derive(Component, Builder, Deserialize)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned")]
+#[serde(deny_unknown_fields)]
 pub struct Confined {
     pub(crate) rect: Rect,
 }

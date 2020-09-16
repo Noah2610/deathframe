@@ -4,6 +4,7 @@ use super::component_prelude::*;
 /// that have the `TakesDamage` component.
 #[derive(Component, Clone, Deserialize)]
 #[storage(VecStorage)]
+#[serde(deny_unknown_fields)]
 pub struct DealsDamage {
     pub damage: HitPoints,
 }

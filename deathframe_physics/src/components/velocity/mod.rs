@@ -7,6 +7,7 @@ use core::geo::Axis;
 #[derive(Component, Default, Builder, Debug, Clone, Deserialize)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned")]
+#[serde(deny_unknown_fields)]
 pub struct Velocity {
     pub x: f32,
     pub y: f32,

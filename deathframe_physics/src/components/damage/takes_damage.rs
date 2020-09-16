@@ -4,4 +4,5 @@ use super::component_prelude::*;
 /// collides with, that have the `DealsDamage` component.
 #[derive(Component, Default, Clone, Deserialize)]
 #[storage(NullStorage)]
+#[serde(deny_unknown_fields)]
 pub struct TakesDamage;

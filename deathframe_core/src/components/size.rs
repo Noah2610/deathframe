@@ -2,6 +2,7 @@ use super::component_prelude::*;
 
 /// `Size` is used in multiple places, including collision and scaling.
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Size {
     pub w: f32,
     pub h: f32,

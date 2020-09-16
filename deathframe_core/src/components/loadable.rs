@@ -4,6 +4,7 @@ use super::component_prelude::*;
 /// (get or remove the `Loaded` component) later on.
 #[derive(Default, Component, Deserialize)]
 #[storage(VecStorage)]
+#[serde(deny_unknown_fields)]
 pub struct Loadable {
     pub(crate) padding: (Option<f32>, Option<f32>),
 }
