@@ -9,6 +9,7 @@ use super::component_prelude::*;
 #[derive(Clone, Debug, Default, Component, Builder, Deserialize)]
 #[storage(VecStorage)]
 #[builder(pattern = "owned", setter(strip_option), default)]
+#[serde(deny_unknown_fields)]
 pub struct Gravity {
     pub x:              Option<f32>,
     pub y:              Option<f32>,
