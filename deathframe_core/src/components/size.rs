@@ -49,3 +49,13 @@ impl Into<Vector> for &Size {
         Vector::new(self.w, self.h)
     }
 }
+
+impl<'a> ByAxis for &'a Size {
+    type Item = &'a f32;
+    fn by_axis(self, axis: &Axis) -> Self::Item {
+        match axis {
+            Axis::X => &self.w,
+            Axis::Y => &self.h,
+        }
+    }
+}

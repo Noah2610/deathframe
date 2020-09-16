@@ -78,6 +78,16 @@ impl From<(Option<f32>, Option<f32>)> for BaseFriction {
     }
 }
 
+impl<'a> ByAxis for &'a BaseFriction {
+    type Item = &'a Option<f32>;
+    fn by_axis(self, axis: &Axis) -> Self::Item {
+        match axis {
+            Axis::X => &self.friction_x,
+            Axis::Y => &self.friction_y,
+        }
+    }
+}
+
 fn default_enabled() -> (bool, bool) {
     (true, true)
 }

@@ -57,6 +57,16 @@ impl From<(Option<f32>, Option<f32>)> for Gravity {
     }
 }
 
+impl<'a> ByAxis for &'a Gravity {
+    type Item = &'a Option<f32>;
+    fn by_axis(self, axis: &Axis) -> Self::Item {
+        match axis {
+            Axis::X => &self.x,
+            Axis::Y => &self.y,
+        }
+    }
+}
+
 fn enabled_default() -> (bool, bool) {
     (true, true)
 }
