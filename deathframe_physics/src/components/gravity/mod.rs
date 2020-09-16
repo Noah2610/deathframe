@@ -11,7 +11,9 @@ use super::component_prelude::*;
 #[builder(pattern = "owned", setter(strip_option), default)]
 #[serde(deny_unknown_fields)]
 pub struct Gravity {
+    #[serde(default)]
     pub x:              Option<f32>,
+    #[serde(default)]
     pub y:              Option<f32>,
     #[serde(skip, default = "enabled_default")]
     pub(crate) enabled: (bool, bool),

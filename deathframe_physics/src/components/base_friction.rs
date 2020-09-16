@@ -7,9 +7,9 @@ use super::component_prelude::*;
 #[builder(pattern = "owned", setter(strip_option), default)]
 #[serde(deny_unknown_fields)]
 pub struct BaseFriction {
-    #[serde(alias = "x")]
+    #[serde(alias = "x", default)]
     pub(crate) friction_x: Option<f32>,
-    #[serde(alias = "y")]
+    #[serde(alias = "y", default)]
     pub(crate) friction_y: Option<f32>,
     #[builder(setter(skip))]
     #[serde(default = "default_enabled")]
