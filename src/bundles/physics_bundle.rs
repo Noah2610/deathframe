@@ -40,7 +40,7 @@ where
 
     /// Set the `ApplyBaseFrictionSystem`'s `velocity_margin`.
     /// See the `ApplyBaseFrictionSystem::with_velocity_margin` function.
-    pub fn with_apply_base_friciton_velocity_margin(
+    pub fn with_apply_base_friction_velocity_margin(
         mut self,
         velocity_margin: f32,
     ) -> Self {
