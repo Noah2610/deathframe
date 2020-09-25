@@ -1,7 +1,7 @@
 use super::component_prelude::*;
 
 /// Entities which have `Loadable` may be loaded or unloaded
-/// (get or remove the `Loaded` component) later on.
+/// (add or remove the `Unloaded` component) later on.
 #[derive(Default, Component, Deserialize)]
 #[storage(VecStorage)]
 #[serde(deny_unknown_fields)]

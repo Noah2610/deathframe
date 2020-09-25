@@ -9,8 +9,7 @@ impl<'a> System<'a> for PlayAnimationsSystem {
         Entities<'a>,
         WriteStorage<'a, Animation>,
         WriteStorage<'a, SpriteRender>,
-        ReadStorage<'a, Loadable>,
-        ReadStorage<'a, Loaded>,
+        ReadStorage<'a, Unloaded>,
     );
 
     fn run(
@@ -19,27 +18,21 @@ impl<'a> System<'a> for PlayAnimationsSystem {
             entities,
             mut animations,
             mut sprite_renders,
-            loadables,
-            loadeds,
+            unloaded_store,
         ): Self::SystemData,
     ) {
-        for (_, animation, sprite_render, loadable_opt, loaded_opt) in (
+        for (_, animation, sprite_render, _) in (
             &entities,
             &mut animations,
             &mut sprite_renders,
-            loadables.maybe(),
-            loadeds.maybe(),
+            !&unloaded_store,
         )
             .join()
         {
-            if let (Some(_), Some(_)) | (None, None) =
-                (loadable_opt, loaded_opt)
-            {
-                animation.update();
-                if let Some(sprite_id) = animation.current_sprite_id() {
-                    if sprite_id != sprite_render.sprite_number {
-                        sprite_render.sprite_number = sprite_id;
-                    }
+            animation.update();
+            if let Some(sprite_id) = animation.current_sprite_id() {
+                if sprite_id != sprite_render.sprite_number {
+                    sprite_render.sprite_number = sprite_id;
                 }
             }
         }

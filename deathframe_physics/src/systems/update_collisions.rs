@@ -31,8 +31,7 @@ where
         ReadStorage<'a, Hitbox>,
         WriteStorage<'a, Collider<C>>,
         ReadStorage<'a, Collidable<C>>,
-        ReadStorage<'a, Loadable>,
-        ReadStorage<'a, Loaded>,
+        ReadStorage<'a, Unloaded>,
     );
 
     fn run(
@@ -43,8 +42,7 @@ where
             hitboxes,
             mut colliders,
             collidables,
-            loadables,
-            loadeds,
+            unloaded_store,
         ): Self::SystemData,
     ) {
         // Generate the collision grid.
@@ -53,65 +51,58 @@ where
             &transforms,
             &hitboxes,
             &collidables,
-            &loadables,
-            &loadeds,
+            &unloaded_store,
             Some(Point::new(PADDING.0, PADDING.1)),
         );
 
         // Loop through all Colliders, and check for collision in the CollisionGrid.
-        for (entity, collider, hitbox, transform, loadable_opt, loaded_opt) in (
+        for (entity, collider, hitbox, transform, _) in (
             &entities,
             &mut colliders,
             &hitboxes,
             &transforms,
-            loadables.maybe(),
-            loadeds.maybe(),
+            !&unloaded_store,
         )
             .join()
         {
-            if let (Some(_), Some(_)) | (None, None) =
-                (loadable_opt, loaded_opt)
-            {
-                let entity_id = entity.id();
-                let entity_pos: Point = {
-                    let trans = transform.translation();
-                    Point::new(trans.x, trans.y)
-                };
-                let collider_base_rect = CollisionRect::<C, ()>::builder()
-                    .id(entity_id)
-                    .tag(collider.tag.clone());
+            let entity_id = entity.id();
+            let entity_pos: Point = {
+                let trans = transform.translation();
+                Point::new(trans.x, trans.y)
+            };
+            let collider_base_rect = CollisionRect::<C, ()>::builder()
+                .id(entity_id)
+                .tag(collider.tag.clone());
 
-                for hitbox_rect in hitbox.rects.iter() {
-                    let rect = hitbox_rect.clone().with_offset(&entity_pos);
-                    let collider_rect =
-                        collider_base_rect.clone().rect(rect).build().unwrap();
-                    let colliding_rects =
-                        collision_grid.colliding_with(&collider_rect);
-                    if !colliding_rects.is_empty() {
-                        let rect_sides = RectSides::new(&collider_rect.rect);
-                        for other_rect in colliding_rects {
-                            // Check which side is in collision
-                            if let Some(side) =
-                                rect_sides.collides_with(&other_rect.rect)
-                            {
-                                collider.set_collision_with(
-                                    other_rect.id.expect(
-                                        "`CollisionRect` should have an `id` \
-                                         here",
-                                    ),
-                                    side,
-                                    other_rect.tag.clone().expect(
-                                        "`CollisionRect` should have a \
-                                         `CollisionTag` here",
-                                    ),
-                                );
-                            }
+            for hitbox_rect in hitbox.rects.iter() {
+                let rect = hitbox_rect.clone().with_offset(&entity_pos);
+                let collider_rect =
+                    collider_base_rect.clone().rect(rect).build().unwrap();
+                let colliding_rects =
+                    collision_grid.colliding_with(&collider_rect);
+                if !colliding_rects.is_empty() {
+                    let rect_sides = RectSides::new(&collider_rect.rect);
+                    for other_rect in colliding_rects {
+                        // Check which side is in collision
+                        if let Some(side) =
+                            rect_sides.collides_with(&other_rect.rect)
+                        {
+                            collider.set_collision_with(
+                                other_rect.id.expect(
+                                    "`CollisionRect` should have an `id` here",
+                                ),
+                                side,
+                                other_rect.tag.clone().expect(
+                                    "`CollisionRect` should have a \
+                                     `CollisionTag` here",
+                                ),
+                            );
                         }
                     }
                 }
-
-                collider.update();
             }
+
+            collider.update();
         }
     }
 }

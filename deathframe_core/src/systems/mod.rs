@@ -43,8 +43,6 @@ pub mod system_prelude {
     pub use crate::components::prelude::*;
     pub use crate::geo::prelude::*;
     pub use crate::resources::prelude::*;
-
-    pub use super::helpers::*;
 }
 
 mod confine_entities;
@@ -55,21 +53,3 @@ mod print_fps;
 mod scale_sprites;
 mod update_health;
 mod update_lifecycle;
-
-mod helpers {
-    use super::system_prelude::*;
-    use amethyst::ecs::storage::{MaskedStorage, Storage};
-    use std::ops::Deref;
-
-    pub fn is_entity_loaded<DA, DB>(
-        entity: Entity,
-        loadable_store: &Storage<Loadable, DA>,
-        loaded_store: &Storage<Loaded, DB>,
-    ) -> bool
-    where
-        DA: Deref<Target = MaskedStorage<Loadable>>,
-        DB: Deref<Target = MaskedStorage<Loaded>>,
-    {
-        loadable_store.contains(entity) == loaded_store.contains(entity)
-    }
-}

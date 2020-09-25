@@ -33,8 +33,7 @@ pub(crate) mod helpers {
         transforms: &Storage<Transform, DT>,
         hitboxes: &ReadStorage<Hitbox>,
         with_collision_tag_comps: &ReadStorage<W>,
-        loadables: &ReadStorage<Loadable>,
-        loadeds: &ReadStorage<Loaded>,
+        unloaded_store: &ReadStorage<Unloaded>,
         padding_opt: Option<Point>,
     ) -> CollisionGrid<Entity, C, ()>
     where
@@ -44,32 +43,24 @@ pub(crate) mod helpers {
     {
         let mut grid = CollisionGrid::<Entity, C, ()>::default();
 
-        for (entity, transform, hitbox, collidable, loadable_opt, loaded_opt) in
-            (
-                entities,
-                transforms,
-                hitboxes,
-                with_collision_tag_comps,
-                loadables.maybe(),
-                loadeds.maybe(),
-            )
-                .join()
+        for (entity, transform, hitbox, collidable, _) in (
+            entities,
+            transforms,
+            hitboxes,
+            with_collision_tag_comps,
+            !unloaded_store,
+        )
+            .join()
         {
-            if let (Some(_), Some(_)) | (None, None) =
-                (loadable_opt, loaded_opt)
-            {
-                let collision_tag = collidable.collision_tag().clone();
-
-                let rects = gen_collision_rects(
-                    &entity,
-                    &transform,
-                    &hitbox,
-                    collision_tag,
-                    &padding_opt,
-                );
-
-                grid.insert(entity, rects);
-            }
+            let collision_tag = collidable.collision_tag().clone();
+            let rects = gen_collision_rects(
+                &entity,
+                &transform,
+                &hitbox,
+                collision_tag,
+                &padding_opt,
+            );
+            grid.insert(entity, rects);
         }
 
         grid

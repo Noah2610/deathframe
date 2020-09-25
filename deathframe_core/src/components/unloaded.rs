@@ -1,10 +1,10 @@
 use super::component_prelude::*;
 
-/// Entities which have `Loadable` and `Loaded` will be included in collision detection.
+/// Entities which have `Unloaded` are ignored in many systems.
 #[derive(Default, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct Loaded;
+pub struct Unloaded;
 
-impl Component for Loaded {
+impl Component for Unloaded {
     type Storage = NullStorage<Self>;
 }

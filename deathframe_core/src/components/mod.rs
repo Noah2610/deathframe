@@ -11,10 +11,10 @@ pub mod prelude {
     pub use super::health::prelude::*;
     pub use super::lifecycle::prelude::*;
     pub use super::loadable::Loadable;
-    pub use super::loaded::Loaded;
     pub use super::loader::Loader;
     pub use super::scale_once::ScaleOnce;
     pub use super::size::Size;
+    pub use super::unloaded::Unloaded;
 }
 
 pub mod component_prelude {
@@ -47,7 +47,7 @@ mod follow;
 mod health;
 mod lifecycle;
 mod loadable;
-mod loaded;
 mod loader;
 mod scale_once;
 mod size;
+mod unloaded;

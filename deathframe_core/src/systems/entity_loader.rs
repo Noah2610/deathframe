@@ -7,13 +7,13 @@ use crate::resources::entity_component_inserter::InsertionAction;
 /// and `Loadable` entities are unloaded when _no_ `Loader` entities
 /// are in range.
 pub struct EntityLoaderSystem {
-    entity_loader:        EntityComponentInserter,
+    entity_unloader:      EntityComponentInserter,
     entity_loader_hidden: EntityComponentInserter,
 }
 
 impl EntityLoaderSystem {
     pub fn with_cache(mut self, use_cache: bool) -> Self {
-        self.entity_loader = self.entity_loader.with_cache(use_cache);
+        self.entity_unloader = self.entity_unloader.with_cache(use_cache);
         self.entity_loader_hidden =
             self.entity_loader_hidden.with_cache(use_cache);
         self
@@ -23,7 +23,7 @@ impl EntityLoaderSystem {
 impl Default for EntityLoaderSystem {
     fn default() -> Self {
         Self {
-            entity_loader:        EntityComponentInserter::default()
+            entity_unloader:      EntityComponentInserter::default()
                 .with_priority(InsertionAction::Insert)
                 .with_cache(true),
             entity_loader_hidden: EntityComponentInserter::default()
@@ -40,7 +40,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
         ReadStorage<'a, Size>,
         ReadStorage<'a, Loader>,
         ReadStorage<'a, Loadable>,
-        WriteStorage<'a, Loaded>,
+        WriteStorage<'a, Unloaded>,
         WriteStorage<'a, Hidden>,
     );
 
@@ -52,7 +52,7 @@ impl<'a> System<'a> for EntityLoaderSystem {
             sizes,
             loaders,
             loadables,
-            mut loadeds,
+            mut unloadeds,
             mut hiddens,
         ): Self::SystemData,
     ) {
@@ -113,9 +113,9 @@ impl<'a> System<'a> for EntityLoaderSystem {
                 );
 
                 if in_loading_distance {
-                    self.entity_loader.insert(target_entity);
+                    self.entity_unloader.remove(target_entity);
                 } else {
-                    self.entity_loader.remove(target_entity);
+                    self.entity_unloader.insert(target_entity);
                 }
 
                 if in_render_distance {
@@ -126,8 +126,8 @@ impl<'a> System<'a> for EntityLoaderSystem {
             }
         }
 
-        self.entity_loader
-            .run(&mut loadeds)
+        self.entity_unloader
+            .run(&mut unloadeds)
             .expect("EntityLoader didn't load entities successfully");
         self.entity_loader_hidden
             .run(&mut hiddens)
