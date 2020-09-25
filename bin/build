@@ -19,4 +19,6 @@ _dir="$( dirname "$0" )"
 source "${_dir}/share.sh"
 unset _dir
 
-cargo_cmd build "$@"
+[ -z "$CARGO_CMD" ] && CARGO_CMD="build"
+
+cargo_cmd "$CARGO_CMD" "$@"
