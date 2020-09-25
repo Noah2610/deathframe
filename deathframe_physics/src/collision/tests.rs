@@ -37,18 +37,21 @@ mod collision_rect_tests {
         let one = CollisionRect::builder()
             .rect(colliding_rects.0)
             .id(0)
+            .tag(())
             .build()
             .unwrap();
         let two = CollisionRect::builder()
             .rect(colliding_rects.1)
             .id(1)
+            .tag(())
             .build()
             .unwrap();
         (one, two)
     }
 
     #[test]
-    fn can_build_collision_rect_with_only_rect() {
+    #[should_panic]
+    fn can_not_build_collision_rect_with_only_rect() {
         let rect = Rect::default();
         let _collision_rect = CollisionRect::<(), ()>::builder()
             .rect(rect)
