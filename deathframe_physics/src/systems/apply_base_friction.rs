@@ -1,13 +1,29 @@
 use super::system_prelude::*;
 
-/// If the velocity is smaller than or equal to this margin,
-/// then just set the velocity to 0.0
-const VELOCITY_MARGIN: f32 = 0.001;
-
 /// Constantly applies friction to entities with `BaseFriction`, for each axis.
 /// Only if friction is enabled for the axis (see `BaseFriction`).
-#[derive(Default)]
-pub struct ApplyBaseFrictionSystem;
+pub struct ApplyBaseFrictionSystem {
+    /// If the velocity is smaller than or equal to this margin,
+    /// then just set the velocity to 0.0
+    velocity_margin: f32,
+}
+
+impl Default for ApplyBaseFrictionSystem {
+    fn default() -> Self {
+        Self {
+            velocity_margin: 0.01,
+        }
+    }
+}
+
+impl ApplyBaseFrictionSystem {
+    /// Set the velocity margin.
+    /// See the `velocity_margin` field's docs for info.
+    pub fn with_velocity_margin(mut self, velocity_margin: f32) -> Self {
+        self.velocity_margin = velocity_margin;
+        self
+    }
+}
 
 impl<'a> System<'a> for ApplyBaseFrictionSystem {
     type SystemData = (
@@ -46,7 +62,7 @@ impl<'a> System<'a> for ApplyBaseFrictionSystem {
             {
                 Axis::for_each(|axis| {
                     let vel = velocity.get(&axis);
-                    if vel.abs() > VELOCITY_MARGIN {
+                    if vel.abs() > self.velocity_margin {
                         if let Some(fric) = base_friction.get(&axis) {
                             // Exponential, but may cause side-effects /
                             // problems with frame rate discrepancies:
