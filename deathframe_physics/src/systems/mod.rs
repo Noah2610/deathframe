@@ -52,10 +52,14 @@ pub(crate) mod helpers {
         )
             .join()
         {
+            let position = {
+                let trans = transform.translation();
+                Point::new(trans.x, trans.y)
+            };
             let collision_tag = collidable.collision_tag().clone();
             let rect = gen_collision_rect(
                 &entity,
-                &transform,
+                &position,
                 &hitbox,
                 collision_tag,
                 &padding_opt,
@@ -68,7 +72,7 @@ pub(crate) mod helpers {
 
     pub fn gen_collision_rect<C>(
         entity: &Entity,
-        transform: &Transform,
+        entity_pos: &Point,
         hitbox: &Hitbox,
         collision_tag: C,
         padding_opt: &Option<Point>,
@@ -77,10 +81,6 @@ pub(crate) mod helpers {
         C: CollisionTag,
     {
         let entity_id = entity.id();
-        let entity_pos: Point = {
-            let trans = transform.translation();
-            Point::new(trans.x, trans.y)
-        };
 
         let mut collision_rect = CollisionRect::<C, ()>::builder()
             .id(entity_id)
@@ -92,9 +92,9 @@ pub(crate) mod helpers {
         // Multiple Rects may exist, because a CollisionRect
         // can have multiple hitboxe Rects.
         hitbox.rects.iter().for_each(|hitbox_rect| {
-            let mut rect = hitbox_rect.clone().with_offset(&entity_pos);
+            let mut rect = hitbox_rect.clone().with_offset(entity_pos);
             if let Some(padding) = padding_opt {
-                rect = rect.with_padding(&padding);
+                rect = rect.with_padding(padding);
             }
             collision_rect.rects.push(rect);
         });

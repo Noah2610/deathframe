@@ -6,6 +6,7 @@ pub mod prelude {
     pub use super::gravity::Gravity;
     pub use super::hitbox::Hitbox;
     pub use super::solid::Solid;
+    pub use super::solid_pusher::SolidPusher;
     pub use super::velocity::Velocity;
 }
 
@@ -22,6 +23,7 @@ mod damage;
 mod gravity;
 mod hitbox;
 mod solid;
+mod solid_pusher;
 mod velocity;
 
 pub mod helpers {

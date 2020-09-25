@@ -1,6 +1,6 @@
-use std::marker::PhantomData;
-
 use super::system_prelude::*;
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 /// This system is responsible for moving all entities with `Transform` and `Velocity`,
 /// by manipulating their `Transform` appropriately.
@@ -20,6 +20,7 @@ where
         WriteStorage<'a, Velocity>,
         ReadStorage<'a, Hitbox>,
         ReadStorage<'a, Solid<C>>,
+        ReadStorage<'a, SolidPusher>,
         ReadStorage<'a, Unloaded>,
     );
 
@@ -28,10 +29,11 @@ where
         (
             entities,
             time,
-            mut transforms,
-            mut velocities,
-            hitboxes,
-            solids,
+            mut transform_store,
+            mut velocity_store,
+            hitbox_store,
+            solid_store,
+            solid_pusher_store,
             unloaded_store,
         ): Self::SystemData,
     ) {
@@ -40,19 +42,20 @@ where
         Self::run_without_collision(
             dt,
             &entities,
-            &mut transforms,
-            &mut velocities,
-            &solids,
+            &mut transform_store,
+            &mut velocity_store,
+            &solid_store,
             &unloaded_store,
         );
 
         Self::run_with_collision(
             dt,
             &entities,
-            &mut transforms,
-            &mut velocities,
-            &solids,
-            &hitboxes,
+            &mut transform_store,
+            &mut velocity_store,
+            &solid_store,
+            &solid_pusher_store,
+            &hitbox_store,
             &unloaded_store,
         );
     }
@@ -65,13 +68,19 @@ where
     fn run_without_collision(
         dt: f32,
         entities: &Entities,
-        transforms: &mut WriteStorage<Transform>,
-        velocities: &mut WriteStorage<Velocity>,
-        solids: &ReadStorage<Solid<C>>,
+        transform_store: &mut WriteStorage<Transform>,
+        velocity_store: &mut WriteStorage<Velocity>,
+        solid_store: &ReadStorage<Solid<C>>,
         unloaded_store: &ReadStorage<Unloaded>,
     ) {
-        for (_, transform, velocity, _, _) in
-            (entities, transforms, velocities, !solids, !unloaded_store).join()
+        for (_, transform, velocity, _, _) in (
+            entities,
+            transform_store,
+            velocity_store,
+            !solid_store,
+            !unloaded_store,
+        )
+            .join()
         {
             transform.prepend_translation_x(velocity.x * dt);
             transform.prepend_translation_y(velocity.y * dt);
@@ -81,53 +90,93 @@ where
     fn run_with_collision(
         dt: f32,
         entities: &Entities,
-        transforms: &mut WriteStorage<Transform>,
-        velocities: &mut WriteStorage<Velocity>,
-        solids: &ReadStorage<Solid<C>>,
-        hitboxes: &ReadStorage<Hitbox>,
+        transform_store: &mut WriteStorage<Transform>,
+        velocity_store: &mut WriteStorage<Velocity>,
+        solid_store: &ReadStorage<Solid<C>>,
+        solid_pusher_store: &ReadStorage<SolidPusher>,
+        hitbox_store: &ReadStorage<Hitbox>,
         unloaded_store: &ReadStorage<Unloaded>,
     ) {
         // Generate the collision grid.
         let mut collision_grid = gen_collision_grid(
             entities,
-            &*transforms,
-            hitboxes,
-            solids,
+            &*transform_store,
+            hitbox_store,
+            solid_store,
             unloaded_store,
             None,
         );
 
-        for (entity, transform, velocity, solid, hitbox, _) in (
+        // Create entity data hashmap for transforms and velocities.
+        // These will be changed when moving, and are applied to their
+        // respective components at the end of the function.
+        let mut entity_data_map = EntityDataMap::new();
+        for (entity, transform, velocity) in
+            (entities, &*transform_store, &*velocity_store).join()
+        {
+            let position = {
+                let trans = transform.translation();
+                Point::new(trans.x, trans.y)
+            };
+            let velocity = Vector::new(velocity.x, velocity.y);
+            entity_data_map.insert(entity, EntityData { position, velocity });
+        }
+
+        for (entity, _transform, velocity, solid, hitbox, pusher_opt, _) in (
             entities,
-            transforms,
-            velocities,
-            solids,
-            hitboxes,
+            &*transform_store,
+            &*velocity_store,
+            solid_store,
+            hitbox_store,
+            solid_pusher_store.maybe(),
             !unloaded_store,
         )
             .join()
         {
-            move_enitity(
+            move_entity(
                 dt,
                 &mut collision_grid,
+                &mut entity_data_map,
                 entity,
-                transform,
                 velocity,
                 solid,
                 hitbox,
+                pusher_opt,
             );
+        }
+
+        // Apply changed entity data to respective components.
+        for (entity, transform, velocity) in
+            (entities, transform_store, velocity_store).join()
+        {
+            if let Some(EntityData {
+                position,
+                velocity: velocity_data,
+            }) = entity_data_map.remove(&entity)
+            {
+                transform.set_translation_x(position.x);
+                transform.set_translation_y(position.y);
+                velocity.x = velocity_data.x;
+                velocity.y = velocity_data.y;
+            } else {
+                panic!(
+                    "Should have generated entity data for entity in \
+                     MoveEntitiesSystem",
+                );
+            }
         }
     }
 }
 
-fn move_enitity<C>(
+fn move_entity<C>(
     dt: f32,
     collision_grid: &mut CollisionGrid<Entity, C, ()>,
+    entity_data_map: &mut EntityDataMap,
     entity: Entity,
-    transform: &mut Transform,
-    velocity: &mut Velocity,
+    velocity: &Velocity,
     solid: &Solid<C>,
     hitbox: &Hitbox,
+    pusher_opt: Option<&SolidPusher>,
 ) where
     C: CollisionTag,
 {
@@ -144,11 +193,11 @@ fn move_enitity<C>(
         'pixel_loop: for _ in 0 .. abs {
             if !move_entity_by_one(
                 collision_grid,
+                entity_data_map,
                 entity,
-                transform,
-                velocity,
                 solid,
                 hitbox,
+                pusher_opt,
                 &axis,
                 sign,
             ) {
@@ -161,11 +210,11 @@ fn move_enitity<C>(
         if rem != 0.0 {
             let _ = move_entity_by_one(
                 collision_grid,
+                entity_data_map,
                 entity,
-                transform,
-                velocity,
                 solid,
                 hitbox,
+                pusher_opt,
                 &axis,
                 rem,
             );
@@ -177,26 +226,35 @@ type DidMoveEntity = bool;
 
 fn move_entity_by_one<C>(
     collision_grid: &mut CollisionGrid<Entity, C, ()>,
+    entity_data_map: &mut EntityDataMap,
     entity: Entity,
-    transform: &mut Transform,
-    velocity: &mut Velocity,
     solid: &Solid<C>,
     hitbox: &Hitbox,
+    pusher_opt: Option<&SolidPusher>,
     axis: &Axis,
     step: f32,
 ) -> DidMoveEntity
 where
     C: CollisionTag,
 {
+    // Remove entity data entry here, is re-inserted at the end of the function
+    let EntityData {
+        mut position,
+        mut velocity,
+    } = entity_data_map.remove(&entity).expect(
+        "Should have `EntityData` for entity in `move_entity_by_one` function",
+    );
+
     let new_position = {
-        let trans = transform.translation();
         match axis {
-            Axis::X => Point::new(trans.x + step, trans.y),
-            Axis::Y => Point::new(trans.x, trans.y + step),
+            Axis::X => Point::new(position.x + step, position.y),
+            Axis::Y => Point::new(position.x, position.y + step),
         }
     };
 
-    let is_position_in_collision = {
+    let is_pusher = pusher_opt.is_some();
+
+    let (is_position_in_collision, colliding_rects) = {
         let collision_rect = CollisionRect::builder()
             .id(entity.id())
             .tag(solid.tag.clone())
@@ -210,23 +268,50 @@ where
             )
             .build()
             .unwrap();
-        collision_grid.collides_any(&collision_rect)
+        if is_pusher {
+            let colliding = collision_grid.colliding_with(&collision_rect);
+            (!colliding.is_empty(), Some(colliding))
+        } else {
+            (collision_grid.collides_any(&collision_rect), None)
+        }
     };
 
-    if is_position_in_collision {
-        // New position would be in collision,
-        // kill the relevant velocity and break out of the loop.
-        velocity.clear(&axis);
-        false
+    let did_move_entity = if is_position_in_collision {
+        if is_pusher {
+            if let Some(colliding_rects) = colliding_rects {
+                // SolidPusher is in collision, so try to push colliding entities,
+                // and move self if they were moved successfully.
+                // TODO
+                let moved_colliding_rects = colliding_rects
+                    .into_iter()
+                    .all(|colliding| unimplemented!());
+                unimplemented!()
+            } else {
+                panic!(
+                    "`colliding_rects` has to be `Some` for `SolidPusher` \
+                     entity that is in collision"
+                )
+            }
+        } else {
+            // New position would be in collision,
+            // kill the relevant velocity and break out of the loop.
+            match axis {
+                Axis::X => velocity.x = 0.0,
+                Axis::Y => velocity.y = 0.0,
+            }
+            false
+        }
     } else {
         // New position is NOT in collision, apply position
-        transform.set_translation_x(new_position.x);
-        transform.set_translation_y(new_position.y);
+        // transform.set_translation_x(new_position.x);
+        // transform.set_translation_y(new_position.y);
+        position.x = new_position.x;
+        position.y = new_position.y;
         // Update position in collision_grid
         if let Some(collision_rect) = collision_grid.get_mut(&entity) {
             let new_rect = gen_collision_rect(
                 &entity,
-                &*transform,
+                &position,
                 hitbox,
                 solid.tag.clone(),
                 &None,
@@ -234,7 +319,12 @@ where
             *collision_rect = new_rect;
         }
         true
-    }
+    };
+
+    // Re-insert position and velocity entity data
+    entity_data_map.insert(entity, EntityData { position, velocity });
+
+    did_move_entity
 }
 
 impl<C> Default for MoveEntitiesSystem<C>
@@ -244,4 +334,11 @@ where
     fn default() -> Self {
         Self(Default::default())
     }
+}
+
+type EntityDataMap = HashMap<Entity, EntityData>;
+
+struct EntityData {
+    pub position: Point,
+    pub velocity: Vector,
 }
