@@ -81,15 +81,18 @@ where
         &self,
         target_rect: &CollisionRect<C, T>,
     ) -> Vec<&CollisionRect<C, T>> {
-        self.rects
-            .values()
-            .map(|rects| {
-                rects.iter().filter(|rect| {
+        let mut colliding_rects = Vec::new();
+        for rects in self.rects.values() {
+            rects
+                .iter()
+                .filter(|rect| {
                     collision_check::do_rects_collide(&target_rect, rect)
                 })
-            })
-            .flatten()
-            .collect()
+                .for_each(|colliding_rect| {
+                    colliding_rects.push(colliding_rect)
+                });
+        }
+        colliding_rects
     }
 }
 
