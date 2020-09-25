@@ -108,21 +108,12 @@ where
         );
 
         // Create entity data hashmap for transforms and velocities.
-        // These will be changed when moving, and are applied to their
-        // respective components at the end of the function.
+        // Will be filled when moving entities later,
+        // and at the end of the function each entity's transform and velocity
+        // components are updated with theses values.
         let mut entity_data_map = EntityDataMap::new();
-        for (entity, transform, velocity) in
-            (entities, &*transform_store, &*velocity_store).join()
-        {
-            let position = {
-                let trans = transform.translation();
-                Point::new(trans.x, trans.y)
-            };
-            let velocity = Vector::new(velocity.x, velocity.y);
-            entity_data_map.insert(entity, EntityData { position, velocity });
-        }
 
-        for (entity, _transform, velocity, solid, hitbox, pusher_opt, _) in (
+        for (entity, transform, velocity, solid, hitbox, pusher_opt, _) in (
             entities,
             &*transform_store,
             &*velocity_store,
@@ -138,6 +129,7 @@ where
                 &mut collision_grid,
                 &mut entity_data_map,
                 entity,
+                transform,
                 velocity,
                 solid,
                 hitbox,
@@ -146,23 +138,14 @@ where
         }
 
         // Apply changed entity data to respective components.
-        for (entity, transform, velocity) in
-            (entities, transform_store, velocity_store).join()
-        {
-            if let Some(EntityData {
-                position,
-                velocity: velocity_data,
-            }) = entity_data_map.remove(&entity)
-            {
+        for (entity, EntityData { position, velocity }) in entity_data_map {
+            if let Some(transform) = transform_store.get_mut(entity) {
                 transform.set_translation_x(position.x);
                 transform.set_translation_y(position.y);
-                velocity.x = velocity_data.x;
-                velocity.y = velocity_data.y;
-            } else {
-                panic!(
-                    "Should have generated entity data for entity in \
-                     MoveEntitiesSystem",
-                );
+            }
+            if let Some(velocity_comp) = velocity_store.get_mut(entity) {
+                velocity_comp.x = velocity.x;
+                velocity_comp.y = velocity.y;
             }
         }
     }
@@ -173,6 +156,7 @@ fn move_entity<C>(
     collision_grid: &mut CollisionGrid<Entity, C, ()>,
     entity_data_map: &mut EntityDataMap,
     entity: Entity,
+    transform: &Transform,
     velocity: &Velocity,
     solid: &Solid<C>,
     hitbox: &Hitbox,
@@ -180,6 +164,8 @@ fn move_entity<C>(
 ) where
     C: CollisionTag,
 {
+    entity_data_map.insert(entity, EntityData::from((transform, velocity)));
+
     Axis::for_each(|axis| {
         let vel = match axis {
             Axis::X => velocity.x * dt,
@@ -341,4 +327,13 @@ type EntityDataMap = HashMap<Entity, EntityData>;
 struct EntityData {
     pub position: Point,
     pub velocity: Vector,
+}
+
+impl<'a> From<(&'a Transform, &'a Velocity)> for EntityData {
+    fn from((transform, velocity): (&'a Transform, &'a Velocity)) -> Self {
+        let trans = transform.translation();
+        let position = Point::new(trans.x, trans.y);
+        let velocity = Vector::new(velocity.x, velocity.y);
+        Self { position, velocity }
+    }
 }
