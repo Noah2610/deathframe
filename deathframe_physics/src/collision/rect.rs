@@ -10,9 +10,9 @@ pub struct CollisionRect<C, T>
 where
     C: CollisionTag,
 {
-    pub id:     Option<Index>,
+    pub id:     Index,
     pub rect:   Rect,
-    pub tag:    Option<C>,
+    pub tag:    C,
     pub custom: Option<T>,
 }
 
@@ -89,11 +89,21 @@ where
             custom,
         } = self;
         Ok(CollisionRect {
-            id,
-            rect: rect.ok_or(amethyst::Error::from_string(
-                "CollisionRectBuilder requires a Rect",
-            ))?,
-            tag,
+            id: id.ok_or_else(|| {
+                amethyst::Error::from_string(
+                    "CollisionRectBuilder requires an id",
+                )
+            })?,
+            rect: rect.ok_or_else(|| {
+                amethyst::Error::from_string(
+                    "CollisionRectBuilder requires a rect",
+                )
+            })?,
+            tag: tag.ok_or_else(|| {
+                amethyst::Error::from_string(
+                    "CollisionRectBuilder requires a tag",
+                )
+            })?,
             custom,
         })
     }

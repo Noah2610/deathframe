@@ -88,14 +88,9 @@ where
                             rect_sides.collides_with(&other_rect.rect)
                         {
                             collider.set_collision_with(
-                                other_rect.id.expect(
-                                    "`CollisionRect` should have an `id` here",
-                                ),
+                                other_rect.id,
                                 side,
-                                other_rect.tag.clone().expect(
-                                    "`CollisionRect` should have a \
-                                     `CollisionTag` here",
-                                ),
+                                other_rect.tag.clone(),
                             );
                         }
                     }
