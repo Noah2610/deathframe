@@ -16,9 +16,10 @@ where
     CU: 'static + CollisionTag,
     CM: 'static + CollisionTag,
 {
-    deps: &'a [&'a str],
-    _cm:  PhantomData<CM>,
-    _cu:  PhantomData<CU>,
+    deps:                                &'a [&'a str],
+    apply_base_friction_velocity_margin: Option<f32>,
+    _cm:                                 PhantomData<CM>,
+    _cu:                                 PhantomData<CU>,
 }
 
 impl<'a, CU, CM> PhysicsBundle<'a, CU, CM>
@@ -34,6 +35,16 @@ where
     /// Set system dependencies for all registered systems.
     pub fn with_deps(mut self, deps: &'a [&'a str]) -> Self {
         self.deps = deps;
+        self
+    }
+
+    /// Set the `ApplyBaseFrictionSystem`'s `velocity_margin`.
+    /// See the `ApplyBaseFrictionSystem::with_velocity_margin` function.
+    pub fn with_apply_base_friciton_velocity_margin(
+        mut self,
+        velocity_margin: f32,
+    ) -> Self {
+        self.apply_base_friction_velocity_margin = Some(velocity_margin);
         self
     }
 }
@@ -54,7 +65,16 @@ where
             self.deps,
         );
         builder.add(
-            ApplyBaseFrictionSystem::default(),
+            {
+                let system = ApplyBaseFrictionSystem::default();
+                if let Some(velocity_margin) =
+                    self.apply_base_friction_velocity_margin
+                {
+                    system.with_velocity_margin(velocity_margin)
+                } else {
+                    system
+                }
+            },
             "apply_base_friction_system",
             &[self.deps, &["apply_gravity_system"]].concat(),
         );
@@ -88,9 +108,10 @@ where
 {
     fn default() -> Self {
         Self {
-            deps: Default::default(),
-            _cm:  Default::default(),
-            _cu:  Default::default(),
+            deps:                                Default::default(),
+            apply_base_friction_velocity_margin: Default::default(),
+            _cm:                                 Default::default(),
+            _cu:                                 Default::default(),
         }
     }
 }
