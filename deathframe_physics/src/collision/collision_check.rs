@@ -8,7 +8,6 @@ use core::geo::prelude::*;
 /// Returns `true` if the two passed `CollisionRect`s are in collision;
 /// also checks, that their entity IDs are not the same,
 /// and that their tags allow them to collide with each other.
-#[inline]
 pub fn do_rects_collide<C, U, V>(
     rect_one: &CollisionRect<C, U>,
     rect_two: &CollisionRect<C, V>,
@@ -18,7 +17,12 @@ where
 {
     !do_rect_ids_match(rect_one.id, rect_two.id)
         && do_rect_tags_match(&rect_one.tag, &rect_two.tag)
-        && do_rects_intersect(&rect_one.rect, &rect_two.rect)
+        && rect_one.rects.iter().any(|rect_one| {
+            rect_two
+                .rects
+                .iter()
+                .any(|rect_two| do_rects_intersect(rect_one, rect_two))
+        })
 }
 
 /// Checks if the given IDs are the same.

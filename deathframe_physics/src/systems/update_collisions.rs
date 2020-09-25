@@ -70,22 +70,25 @@ where
                 let trans = transform.translation();
                 Point::new(trans.x, trans.y)
             };
-            let collider_base_rect = CollisionRect::<C, ()>::builder()
+            let mut collider_rect = CollisionRect::<C, ()>::builder()
                 .id(entity_id)
-                .tag(collider.tag.clone());
+                .tag(collider.tag.clone())
+                .build()
+                .unwrap();
 
             for hitbox_rect in hitbox.rects.iter() {
                 let rect = hitbox_rect.clone().with_offset(&entity_pos);
-                let collider_rect =
-                    collider_base_rect.clone().rect(rect).build().unwrap();
+                collider_rect.rects = vec![rect];
                 let colliding_rects =
                     collision_grid.colliding_with(&collider_rect);
                 if !colliding_rects.is_empty() {
-                    let rect_sides = RectSides::new(&collider_rect.rect);
+                    let rect_sides = RectSides::new(&collider_rect.rects[0]);
                     for other_rect in colliding_rects {
                         // Check which side is in collision
                         if let Some(side) =
-                            rect_sides.collides_with(&other_rect.rect)
+                            other_rect.rects.iter().find_map(|other_rect| {
+                                rect_sides.collides_with(other_rect)
+                            })
                         {
                             collider.set_collision_with(
                                 other_rect.id,

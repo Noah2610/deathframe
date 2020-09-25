@@ -53,26 +53,26 @@ pub(crate) mod helpers {
             .join()
         {
             let collision_tag = collidable.collision_tag().clone();
-            let rects = gen_collision_rects(
+            let rect = gen_collision_rect(
                 &entity,
                 &transform,
                 &hitbox,
                 collision_tag,
                 &padding_opt,
             );
-            grid.insert(entity, rects);
+            grid.insert(entity, rect);
         }
 
         grid
     }
 
-    pub fn gen_collision_rects<C>(
+    pub fn gen_collision_rect<C>(
         entity: &Entity,
         transform: &Transform,
         hitbox: &Hitbox,
         collision_tag: C,
         padding_opt: &Option<Point>,
-    ) -> Vec<CollisionRect<C, ()>>
+    ) -> CollisionRect<C, ()>
     where
         C: CollisionTag,
     {
@@ -82,23 +82,23 @@ pub(crate) mod helpers {
             Point::new(trans.x, trans.y)
         };
 
-        let base_collision_rect = CollisionRect::<C, ()>::builder()
+        let mut collision_rect = CollisionRect::<C, ()>::builder()
             .id(entity_id)
-            .tag(collision_tag);
+            .tag(collision_tag)
+            .build()
+            .unwrap();
 
-        // Create the CollisionRect(s) for this entity.
-        // Multiple CollisionRects may exist, because an entity
-        // can have multiple Hitboxes (Hitbox parts).
-        hitbox
-            .rects
-            .iter()
-            .map(|hitbox_rect| {
-                let mut rect = hitbox_rect.clone().with_offset(&entity_pos);
-                if let Some(padding) = padding_opt {
-                    rect = rect.with_padding(&padding);
-                }
-                base_collision_rect.clone().rect(rect).build().unwrap()
-            })
-            .collect()
+        // Create the Rects for this entity.
+        // Multiple Rects may exist, because a CollisionRect
+        // can have multiple hitboxe Rects.
+        hitbox.rects.iter().for_each(|hitbox_rect| {
+            let mut rect = hitbox_rect.clone().with_offset(&entity_pos);
+            if let Some(padding) = padding_opt {
+                rect = rect.with_padding(&padding);
+            }
+            collision_rect.rects.push(rect);
+        });
+
+        collision_rect
     }
 }

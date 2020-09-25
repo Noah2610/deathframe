@@ -3,7 +3,8 @@ use amethyst::ecs::world::Index;
 use core::amethyst;
 use core::geo::prelude::*;
 
-/// A rectangular collision area with a unique entity ID.
+/// A collision hitbox with a unique entity ID.
+/// Holds multiple `Rect`s as the hitbox.
 /// Can also hold optional custom data.
 #[derive(Clone, Debug)]
 pub struct CollisionRect<C, T>
@@ -11,7 +12,7 @@ where
     C: CollisionTag,
 {
     pub id:     Index,
-    pub rect:   Rect,
+    pub rects:  Vec<Rect>,
     pub tag:    C,
     pub custom: Option<T>,
 }
@@ -33,7 +34,7 @@ where
     C: CollisionTag,
 {
     id:     Option<Index>,
-    rect:   Option<Rect>,
+    rects:  Vec<Rect>,
     tag:    Option<C>,
     custom: Option<T>,
 }
@@ -45,7 +46,7 @@ where
     fn default() -> Self {
         Self {
             id:     None,
-            rect:   None,
+            rects:  Vec::new(),
             tag:    None,
             custom: None,
         }
@@ -62,9 +63,15 @@ where
         self
     }
 
-    /// Set the `rect`.
+    /// Set the `rects`.
+    pub fn rects(mut self, rects: Vec<Rect>) -> Self {
+        self.rects = rects;
+        self
+    }
+
+    /// Add a `Rect` to the rects vec.
     pub fn rect(mut self, rect: Rect) -> Self {
-        self.rect = Some(rect);
+        self.rects.push(rect);
         self
     }
 
@@ -84,7 +91,7 @@ where
     pub fn build(self) -> Result<CollisionRect<C, T>, amethyst::Error> {
         let CollisionRectBuilder {
             id,
-            rect,
+            rects,
             tag,
             custom,
         } = self;
@@ -94,11 +101,7 @@ where
                     "CollisionRectBuilder requires an id",
                 )
             })?,
-            rect: rect.ok_or_else(|| {
-                amethyst::Error::from_string(
-                    "CollisionRectBuilder requires a rect",
-                )
-            })?,
+            rects,
             tag: tag.ok_or_else(|| {
                 amethyst::Error::from_string(
                     "CollisionRectBuilder requires a tag",

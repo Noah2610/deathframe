@@ -76,8 +76,8 @@ mod collision_rect_tests {
     fn rects_collide_in_collision_rect() {
         let (one, two) = get_intersecting_collision_rects();
         let mut grid_map = HashMap::new();
-        grid_map.insert("One", vec![one.clone()]);
-        grid_map.insert("Two", vec![two.clone()]);
+        grid_map.insert("One", one.clone());
+        grid_map.insert("Two", two.clone());
         let grid = CollisionGrid::new(grid_map);
 
         assert!(
@@ -96,7 +96,7 @@ mod collision_rect_tests {
              CollisionRect in CollisionGrid"
         );
         assert_eq!(
-            &colliding_with_one[0].rect, &two.rect,
+            &colliding_with_one[0].rects[0], &two.rects[0],
             "CollisionRect colliding with first Rect should be the second Rect"
         );
     }

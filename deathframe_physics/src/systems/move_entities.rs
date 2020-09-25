@@ -138,7 +138,7 @@ where
                 transform.set_translation_x(position.x);
                 transform.set_translation_y(position.y);
                 if let Some(rects) = collision_grid.get_mut(&entity) {
-                    let new_rects = gen_collision_rects(
+                    let new_rects = gen_collision_rect(
                         &entity,
                         &*transform,
                         hitbox,
