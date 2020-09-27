@@ -1,5 +1,5 @@
 use super::system_prelude::*;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 
 /// This system is responsible for moving all entities with `Transform` and `Velocity`,
@@ -110,14 +110,16 @@ where
         // Create entity data hashmap for transforms and velocities.
         // At the end of the function each entity's transform and velocity
         // components are updated with theses values.
+        // Note, that this data is generated for all movable entities,
+        // even unloaded entities.
         let mut entity_data_map = EntityDataMap::new();
-        for (entity, transform, _) in
-            (entities, &*transform_store, !unloaded_store).join()
+        for (entity, transform, _solid, _hitbox) in
+            (entities, &*transform_store, solid_store, hitbox_store).join()
         {
             entity_data_map.insert(entity, EntityData::from(transform));
         }
 
-        for (entity, transform, velocity, _solid, _hitbox, _) in (
+        for (entity, _transform, velocity, _solid, _hitbox, _) in (
             entities,
             &*transform_store,
             velocity_store,
@@ -132,7 +134,6 @@ where
                 &mut collision_grid,
                 &mut entity_data_map,
                 entity,
-                transform,
                 velocity,
                 entities,
                 solid_store,
@@ -156,7 +157,6 @@ fn move_entity<C>(
     collision_grid: &mut CollisionGrid<Entity, C, ()>,
     entity_data_map: &mut EntityDataMap,
     entity: Entity,
-    transform: &Transform,
     velocity: &mut Velocity,
     entities: &Entities,
     solid_store: &ReadStorage<Solid<C>>,
@@ -186,6 +186,7 @@ fn move_entity<C>(
                 solid_store,
                 hitbox_store,
                 pusher_store,
+                &mut HashSet::new(),
             ) {
                 // Entity did not move, would have been in collision.
                 // kill the relevant velocity and break out of the loop.
@@ -206,6 +207,7 @@ fn move_entity<C>(
                 solid_store,
                 hitbox_store,
                 pusher_store,
+                &mut HashSet::new(),
             ) {
                 // Entity did not move, would have been in collision.
                 // kill the relevant velocity.
@@ -227,6 +229,7 @@ fn move_entity_by_one<C>(
     solid_store: &ReadStorage<Solid<C>>,
     hitbox_store: &ReadStorage<Hitbox>,
     pusher_store: &ReadStorage<SolidPusher>,
+    pushed_entities: &mut HashSet<Entity>,
 ) -> DidMoveEntity
 where
     C: CollisionTag,
@@ -304,17 +307,24 @@ where
                 // and move self if they were moved successfully.
                 let did_move_colliding_rects =
                     colliding_rects.into_iter().all(|colliding| {
-                        move_entity_by_one(
-                            collision_grid,
-                            entity_data_map,
-                            entities.entity(colliding.id),
-                            axis,
-                            step,
-                            entities,
-                            solid_store,
-                            hitbox_store,
-                            pusher_store,
-                        )
+                        let colliding_entity = entities.entity(colliding.id);
+                        if pushed_entities.contains(&colliding_entity) {
+                            true
+                        } else {
+                            pushed_entities.insert(colliding_entity.clone());
+                            move_entity_by_one(
+                                collision_grid,
+                                entity_data_map,
+                                colliding_entity,
+                                axis,
+                                step,
+                                entities,
+                                solid_store,
+                                hitbox_store,
+                                pusher_store,
+                                pushed_entities,
+                            )
+                        }
                     });
                 if did_move_colliding_rects {
                     // Move this entity, because all colliding entities were moved
