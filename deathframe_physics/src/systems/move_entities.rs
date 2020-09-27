@@ -293,10 +293,17 @@ fn move_entity_by_one<C>(
 where
     C: CollisionTag,
 {
+    // TODO
     // Remove entity data entry here, is re-inserted at the end of the function
-    let EntityData { mut position } = entity_data_map.remove(&entity).expect(
-        "Should have `EntityData` for entity in `move_entity_by_one` function",
-    );
+    // let EntityData { mut position } = entity_data_map.remove(&entity).expect(
+    //     "Should have `EntityData` for entity in `move_entity_by_one` function",
+    // );
+    let EntityData { mut position } =
+        if let Some(data) = entity_data_map.remove(&entity) {
+            data
+        } else {
+            return false;
+        };
 
     let solid = solid_store
         .get(entity)
