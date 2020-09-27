@@ -24,7 +24,7 @@ impl Default for EntityLoaderSystem {
     fn default() -> Self {
         Self {
             entity_unloader:      EntityComponentInserter::default()
-                .with_priority(InsertionAction::Insert)
+                .with_priority(InsertionAction::Remove)
                 .with_cache(true),
             entity_loader_hidden: EntityComponentInserter::default()
                 .with_priority(InsertionAction::Remove)
