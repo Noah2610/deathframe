@@ -6,6 +6,7 @@ use super::component_prelude::*;
 #[storage(VecStorage)]
 #[serde(deny_unknown_fields)]
 pub struct Loadable {
+    #[serde(default)]
     pub(crate) padding: (Option<f32>, Option<f32>),
 }
 
