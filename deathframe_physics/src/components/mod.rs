@@ -5,6 +5,7 @@ pub mod prelude {
     pub use super::damage::prelude::*;
     pub use super::gravity::Gravity;
     pub use super::hitbox::Hitbox;
+    pub use super::non_precise_movement::NonPreciseMovement;
     pub use super::solid::Solid;
     pub use super::solid_pushable::SolidPushable;
     pub use super::solid_pusher::SolidPusher;
@@ -23,6 +24,7 @@ mod collider;
 mod damage;
 mod gravity;
 mod hitbox;
+mod non_precise_movement;
 mod solid;
 mod solid_pushable;
 mod solid_pusher;

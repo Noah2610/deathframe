@@ -22,6 +22,7 @@ where
         ReadStorage<'a, Solid<C>>,
         ReadStorage<'a, SolidPusher>,
         ReadStorage<'a, SolidPushable>,
+        ReadStorage<'a, NonPreciseMovement>,
         ReadStorage<'a, Unloaded>,
     );
 
@@ -36,6 +37,7 @@ where
             solid_store,
             solid_pusher_store,
             solid_pushable_store,
+            non_precise_movement_store,
             unloaded_store,
         ): Self::SystemData,
     ) {
@@ -59,6 +61,7 @@ where
             &solid_pusher_store,
             &solid_pushable_store,
             &hitbox_store,
+            &non_precise_movement_store,
             &unloaded_store,
         );
     }
@@ -99,6 +102,7 @@ where
         solid_pusher_store: &ReadStorage<SolidPusher>,
         solid_pushable_store: &ReadStorage<SolidPushable>,
         hitbox_store: &ReadStorage<Hitbox>,
+        non_precise_movement_store: &ReadStorage<NonPreciseMovement>,
         unloaded_store: &ReadStorage<Unloaded>,
     ) {
         // Generate the collision grid.
@@ -123,12 +127,21 @@ where
             entity_data_map.insert(entity, EntityData::from(transform));
         }
 
-        for (entity, _transform, velocity, _solid, _hitbox, _) in (
+        for (
+            entity,
+            _transform,
+            velocity,
+            _solid,
+            _hitbox,
+            non_precise_movement_opt,
+            _,
+        ) in (
             entities,
             &*transform_store,
             velocity_store,
             solid_store,
             hitbox_store,
+            non_precise_movement_store.maybe(),
             !unloaded_store,
         )
             .join()
@@ -144,6 +157,7 @@ where
                 hitbox_store,
                 solid_pusher_store,
                 solid_pushable_store,
+                non_precise_movement_opt,
             );
         }
 
@@ -168,6 +182,7 @@ fn move_entity<C>(
     hitbox_store: &ReadStorage<Hitbox>,
     pusher_store: &ReadStorage<SolidPusher>,
     pushable_store: &ReadStorage<SolidPushable>,
+    non_precise_movement_opt: Option<&NonPreciseMovement>,
 ) where
     C: CollisionTag,
 {
@@ -202,26 +217,61 @@ fn move_entity<C>(
             }
         }
 
-        // Try to move by the floating point remainder
-        if rem != 0.0 {
-            if !move_entity_by_one(
-                collision_grid,
-                entity_data_map,
-                entity,
-                &axis,
-                rem,
-                entities,
-                solid_store,
-                hitbox_store,
-                pusher_store,
-                pushable_store,
-                &mut HashSet::new(),
-            ) {
-                // Entity did not move, would have been in collision.
-                // kill the relevant velocity.
-                velocity.clear(&axis);
+        if non_precise_movement_opt.is_none() {
+            // Try to move by the floating point remainder.
+            // Only if entity does NOT have `NonPreciseMovement` component.
+            if rem != 0.0 {
+                if !move_entity_by_one(
+                    collision_grid,
+                    entity_data_map,
+                    entity,
+                    &axis,
+                    rem,
+                    entities,
+                    solid_store,
+                    hitbox_store,
+                    pusher_store,
+                    pushable_store,
+                    &mut HashSet::new(),
+                ) {
+                    // Entity did not move, would have been in collision.
+                    // kill the relevant velocity.
+                    velocity.clear(&axis);
+                }
             }
         }
+
+        // TODO
+        // Round position, if it's moving in the direction of the nearest
+        // rounded number, and if the pos would round to that number.
+        // if let Some(EntityData { position }) = entity_data_map.get(&entity) {
+        //     let pos_rem = (position.x, position.y).by_axis(&axis) % 1.0;
+        //     // Try to move to next integer pixel
+        //     let step = if sign < 0.0 && pos_rem < 0.5 {
+        //         Some(-pos_rem)
+        //     } else if sign > 0.0 && pos_rem >= 0.5 {
+        //         Some(pos_rem)
+        //     } else {
+        //         None
+        //     };
+        //     if let Some(step) = step {
+        //         if !move_entity_by_one(
+        //             collision_grid,
+        //             entity_data_map,
+        //             entity,
+        //             &axis,
+        //             step,
+        //             entities,
+        //             solid_store,
+        //             hitbox_store,
+        //             pusher_store,
+        //             pushable_store,
+        //             &mut HashSet::new(),
+        //         ) {
+        //             velocity.clear(&axis);
+        //         }
+        //     }
+        // }
     });
 }
 
