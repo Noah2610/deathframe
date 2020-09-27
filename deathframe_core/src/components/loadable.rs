@@ -2,7 +2,7 @@ use super::component_prelude::*;
 
 /// Entities which have `Loadable` may be loaded or unloaded
 /// (add or remove the `Unloaded` component) later on.
-#[derive(Default, Component, Deserialize)]
+#[derive(Default, Component, Deserialize, Clone)]
 #[storage(VecStorage)]
 #[serde(deny_unknown_fields)]
 pub struct Loadable {
