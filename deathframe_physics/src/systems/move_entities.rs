@@ -21,6 +21,7 @@ where
         ReadStorage<'a, Hitbox>,
         ReadStorage<'a, Solid<C>>,
         ReadStorage<'a, SolidPusher>,
+        ReadStorage<'a, SolidPushable>,
         ReadStorage<'a, Unloaded>,
     );
 
@@ -34,6 +35,7 @@ where
             hitbox_store,
             solid_store,
             solid_pusher_store,
+            solid_pushable_store,
             unloaded_store,
         ): Self::SystemData,
     ) {
@@ -55,6 +57,7 @@ where
             &mut velocity_store,
             &solid_store,
             &solid_pusher_store,
+            &solid_pushable_store,
             &hitbox_store,
             &unloaded_store,
         );
@@ -94,6 +97,7 @@ where
         velocity_store: &mut WriteStorage<Velocity>,
         solid_store: &ReadStorage<Solid<C>>,
         solid_pusher_store: &ReadStorage<SolidPusher>,
+        solid_pushable_store: &ReadStorage<SolidPushable>,
         hitbox_store: &ReadStorage<Hitbox>,
         unloaded_store: &ReadStorage<Unloaded>,
     ) {
@@ -139,6 +143,7 @@ where
                 solid_store,
                 hitbox_store,
                 solid_pusher_store,
+                solid_pushable_store,
             );
         }
 
@@ -162,6 +167,7 @@ fn move_entity<C>(
     solid_store: &ReadStorage<Solid<C>>,
     hitbox_store: &ReadStorage<Hitbox>,
     pusher_store: &ReadStorage<SolidPusher>,
+    pushable_store: &ReadStorage<SolidPushable>,
 ) where
     C: CollisionTag,
 {
@@ -186,6 +192,7 @@ fn move_entity<C>(
                 solid_store,
                 hitbox_store,
                 pusher_store,
+                pushable_store,
                 &mut HashSet::new(),
             ) {
                 // Entity did not move, would have been in collision.
@@ -207,6 +214,7 @@ fn move_entity<C>(
                 solid_store,
                 hitbox_store,
                 pusher_store,
+                pushable_store,
                 &mut HashSet::new(),
             ) {
                 // Entity did not move, would have been in collision.
@@ -229,6 +237,7 @@ fn move_entity_by_one<C>(
     solid_store: &ReadStorage<Solid<C>>,
     hitbox_store: &ReadStorage<Hitbox>,
     pusher_store: &ReadStorage<SolidPusher>,
+    pushable_store: &ReadStorage<SolidPushable>,
     pushed_entities: &mut HashSet<Entity>,
 ) -> DidMoveEntity
 where
@@ -308,7 +317,9 @@ where
                 let did_move_colliding_rects =
                     colliding_rects.into_iter().all(|colliding| {
                         let colliding_entity = entities.entity(colliding.id);
-                        if pushed_entities.contains(&colliding_entity) {
+                        if !pushable_store.contains(colliding_entity) {
+                            false
+                        } else if pushed_entities.contains(&colliding_entity) {
                             true
                         } else {
                             pushed_entities.insert(colliding_entity.clone());
@@ -322,6 +333,7 @@ where
                                 solid_store,
                                 hitbox_store,
                                 pusher_store,
+                                pushable_store,
                                 pushed_entities,
                             )
                         }
