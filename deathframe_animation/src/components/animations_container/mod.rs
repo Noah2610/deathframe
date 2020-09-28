@@ -19,11 +19,10 @@ pub struct AnimationsContainer<K>
 where
     K: 'static + Hash + Eq + Send + Sync + Clone + Debug,
 {
-    animations:              HashMap<K, Animation>,
-    #[serde(skip)]
-    animation_stack:         Vec<K>,
-    #[serde(skip)]
-    last_finished_animation: Option<K>,
+    animations:               HashMap<K, Animation>,
+    animation_stack:          Vec<K>,
+    last_finished_animation:  Option<K>,
+    pub(crate) should_update: bool,
 }
 
 impl<K> AnimationsContainer<K>
@@ -45,9 +44,13 @@ where
     pub fn play(&mut self, key: K) -> Result<(), String> {
         if self.animations.contains_key(&key) {
             if let Some(base_animation_key) = self.animation_stack.get_mut(0) {
-                *base_animation_key = key;
+                if base_animation_key != &key {
+                    *base_animation_key = key;
+                    self.should_update = true;
+                }
             } else {
                 self.animation_stack.push(key);
+                self.should_update = true;
             }
             self.last_finished_animation = None;
             Ok(())
@@ -76,6 +79,7 @@ where
                 .unwrap_or(true)
             {
                 self.animation_stack.push(key);
+                self.should_update = true;
             }
             self.last_finished_animation = None;
             Ok(())
@@ -100,6 +104,7 @@ where
             .pop()
             .map(|anim| {
                 self.last_finished_animation = Some(anim.clone());
+                self.should_update = true;
                 anim
             })
             .ok_or(String::from(
@@ -156,6 +161,7 @@ where
                 .collect(),
             animation_stack:         Default::default(),
             last_finished_animation: None,
+            should_update:           true,
         }
     }
 }
@@ -169,6 +175,7 @@ where
             animations:              HashMap::new(),
             animation_stack:         Vec::new(),
             last_finished_animation: None,
+            should_update:           true,
         }
     }
 }

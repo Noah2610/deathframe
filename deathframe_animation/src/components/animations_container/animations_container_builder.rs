@@ -43,6 +43,7 @@ where
                 .map(|current| vec![current])
                 .unwrap_or_else(Default::default),
             last_finished_animation: None,
+            should_update:           true,
         })
     }
 }
