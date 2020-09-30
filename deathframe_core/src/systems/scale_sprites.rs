@@ -68,23 +68,26 @@ impl<'s> System<'s> for ScaleSpritesSystem {
                     None
                 }
             } else if let Some(texture_handle) = texture_handle_opt {
-                if let Some(texture) = texture_asset.get(&texture_handle) {
-                    // let texture_size = texture.size();
-                    // let texture_size =
-                    //     texture.image().raw().get_info().kind.get_dimensions();
+                #[cfg(feature = "texture_scaling")]
+                {
+                    if let Some(texture) = texture_asset.get(&texture_handle) {
+                        let texture_size = match texture {
+                            Texture::Vulkan(tex) => {
+                                let extent = tex.image().kind().extent();
+                                (extent.width, extent.height)
+                            }
+                        };
 
-                    let texture_size = match texture {
-                        Texture::Vulkan(tex) => {
-                            let extent = tex.image().kind().extent();
-                            (extent.width, extent.height)
-                        }
-                    };
-
-                    Some([
-                        size.w / texture_size.0 as f32,
-                        size.h / texture_size.1 as f32,
-                    ])
-                } else {
+                        Some([
+                            size.w / texture_size.0 as f32,
+                            size.h / texture_size.1 as f32,
+                        ])
+                    } else {
+                        None
+                    }
+                }
+                #[cfg(not(feature = "texture_scaling"))]
+                {
                     None
                 }
             } else {

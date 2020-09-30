@@ -46,4 +46,6 @@ vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
 empty  = ["core/empty"]
 
+texture_scaling = ["core/texture_scaling"]
+
 debug = ["core/debug", "physics/debug", "animation/debug"]

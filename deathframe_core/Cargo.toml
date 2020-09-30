@@ -26,4 +26,6 @@ vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]
 
+texture_scaling = []
+
 debug = []
