@@ -15,6 +15,7 @@ use crate::collision::tag::CollisionTag;
 use core::amethyst::ecs::world::Index;
 use prelude::*;
 
+#[derive(Clone)]
 pub struct CollisionData<C>
 where
     C: CollisionTag,

@@ -4,13 +4,15 @@ use crate::query::Query;
 use core::amethyst::ecs::world::Index;
 use std::collections::HashMap;
 
-#[derive(Component)]
+#[derive(Component, Deserialize, Clone)]
 #[storage(DenseVecStorage)]
+#[serde(deny_unknown_fields)]
 pub struct Collider<C>
 where
     C: 'static + CollisionTag,
 {
     pub tag:        C,
+    #[serde(skip)]
     pub collisions: HashMap<Index, CollisionData<C>>,
 }
 

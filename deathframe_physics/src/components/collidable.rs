@@ -1,7 +1,8 @@
 use super::component_prelude::*;
 
-#[derive(Component)]
+#[derive(Component, Deserialize, Clone)]
 #[storage(VecStorage)]
+#[serde(deny_unknown_fields)]
 pub struct Collidable<T>
 where
     T: 'static + CollisionTag,
