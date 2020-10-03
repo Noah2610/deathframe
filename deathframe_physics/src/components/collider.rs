@@ -12,7 +12,7 @@ where
     C: 'static + CollisionTag,
 {
     pub tag:        C,
-    #[serde(skip)]
+    #[serde(skip, default = "default_collisions_data")]
     pub collisions: HashMap<Index, CollisionData<C>>,
 }
 
@@ -94,4 +94,11 @@ where
             self.collisions.remove(&id);
         }
     }
+}
+
+fn default_collisions_data<C>() -> HashMap<Index, CollisionData<C>>
+where
+    C: CollisionTag,
+{
+    HashMap::new()
 }
