@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies.amethyst]
-version = "0.15.0"
+version = "0.15.3"
 default-features = false
 features = ["animation", "audio", "renderer"]
 
