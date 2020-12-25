@@ -1,3 +1,5 @@
+use std::iter::IntoIterator;
+
 /// The `ActionQueue` can receive and accumulate actions,
 /// which can then be consumed at some point.
 pub trait ActionQueue {
@@ -9,6 +11,15 @@ pub trait ActionQueue {
     /// Add an `Action` to the action queue.
     fn add_action(&mut self, action: Self::Action) {
         self.mut_actions().push(action);
+    }
+
+    fn add_actions<T>(&mut self, actions: T)
+    where
+        T: IntoIterator<Item = Self::Action>,
+    {
+        actions
+            .into_iter()
+            .for_each(|action| self.add_action(action));
     }
 
     /// Returns a draining iterator over all queued actions.
