@@ -1,4 +1,5 @@
 use super::component_prelude::*;
+use core::components::prelude::Size;
 
 /// A `Hitbox` has one or more `Rect` rects,
 /// which are collision boxes, relative to this entity's `Transform`.
@@ -33,6 +34,20 @@ impl Hitbox {
 impl From<Vec<Rect>> for Hitbox {
     fn from(rects: Vec<Rect>) -> Self {
         Self { rects }
+    }
+}
+
+impl From<Rect> for Hitbox {
+    fn from(rect: Rect) -> Self {
+        Self { rects: vec![rect] }
+    }
+}
+
+impl From<&Size> for Hitbox {
+    fn from(size: &Size) -> Self {
+        Self {
+            rects: vec![Rect::from(size)],
+        }
     }
 }
 
