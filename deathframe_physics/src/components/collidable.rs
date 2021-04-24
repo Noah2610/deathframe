@@ -2,19 +2,19 @@ use super::component_prelude::*;
 
 #[derive(Component, Deserialize, Clone)]
 #[storage(VecStorage)]
-#[serde(deny_unknown_fields)]
-pub struct Collidable<T>
+#[serde(deny_unknown_fields, from = "C")]
+pub struct Collidable<C>
 where
-    T: 'static + CollisionTag,
+    C: 'static + CollisionTag,
 {
-    pub tag: T,
+    pub tag: C,
 }
 
-impl<T> Collidable<T>
+impl<C> Collidable<C>
 where
-    T: 'static + CollisionTag,
+    C: 'static + CollisionTag,
 {
-    pub fn new(tag: T) -> Self {
+    pub fn new(tag: C) -> Self {
         Self { tag }
     }
 }
@@ -25,5 +25,14 @@ where
 {
     fn collision_tag(&self) -> &C {
         &self.tag
+    }
+}
+
+impl<C> From<C> for Collidable<C>
+where
+    C: CollisionTag,
+{
+    fn from(tag: C) -> Self {
+        Self { tag }
     }
 }

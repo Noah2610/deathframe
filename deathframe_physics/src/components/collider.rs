@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 #[derive(Component, Deserialize, Clone)]
 #[storage(DenseVecStorage)]
-#[serde(deny_unknown_fields)]
+#[serde(deny_unknown_fields, from = "C")]
 pub struct Collider<C>
 where
     C: 'static + CollisionTag,
@@ -92,6 +92,18 @@ where
         }
         for id in to_remove {
             self.collisions.remove(&id);
+        }
+    }
+}
+
+impl<C> From<C> for Collider<C>
+where
+    C: CollisionTag,
+{
+    fn from(tag: C) -> Self {
+        Self {
+            tag,
+            collisions: default_collisions_data(),
         }
     }
 }
