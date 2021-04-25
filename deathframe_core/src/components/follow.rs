@@ -9,6 +9,7 @@ pub struct Follow {
     pub(crate) to_follow: Entity,
     pub(crate) priority:  i32,
     pub(crate) offset:    (f32, f32),
+    pub(crate) only_axis: Option<Axis>,
 }
 
 impl Follow {
@@ -18,6 +19,7 @@ impl Follow {
             to_follow,
             priority: 0,
             offset: (0.0, 0.0),
+            only_axis: None,
         }
     }
 
@@ -34,6 +36,19 @@ impl Follow {
     /// So this entity follows the followed entity with an offset.
     pub fn with_offset(mut self, offset: (f32, f32)) -> Self {
         self.offset = offset;
+        self
+    }
+
+    /// Only follow entity on the given axis, instead of on both axes.
+    pub fn with_only_axis(mut self, only_axis: Axis) -> Self {
+        self.only_axis = Some(only_axis);
+        self
+    }
+
+    /// Follow entity on both axes (default).
+    /// This function only exists to undo `.with_only_axis`.
+    pub fn with_both_axes(mut self) -> Self {
+        self.only_axis = None;
         self
     }
 }

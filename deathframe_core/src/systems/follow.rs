@@ -27,10 +27,22 @@ impl<'a> System<'a> for FollowSystem {
                 if let Some(follower_transform) =
                     transforms.get_mut(follower_entity)
                 {
-                    follower_transform
-                        .set_translation_x(followed_pos.0 + follower.offset.0);
-                    follower_transform
-                        .set_translation_y(followed_pos.1 + follower.offset.1);
+                    let new_pos = (
+                        followed_pos.0 + follower.offset.0,
+                        followed_pos.1 + follower.offset.1,
+                    );
+                    match follower.only_axis.as_ref() {
+                        None => {
+                            follower_transform.set_translation_x(new_pos.0);
+                            follower_transform.set_translation_y(new_pos.1);
+                        }
+                        Some(Axis::X) => {
+                            follower_transform.set_translation_x(new_pos.0);
+                        }
+                        Some(Axis::Y) => {
+                            follower_transform.set_translation_y(new_pos.1);
+                        }
+                    }
                 }
             }
         }
