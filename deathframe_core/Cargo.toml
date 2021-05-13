@@ -8,7 +8,8 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies.amethyst]
-version = "0.15.3"
+path = "../../amethyst"
+# version = "0.15.3"
 default-features = false
 features = ["animation", "audio", "renderer"]
 
@@ -22,6 +23,7 @@ version = "0.9.0"
 [features]
 default = []
 
+gl     = ["amethyst/gl"]
 vulkan = ["amethyst/vulkan"]
 metal  = ["amethyst/metal"]
 empty  = ["amethyst/empty"]

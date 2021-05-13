@@ -42,6 +42,7 @@ optional = true
 [features]
 default = ["physics", "animation", "audio"]
 
+gl     = ["core/gl"]
 vulkan = ["core/vulkan"]
 metal  = ["core/metal"]
 empty  = ["core/empty"]

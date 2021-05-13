@@ -41,7 +41,7 @@ where
         WriteStorage<'a, SoundPlayer<K>>,
         Read<'a, Sounds<K>>,
         Read<'a, AssetStorage<Source>>,
-        Read<'a, AudioOutput>,
+        Read<'a, Option<AudioOutput>>,
     );
 
     fn run(
@@ -51,41 +51,43 @@ where
             mut sound_player_store,
             sounds,
             asset_storage,
-            audio_output,
+            audio_output_opt,
         ): Self::SystemData,
     ) {
-        let handle_sound_player_actions =
-            |sound_player: &mut SoundPlayer<K>| {
-                for action in sound_player.drain_actions() {
-                    match action {
-                        SoundAction::Play(sound_key) => {
-                            play_sound(
-                                &sounds,
-                                &asset_storage,
-                                &audio_output,
-                                &sound_key,
-                                self.default_volume,
-                            );
-                        }
-                        SoundAction::PlayWithVolume(sound_key, volume) => {
-                            play_sound(
-                                &sounds,
-                                &asset_storage,
-                                &audio_output,
-                                &sound_key,
-                                volume,
-                            );
+        if let Some(audio_output) = &*audio_output_opt {
+            let handle_sound_player_actions =
+                |sound_player: &mut SoundPlayer<K>| {
+                    for action in sound_player.drain_actions() {
+                        match action {
+                            SoundAction::Play(sound_key) => {
+                                play_sound(
+                                    &sounds,
+                                    &asset_storage,
+                                    &audio_output,
+                                    &sound_key,
+                                    self.default_volume,
+                                );
+                            }
+                            SoundAction::PlayWithVolume(sound_key, volume) => {
+                                play_sound(
+                                    &sounds,
+                                    &asset_storage,
+                                    &audio_output,
+                                    &sound_key,
+                                    volume,
+                                );
+                            }
                         }
                     }
-                }
-            };
+                };
 
-        if let Some(mut sound_player) = sound_player_res {
-            handle_sound_player_actions(&mut sound_player);
-        }
+            if let Some(mut sound_player) = sound_player_res {
+                handle_sound_player_actions(&mut sound_player);
+            }
 
-        for sound_player in (&mut sound_player_store).join() {
-            handle_sound_player_actions(sound_player);
+            for sound_player in (&mut sound_player_store).join() {
+                handle_sound_player_actions(sound_player);
+            }
         }
     }
 }
