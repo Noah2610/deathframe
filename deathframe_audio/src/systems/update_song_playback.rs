@@ -21,53 +21,49 @@ where
     type SystemData = (
         Write<'a, Songs<K>>,
         Read<'a, AssetStorage<Source>>,
-        Read<'a, Option<Output>>,
+        ReadExpect<'a, Output>,
     );
 
     fn run(
         &mut self,
-        (mut songs, source_asset_store, output_opt): Self::SystemData,
+        (mut songs, source_asset_store, output): Self::SystemData,
     ) {
-        if let Some(output) = &*output_opt {
-            for song in songs.songs.values_mut() {
-                if let Some(audio_sink_action) = song.audio_sink_action.take() {
-                    match audio_sink_action {
-                        AudioSinkAction::Play => {
-                            if let Some(source) =
-                                source_asset_store.get(&song.source)
-                            {
-                                song.audio_sink.stop();
-                                song.audio_sink = AudioSink::new(&output);
-                                song.audio_sink.set_volume(song.volume);
-                                if let Err(e) = song.audio_sink.append(source) {
-                                    eprintln!(
-                                        "[WARNING]\n[deathframe::audio::\
-                                         systems::prelude::\
-                                         UpdateSongPlaybackSystem]\n    \
-                                         Cannot append `Source` to \
-                                         `AudioSink`\n{}",
-                                        e
-                                    );
-                                };
-                            } else {
+        for song in songs.songs.values_mut() {
+            if let Some(audio_sink_action) = song.audio_sink_action.take() {
+                match audio_sink_action {
+                    AudioSinkAction::Play => {
+                        if let Some(source) =
+                            source_asset_store.get(&song.source)
+                        {
+                            song.audio_sink.stop();
+                            song.audio_sink = AudioSink::new(&output);
+                            song.audio_sink.set_volume(song.volume);
+                            if let Err(e) = song.audio_sink.append(source) {
                                 eprintln!(
                                     "[WARNING]\n[deathframe::audio::systems::\
                                      prelude::UpdateSongPlaybackSystem]\n    \
-                                     Couldn't get audio `Source` from \
-                                     `SourceHandle` for `Song`"
+                                     Cannot append `Source` to `AudioSink`\n{}",
+                                    e
                                 );
-                            }
+                            };
+                        } else {
+                            eprintln!(
+                                "[WARNING]\n[deathframe::audio::systems::\
+                                 prelude::UpdateSongPlaybackSystem]\n    \
+                                 Couldn't get audio `Source` from \
+                                 `SourceHandle` for `Song`"
+                            );
                         }
-
-                        AudioSinkAction::Stop => {
-                            song.audio_sink.stop();
-                            song.audio_sink = AudioSink::new(&output);
-                        }
-
-                        AudioSinkAction::Pause => song.audio_sink.pause(),
-
-                        AudioSinkAction::Resume => song.audio_sink.play(),
                     }
+
+                    AudioSinkAction::Stop => {
+                        song.audio_sink.stop();
+                        song.audio_sink = AudioSink::new(&output);
+                    }
+
+                    AudioSinkAction::Pause => song.audio_sink.pause(),
+
+                    AudioSinkAction::Resume => song.audio_sink.play(),
                 }
             }
         }
