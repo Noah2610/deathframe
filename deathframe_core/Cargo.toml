@@ -8,8 +8,9 @@ license = "MIT"
 repository = "https://github.com/Noah2610/deathframe"
 
 [dependencies.amethyst]
-path = "../../amethyst"
-# version = "0.15.3"
+version = "0.15.3"
+git = "https://github.com/Noah2610/amethyst"
+branch = "gl-hack"
 default-features = false
 features = ["animation", "audio", "renderer"]
 
